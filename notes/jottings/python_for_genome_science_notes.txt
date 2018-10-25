@@ -1,0 +1,67 @@
+
+### Some notes on biopython
+
+- Seems to be great for scraping NCBI
+- Maybe use the genbank file file parsing, because writing parsers for that may take
+some time.
+- Has a random shuffle function. if im looking for features, and want to know if they
+appear by chance, then shuffling the genome would be very useful
+- fastQ quality trimming uses a generator as to not put the whole file in memory
+- my scripts (non biopython, with the file class) pull everything into memory
+- looks like there is lots of things for dealing with aligments, like genearting score
+matrices.
+
+### OPP notes
+- capatalize class names
+- self is the variable that will be replaced by the name of of particular instance
+- self... are simply variables (attributes) that the class calls for the creation of. can be set to none, or something empty?
+- the functions in the class set the attributes at the end of the function
+- it seems like you can return variables, but they don't need to be attributes. then i guess you just organize functions, that are called as part of a class?
+- no setters?
+
+### in terms of doing data, i am definitely missing linear algebra. blue brown video.
+
+
+
+
+
+importing data
+
+import sys
+print(sys.arg)
+
+in the script
+import sys
+filename=sys.argv[1]
+
+then open the file
+
+
+arguments to a script
+
+def usage(): -print out a long message
+	"""
+
+	"""
+
+i should look up standard syntax for usage message
+
+import sys
+import getopt
+def usage():
+
+o, a = getopt.getopt(sys.argv[1:], 'l:h')
+opts = {}
+
+
+calling external programs
+
+call()
+
+import subprocess
+subprocess.call(['blastn', 'arg2'])
+
+
+from Bio.Blast import NCBIWWW
+
+help(NCBI.qblast)

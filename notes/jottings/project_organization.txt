@@ -1,0 +1,17 @@
+- Someone unfamiliar with your project should be able to look at your computer files and understand in detail what you did and why. 
+- subdirectories in results and data should simply be dates
+- computational lab notebook in results directory
+- record every operation in a README
+- avoid editing intermediate files by hand
+- store all files and directory locations in the drivers script / readme
+(i should fix my sripts to conform with this, it makes sense)
+- use relative path names (starting form the projects directory), so that the project works on other peoples computers
+
+four categories of scripts:
+	- driver script, top level, one or scripts of this type
+	- single use script, in the same directory as the driver that calls it
+	- project script (generic functionaliry, usually in a directory one below project called bin, for example)
+	- multiproject script
+
+
+Workflow manager?

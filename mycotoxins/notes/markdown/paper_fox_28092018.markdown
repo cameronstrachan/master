@@ -1,0 +1,21 @@
+|paper|Secondary metabolism:regulation and role in in fungal biology|28-09-2018
+|---|---|---|
+
+## Summary
+
+* The role of secondary metabolites in fungi remains a mystery.
+* Many of the fungi live saprophytically in soil.
+* Speculate that the metabolites protect against other inhabitants in their ecologial niche. 
+* Summarizes some of the regulatory factors invovled in the expression of various secondary metabolites.
+
+### Notes
+
+* Aflotoxin and fumonisins are polyketides (many mycotoxins are polyketides)
+* Sirodesmin, peramine and siderophores are non-ribosomal peptides
+* T-2 toxin and deoxynivalenol (DON) are terpenes.
+
+* Many genes times the biosynthetic cultures are expressed at such low levels that it is hard to detect the product under standard culture conditions.
+* Compounds invovled in iron uptake (siderophores) are often involved in virulence.
+* Say that the compounds protect against amoebae, nematodes and other invertebrates, for example.
+
+[paper link](https://www.sciencedirect.com/science/article/pii/S1369527408001446?via%3Dihub)

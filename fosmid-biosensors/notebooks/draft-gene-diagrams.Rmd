@@ -1,0 +1,334 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(stringi)
+library(ggplot2)
+library(gggenes)
+library(printr)
+library(knitr)
+```
+
+
+## Gene Diagrams and Annotations for Selected Biosensors
+  
+* Each page starts with a gene diagram, which represents an individual clone  
+* Each gene diagram shows an unique contig  
+* All ORFs were annotated using the complete RefSeq database  
+  + ORFs that were annotated to genes in the PCC1 fosmid are coloured in red  
+  + ORFs that were annotated to genes in the transposon are coloured in green  
+* A red curved line is showing where the sequence mapped to PCC1 at the DNA level  
+* A green curved line is showing where the sequence mapped to the transposon at the DNA level  
+* A table with the annotations for the non PCC1 or transposon genes is below the gene diagram 
+
+\newpage
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+plasmid <- c("MULTISPECIES: type A-1 chloramphenicol O-acetyltransferase ", "MULTISPECIES: replication initiation protein ", "MULTISPECIES: protein SopA", "MULTISPECIES: protein SopB ", "ParB/RepB/Spo0J family plasmid partition protein ", "ParB/RepB/Spo0J family plasmid partition protein, partial ", "MULTISPECIES: resolvase ","MULTISPECIES: protein SopA ")
+
+transposon <- c("MULTISPECIES: ANT(3'')-Ia family aminoglycoside nucleotidyltransferase AadA1 ", "MULTISPECIES: tetracycline efflux MFS transporter Tet(C) ", "AadA family aminoglycoside 3''-O-nucleotidyltransferase, partial ", "MULTISPECIES: hypothetical protein ")
+
+gfp <- c("MULTISPECIES: green fluorescent protein ")
+
+df <- read.csv("../dataflow/03-blast-tables/single_fosmids_refseq_prot.csv") %>%
+  separate(header, into = c("header", "start", "stop", "strand",  "prodigal_info"), sep = "#") %>%
+  rename(id = X) %>%
+  rowwise() %>%
+  mutate(gene_number = stri_reverse(stri_split_fixed(stri_reverse(id),"_",n = 2)[[1]][1])) %>%
+  mutate(clone_contig = stri_reverse(stri_split_fixed(stri_reverse(id),"_",n = 2)[[1]][2])) %>%
+  mutate(start_dir = ifelse(strand == " 1 ", start, stop)) %>%
+  mutate(stop_dir = ifelse(strand == " 1 ", stop, start)) %>%
+  mutate(taxa = sub("\\].*", "", sub(".*\\[", "", sseq_description))) %>%
+  mutate(annotation_clean = stri_split_fixed(sseq_description,"[",n = 2)[[1]][1]) %>%
+  mutate(gene_colour = ifelse(annotation_clean %in% gfp, "gfp", 
+                       ifelse(annotation_clean %in% plasmid, "plasmid",
+                       ifelse(annotation_clean %in% transposon, "transposon", "other")))) %>%
+  separate(clone_contig, into=c("clone", "contig"), sep = "_seq", remove = FALSE) %>%
+  unite(gene_label, c("gene_number", "gene_colour"), sep = ": ", remove = FALSE)
+
+
+df$gene_number <- as.factor(as.numeric(df$gene_number))
+df$start_dir <- as.numeric(df$start_dir)
+df$stop_dir <- as.numeric(df$stop_dir)
+df$contig <- as.character(as.numeric(df$contig))
+
+
+
+files <- list.files("../dataflow/03-blast-tables")
+pcc1_transposon_files <- files[grep("_pcc1_transposon_nucl", files)]
+df_trans_list <- list()
+l <- 1
+
+for (file in pcc1_transposon_files){
+  df_trans <- read.table(paste("../dataflow/03-blast-tables/", file, sep = ""), header = FALSE, )
+  df_trans_list[[l]] <- df_trans
+  l <- l+1
+}
+
+df_trans <- bind_rows(df_trans_list)
+
+colnames(df_trans) <- c("clone_contig", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length")
+
+df_trans <- df_trans %>%
+  filter(length > 500) %>%
+  select(clone_contig, sseqid, qstart, qend)
+
+
+
+
+
+clone_dfs <- list()
+i <- 1
+
+for (clone_id in unique(df$clone)){
+  clone_df <- df %>%
+    filter(clone == clone_id) %>%
+    inner_join(df_trans)
+  clone_dfs[[i]] <- clone_df
+  i <- i+1
+}
+```
+
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+transposon = "green"
+plasmid = "violetred2"
+other = "yellow1"
+gfp = "lightgreen"
+
+c2 <- c(transposon, plasmid, other, gfp)
+names(c2) <- c("transposon", "plasmid", "other", "gfp")
+
+
+transposon2 = "darkgreen"
+plasmid2 = "red4"
+
+c3 <- c(transposon2, plasmid2)
+names(c3) <- c("transposon_b0032_gemini_aada_tet", "pcc1fos")
+```
+
+
+
+
+```{r, echo=FALSE, results = "asis", fig.height=2, fig.width=20}
+for (j in 1:59) {
+  
+  data_to_plot <- clone_dfs[[j]]
+  
+  for (con in unique(data_to_plot$contig)){
+  contig_to_plot <- data_to_plot %>%
+      filter(contig == con)
+    
+  plot(ggplot2::ggplot(contig_to_plot, ggplot2::aes(xmin = start_dir, xmax = stop_dir, y =
+                                            contig, fill = gene_colour, label = gene_number)) +
+  geom_gene_arrow(arrowhead_height = unit(15, "mm"), arrowhead_width = unit(3, "mm"), arrow_body_height = unit(15, "mm")) +
+  geom_gene_label(align = "center", height = grid::unit(15, "mm"), padding.x = grid::unit(0, "mm"),
+padding.y = grid::unit(0, "lines")) +
+  ggplot2::facet_wrap(. ~ contig, scales = "free", ncol = 1) +
+  theme_genes() +
+  ggplot2::scale_fill_manual(values=c2) +
+  ggtitle(paste(unique(data_to_plot$clone), " contig ", con)) +
+  theme(plot.title = element_text(size = 30, face = "bold")) +
+ geom_curve(aes(x = qstart, y = 1, xend = qend, yend = 1, colour = sseqid), curvature = 0.1, size = 2) +
+  scale_colour_manual(values=c3) +
+  theme(legend.direction = "vertical", 
+        legend.position = "right",
+        legend.box = "horizontal"
+        ))
+  }
+  
+  cat("\n\n\n")
+  
+  table <- data_to_plot %>%
+    filter(gene_colour == "other") %>%
+    mutate(annotation = substr(annotation_clean, 1, 50)) %>%
+    mutate(taxa = substr(taxa, 1, 25)) %>%
+    select(gene_number, contig, annotation, taxa) %>%
+    rename(gene = gene_number) %>%
+    distinct()
+  
+  table <- as.data.frame(table)
+  
+  print(kable(table, caption = paste(unique(contig_to_plot$clone))))
+  
+  cat("\n\n\\pagebreak\n")
+  
+}
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=2, fig.width=15}
+# ggplot2::ggplot(clone_dfs[[1]], ggplot2::aes(xmin = start_dir, xmax = stop_dir, y =
+#                                             contig, fill = gene_colour, label = gene_label)) +
+#   geom_gene_arrow(arrowhead_height = unit(3, "mm"), arrowhead_width = unit(1, "mm")) +
+#   geom_gene_label(align = "center") +
+#   ggplot2::facet_wrap(~ contig, scales = "free", ncol = 1) +
+#   ggplot2::scale_fill_brewer(palette = "Set3") +
+#   theme_genes()
+# 
+# clone_dfs[[1]] %>%
+#   filter(gene_colour == "other") %>%
+#   rename(annotation = annotation_clean) %>%
+#   select(gene_number, annotation_clean, taxa, percent_identity)
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=10}
+# dummies <- make_alignment_dummies(
+#   df,
+#   ggplot2::aes(xmin = start_dir, xmax = stop_dir, y = clone, id = gene_colour),
+#   on = "gene_colour"
+# )
+
+# ggplot2::ggplot(df, ggplot2::aes(xmin = start_dir, xmax = stop_dir, y =
+#                                             clone, fill = gene_colour)) +
+#   geom_gene_arrow() +
+#   ggplot2::geom_blank(data = dummies) +
+#   ggplot2::facet_wrap(~ clone, scales = "free", ncol = 1) +
+#   ggplot2::scale_fill_brewer(palette = "Set3") +
+#   theme_genes()
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=20, fig.width=15}
+# ggplot2::ggplot(df, ggplot2::aes(xmin = start_dir, xmax = stop_dir, y =
+#                                             clone, fill = gene_colour, label = gene_colour)) +
+#   geom_gene_arrow(arrowhead_height = unit(3, "mm"), arrowhead_width = unit(1, "mm")) +
+#   geom_gene_label(align = "center") +
+#   #ggplot2::geom_blank(data = dummies) +
+#   ggplot2::facet_wrap(~ clone, scales = "free", ncol = 1) +
+#   ggplot2::scale_fill_brewer(palette = "Set3") +
+#   theme_genes()
+```
+
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=10}
+# ggplot2::ggplot(df, ggplot2::aes(xmin = start_dir, xmax = stop_dir, y =
+#                                             clone, fill = gene_number)) +
+#   geom_gene_arrow() +
+#   ggplot2::facet_wrap(~ clone, scales = "free", ncol = 1) +
+#   #ggplot2::scale_fill_brewer(palette = "Set3") +
+#   theme_genes()
+```
+
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=10}
+# ggplot2::ggplot(example_genes, ggplot2::aes(xmin = start, xmax = end, y =
+#                                             molecule, fill = gene)) +
+#   geom_gene_arrow() +
+#   ggplot2::facet_wrap(~ molecule, scales = "free", ncol = 1) +
+#   ggplot2::scale_fill_brewer(palette = "Set3") +
+#   theme_genes()
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=10}
+# dummies <- make_alignment_dummies(
+#   example_genes,
+#   ggplot2::aes(xmin = start, xmax = end, y = molecule, id = gene),
+#   on = "genE"
+# )
+# 
+# ggplot2::ggplot(example_genes, ggplot2::aes(xmin = start, xmax = end, y =
+#                                             molecule, fill = gene)) +
+#   geom_gene_arrow() +
+#   ggplot2::geom_blank(data = dummies) +
+#   ggplot2::facet_wrap(~ molecule, scales = "free", ncol = 1) +
+#   ggplot2::scale_fill_brewer(palette = "Set3") +
+#   theme_genes()
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=10}
+# ggplot2::ggplot(example_genes, ggplot2::aes(xmin = start, xmax = end, y =
+#                                             molecule, fill = gene, label = gene)) +
+#   geom_gene_arrow(arrowhead_height = unit(3, "mm"), arrowhead_width = unit(1, "mm")) +
+#   geom_gene_label(align = "left") +
+#   ggplot2::geom_blank(data = dummies) +
+#   ggplot2::facet_wrap(~ molecule, scales = "free", ncol = 1) +
+#   ggplot2::scale_fill_brewer(palette = "Set3") +
+#   theme_genes()
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# df <- read_table2("~/Desktop/test/blast/single_pesticide_clones_assembly.faa", col_names = FALSE)
+# df_header <- df[complete.cases(df), c(1,3,5,7)]
+# colnames(df_header) <- c("header", "start", "stop", "direction")
+# 
+# df_clean <- df_header %>%
+#   rowwise() %>%
+#   mutate(gene_number = stri_reverse(stri_split_fixed(stri_reverse(header),"_",n = 2)[[1]][1])) %>%
+#   mutate(clone = stri_split_fixed(stri_reverse(stri_split_fixed(stri_reverse(header),"_",n = 6)[[1]][6]), "_", n=2)[[1]][2]) %>%
+#   mutate(length = stri_reverse(stri_split_fixed(stri_reverse(header),"_",n = 4)[[1]][3])) %>%
+#   select(-header)
+# 
+# df2 <- read_delim("~/Desktop/test/blast/single_fosmids_prot_ref_genomes_mapped", "\t", escape_double = FALSE, col_names = FALSE, trim_ws = TRUE)
+# df_annotations <- df2[,c(1,2)]
+# colnames(df_annotations) <- c("header", "annotation")
+# 
+# df_annotation_clean <- df_annotations %>%
+#   rowwise() %>%
+#   mutate(gene_number = stri_reverse(stri_split_fixed(stri_reverse(header),"_",n = 2)[[1]][1])) %>%
+#   mutate(clone = stri_split_fixed(stri_reverse(stri_split_fixed(stri_reverse(header),"_",n = 6)[[1]][6]), "_", n=2)[[1]][2]) %>%
+#   mutate(length = stri_reverse(stri_split_fixed(stri_reverse(header),"_",n = 4)[[1]][3])) %>%
+#   select(-header) %>%
+#   mutate(taxa = sub("\\].*", "", sub(".*\\[", "", annotation))) %>%
+#   mutate(annotation_clean = stri_split_fixed(annotation,"_",n = 3)[[1]][3]) %>%
+#   mutate(annotation_clean = stri_reverse(stri_split_fixed(stri_reverse(annotation_clean),"[",n = 2)[[1]][2]))
+#   
+# df_annotation_clean$annotation_clean <- gsub("_", " ", df_annotation_clean$annotation_clean)
+# df_annotation_clean$taxa <- gsub("_", " ", df_annotation_clean$taxa)
+# 
+# df_annotation_clean$annotation_clean <- trimws(df_annotation_clean$annotation_clean, which = c("both"))
+# df_annotation_clean$taxa <- trimws(df_annotation_clean$taxa, which = c("both"))
+# 
+# df_final <- full_join(df_clean, df_annotation_clean) %>%
+#   select(-annotation) %>%
+#   mutate(plasmid_insert = ifelse(annotation_clean == "MULTISPECIES: plasmid-partitioning protein SopA" |
+#                                  annotation_clean == "MULTISPECIES: replication initiation protein RepE" |
+#                                  annotation_clean == "MULTISPECIES: phage integrase family protein" |
+#                                  annotation_clean == "MULTISPECIES: type A-1 chloramphenicol O-acetyltransferase [Bacteria]" |
+#                                  annotation_clean == "MULTISPECIES: beta-galactosidase" |
+#                                  annotation_clean == "MULTISPECIES: plasmid partitioning protein", "plasmid", 
+#                            ifelse(annotation_clean == "MULTISPECIES: ANT(3'')-Ia family aminoglycoside nucleotidyltransferase AadA1" |
+#                                   annotation_clean == "MULTISPECIES: tetracycline efflux MFS transporter Tet(C)" |
+#                                   taxa == "Pseudoalteromonas luteoviolacea", "insert", "other"))) %>%
+#   mutate(set = ifelse(clone == "o_1_g12" | 
+#                       clone == "o_2_b4" |
+#                       clone == "0_1_e03", "set1",
+#                       
+#                ifelse(clone == "25_e01" | 
+#                       clone == "25_e03", "set2", clone))) %>%
+#   mutate(start_dir = ifelse(direction == 1, start, stop)) %>%
+#   mutate(stop_dir = ifelse(direction == 1, stop, start))
+# 
+# df_final$set <- as.character(df_final$set)
+# 
+# 
+# datalist_plots_gfp = list()
+# i <- 1
+# 
+# for (goat in unique(df_final$set)) {
+#   
+#   p_df <- subset(df_final, set == goat)
+#   p2 <- ggplot() + geom_segment(data=p_df, aes(x = start_dir, xend = stop_dir, y = set, yend = set, color=plasmid_insert, size=0.5), arrow = arrow()) +
+#     facet_grid(clone ~ .)
+#   
+#   datalist_plots_gfp[[i]] <- plot_grid(p2, ncol = 1)
+#   i <- i + 1
+# } 
+```
+
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=4, fig.width=20}
+# for (i in 1:length(datalist_plots_gfp)) {
+#   plot(datalist_plots_gfp[[i]])
+#   cat("\r\n\r\n")
+# }
+```
