@@ -38,3 +38,36 @@ if runqiime == 'y':
 	subprocess.call('/Users/cameronstrachan/master/bash/qiime_export.sh')
 	os.rename('dataflow/03-asv-seqs/dna-sequences.fasta', 'dataflow/03-asv-seqs/wetzels2017.fasta')
 	os.rename('dataflow/03-asv-table/feature-table.txt', 'dataflow/03-asv-table/wetzels2017.txt')
+
+
+### DOWNLOAD GENOMES AND MAKE FASTA FILES
+
+downloadgenomes = input("\n" + "Download complete bacteroides ovatus genomes? (y or n):")
+
+if downloadgenomes == 'y':
+
+	gb_dir = 'dataflow/01-gb/'
+	ss.ncbigenomescrape('bacteroides ovatus', location=gb_dir)
+	gb_prot_out = 'dataflow/01-prot/'
+	gb_nucl_out = 'dataflow/01-nucl/'
+	extention_add = '_genbank.fasta'
+
+	files = [f for f in os.listdir(gb_dir) if f.endswith(".gb")]
+
+	for file in files:
+		file_obj = sc.GenBank(file, gb_dir)
+		# output location
+		file_obj.setOutputLocation(gb_prot_out)
+
+		# output name
+		file_out = file.split('.g')[0] + extention_add
+		file_obj.setOutputName(file_out)
+
+		# run genbank to prot
+		file_obj.genbank2protfasta()
+
+		# output location
+		file_obj.setOutputLocation(gb_nucl_out)
+
+		# run genbank to prot
+		file_obj.genbank2nuclfasta()
