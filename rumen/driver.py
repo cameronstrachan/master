@@ -36,8 +36,12 @@ runqiime = input("\n" + "Run Qiime on data from Wetzels et al. 2017? (y or n):")
 if runqiime == 'y':
 	subprocess.call('/Users/cameronstrachan/master/bash/run_qiime.sh')
 	subprocess.call('/Users/cameronstrachan/master/bash/qiime_export.sh')
-	os.rename('dataflow/03-asv-seqs/dna-sequences.fasta', 'dataflow/03-asv-seqs/wetzels2017.fasta')
-	os.rename('dataflow/03-asv-table/feature-table.txt', 'dataflow/03-asv-table/wetzels2017.txt')
+	os.rename('dataflow/03-asv-seqs/dna-sequences-100.fasta', 'dataflow/03-asv-seqs/wetzels2017-100.fasta')
+	os.rename('dataflow/03-asv-seqs/dna-sequences-99.fasta', 'dataflow/03-asv-seqs/wetzels2017-99.fasta')
+	os.rename('dataflow/03-asv-seqs/dna-sequences-97.fasta', 'dataflow/03-asv-seqs/wetzels2017-97.fasta')
+	os.rename('dataflow/03-asv-table/feature-table-100.txt', 'dataflow/03-asv-table/wetzels2017-100.txt')
+	os.rename('dataflow/03-asv-table/feature-table-99.txt', 'dataflow/03-asv-table/wetzels2017-99.txt')
+	os.rename('dataflow/03-asv-table/feature-table-97.txt', 'dataflow/03-asv-table/wetzels2017-97.txt')
 
 
 ### DOWNLOAD GENOMES AND MAKE FASTA FILES

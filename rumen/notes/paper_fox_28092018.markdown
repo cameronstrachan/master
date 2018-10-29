@@ -1,11 +1,11 @@
-|paper|Secondary metabolism:regulation and role in in fungal biology|28-09-2018
+|paper|Secondary metabolism:regulation and role in in fungal biology|28-09-2018|
 |---|---|---|
 
 ## Summary
 
 * The role of secondary metabolites in fungi remains a mystery.
 * Many of the fungi live saprophytically in soil.
-* Speculate that the metabolites protect against other inhabitants in their ecologial niche. 
+* Speculate that the metabolites protect against other inhabitants in their ecologial niche.
 * Summarizes some of the regulatory factors invovled in the expression of various secondary metabolites.
 
 ### Notes
