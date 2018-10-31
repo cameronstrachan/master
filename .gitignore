@@ -41,6 +41,7 @@ Thumbs.db
 
 *.fasta
 *.fastq
+*.fa
 *.nhr
 *.nin
 *.nsq
