@@ -1,0 +1,308 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(printr)
+library(ggplot2)
+library(cowplot)
+library(printr)
+library(reshape2)
+library(knitr)
+library(pwr)
+library("ggpubr")
+library(cluster)
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+one_way_anova_extract <- function(df, value = 1, y = "NA", factor1 = "NA"){
+
+  
+  df <- as.data.frame(df)
+  # rename the columns to generalize the method
+  colnames(df)[which(names(df) == y)] <- "dependant"
+  colnames(df)[which(names(df) == factor1)] <- "category1"
+
+  res.aov <- lm(dependant ~ category1, data = df)
+  sum <- anova(res.aov)
+  
+  # extract p value
+  pvalue <- sum$"Pr(>F)"[1]
+  
+  # only return p value for now 
+  return(pvalue)
+}
+
+```
+
+
+## plot of sequence quality
+
+- Plotting the median phred quality score from the sequencing. I typically find that you don't want to go below a quality score of 35, which presents somewhere between 99.9 and 99.99% accuracy.  
+- The is a massive drop in quality at the end of the sequence, so I will trim from 6 to 166 basepairs.
+
+\vspace{12pt}
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=20, fig.height=5}
+quality_qiime <- read.csv("~/master/rumen/dataflow/02-qiime/reddy2018-seq-quality-summary.csv", header=FALSE)
+quality_qiime <- as.data.frame(t(quality_qiime))
+
+quality_qiime[, ] <- lapply(quality_qiime[, ], as.character)
+
+
+quality_qiime[1,] <- gsub("\\%", "", quality_qiime[1,])
+
+colnames(quality_qiime) <- quality_qiime[1,]
+
+quality_qiime <- quality_qiime[-1,]
+
+colnames(quality_qiime)[1] <- "position"
+
+quality_qiime$'50' <- as.numeric(quality_qiime$'50')
+
+xbreaks <- quality_qiime$position[seq(1, length(quality_qiime$position), 10)]
+
+qplot(quality_qiime$position, quality_qiime$'50') + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 18),
+        axis.text.y = element_text(size = 18), 
+        axis.title.x = element_text(size = 25), 
+        axis.title.y = element_text(size = 25)) +
+  scale_x_discrete("Position",  breaks = xbreaks) +
+  ylab("Median Quality Score")
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_meta <- read.csv("~/master/rumen/dataflow/00-meta/reddy2018_fastq.csv")
+df_classification <- read.csv("~/master/rumen/dataflow/03-asv-taxonomy/reddy2018-6_166-100-rdp.csv")
+df_classification[,1] <- NULL
+
+df_100 <- read.delim("~/master/rumen/dataflow/03-asv-table/reddy2018-6_166-100.txt", skip = 1, header = TRUE)
+df_100$clustering <- 100
+
+df_99 <- read.delim("~/master/rumen/dataflow/03-asv-table/reddy2018-6_166-99.txt", skip = 1, header = TRUE)
+df_99$clustering <- 99
+
+df_97 <- read.delim("~/master/rumen/dataflow/03-asv-table/reddy2018-6_166-97.txt", skip = 1, header = TRUE)
+df_97$clustering <- 97
+
+df <- bind_rows(df_100, df_99, df_97)
+
+colnames(df)[1] <- 'asv_id'
+
+col_to_gather <- names(df)[!startsWith(names(df), "L")]
+df <- melt(df, id = col_to_gather)
+colnames(df)[3:4] <- c('sra_accession', 'count')
+
+df_normalization <- df %>%
+  filter(clustering == 100) %>%
+  group_by(sra_accession) %>%
+  mutate(total_16s_reads = sum(count)) %>%
+  ungroup() %>%
+  select(sra_accession, total_16s_reads) %>%
+  ungroup() %>%
+  distinct() 
+
+
+df_classification <- df_classification %>%
+  select(asv_id, phylum, family, genus)
+
+
+df_complete <- inner_join(df, df_meta) %>%
+  inner_join(df_normalization) %>%
+  inner_join(df_classification)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_metrics <- df_complete %>% 
+  
+  filter(count > 0) %>%
+  
+  mutate(count_norm = (count / total_16s_reads)*100) %>%
+  
+  group_by(asv_id, clustering, treatment) %>%
+  mutate(med_count_norm = median(count_norm)) %>%
+  mutate(sd_count_norm = sd(count_norm)) %>%
+  mutate(cv_count_norm =  (sd(count_norm) / mean(count_norm))*100) %>%
+  mutate(n_count = length(count_norm)) %>%
+  ungroup() %>%
+  
+  filter(n_count == 3 | n_count == 4 | n_count == 5) %>%
+  
+  group_by(asv_id, clustering) %>%
+  mutate(ntreatment = length(unique(treatment))) %>%
+  ungroup() %>%
+  
+  filter(ntreatment == 3) %>%
+  
+  unite(classification, c("phylum", "family", "genus"), sep = ";")
+
+df_metrics$classification <- gsub(";NA", "", df_metrics$classification)
+
+```
+
+## data clean up
+
+- Data with no counts for a sequence were removed.  
+- Data without triplicates remaining were also removed.  
+- Data without all 3 treatments were removed.  
+
+## plot of approximate abundances
+
+- Percent of the sample reaches up to 4%. 
+- A good percentage of the data lies between 0.5 and 3%. 
+
+\vspace{12pt}
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.height=3}
+df_abundance <- df_metrics %>%
+  select(asv_id, clustering, med_count_norm) %>%
+  unique() %>%
+  arrange(med_count_norm)
+
+df_abundance$clustering <- as.factor(df_abundance$clustering)
+
+plot <- ggplot(df_abundance, aes(x=reorder(asv_id, med_count_norm))) +
+    theme_few() +
+    geom_point(aes(y = med_count_norm, colour = clustering),
+      stat = "identity", fill = "lightgrey", size = 0.75) +
+    theme(strip.text = element_text(size = 20),
+          axis.text.y = element_text(size = 20), 
+          axis.title.y = element_text(size = 20)) +
+    theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  facet_grid(. ~ clustering) +
+  theme(legend.position="none") +
+  ylab("Percent of Sample")
+plot
+```
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# blogged followed to carry out the ANOVA and Pairwise test
+# http://www.sthda.com/english/wiki/two-way-anova-test-in-r
+```
+
+## 2 way anova and box plots
+
+- Carried out a one way ANOVA. 
+- Selected data with a p-value lower than 0.05 for the treatment. These plots are to show any differences between control and treatments.
+- Plots sorted by overall aundance. 
+
+\vspace{12pt}
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_metrics$treatment <- as.factor(df_metrics$treatment)
+df_anova_list <- list()
+i <- 1
+
+for (seq in unique(df_metrics$asv_id)) {
+  
+  df_anova_select1 <- df_metrics %>% 
+    select(asv_id, clustering, treatment, count_norm) %>% 
+    filter(asv_id == seq)
+  
+  for (cluster in unique(df_anova_select1$clustering)) {
+    
+    df_anova_select2 <- df_anova_select1 %>% 
+      filter(clustering == cluster)
+      
+      df_anova_select2$treatment_anova <- one_way_anova_extract(df_anova_select2, 
+        value = 1, y = "count_norm", factor1 = "treatment")
+      
+      df_anova_list[[i]] <- df_anova_select2
+      i <- i + 1
+
+  }
+}
+
+df_anova <- bind_rows(df_anova_list) %>%
+  select(-count_norm) %>%
+  distinct()
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_treatment_plot <- inner_join(df_metrics, df_anova) %>%
+  filter(treatment_anova < 0.05) %>%
+  
+  group_by(asv_id, clustering) %>%
+  mutate(exp_med = median(count_norm)) %>%
+  ungroup() %>%
+  
+  arrange(desc(count_norm))
+  
+  
+  
+
+# dummy data frames to fix facet in plotting. 
+df_dummy <- df_treatment_plot %>%
+  select(clustering, treatment) %>%
+  unique()
+
+df_dummy_100 <- df_dummy  %>%
+  filter(clustering == 100)
+
+df_dummy_99 <- df_dummy  %>%
+  filter(clustering == 99)
+
+df_dummy_97 <- df_dummy  %>%
+  filter(clustering == 97)
+
+seqs <- unique(df_treatment_plot$asv_id)
+plots <- list()
+i <- 1
+
+for (seq in seqs){
+  
+    df_p <- df_treatment_plot %>%
+      filter(asv_id == seq)
+  
+    if( !(100 %in% unique(df_p$clustering)) ){
+      df_p <- bind_rows(df_p, df_dummy_100 )
+    }
+    
+    if( !(99 %in% unique(df_p$clustering)) ){
+      df_p <- bind_rows(df_p, df_dummy_99 )
+    }
+    
+    if( !(97 %in% unique(df_p$clustering)) ){
+      df_p <- bind_rows(df_p, df_dummy_97 )
+    }
+  
+    taxa <- unique(df_p$classification)
+    
+plot <- ggboxplot(df_p, x = "treatment", y = "count_norm",
+          palette = c("#00AFBB", "#E7B800")) +
+          ylab("Percent of Sample") + 
+          xlab("Day") +
+          theme(strip.text = element_text(size = 20),
+          plot.title = element_text(size = 20), 
+          axis.text.x = element_text(angle = 90, hjust = 1, size = 20),  
+          axis.text.y = element_text(size = 20), 
+          axis.title.x = element_text(size = 20), 
+          axis.title.y = element_text(size = 20)) + 
+  
+          facet_grid(. ~ clustering) + 
+          ggtitle(taxa)
+    
+
+plots[[i]] <- plot
+    
+    i <- i + 1
+}
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=20, fig.height=6}
+for (i in 1:length(plots)) {
+  plot(plots[[i]])
+  cat("\r\n\r\n")
+}
+```

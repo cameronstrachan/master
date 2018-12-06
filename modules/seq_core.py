@@ -5,7 +5,12 @@ import os, sys
 import subprocess
 from Bio import SeqIO
 from Bio.Blast import NCBIWWW
+from operator import itemgetter
+import argparse
 
+
+sys.path.insert(0, '/Users/cameronstrachan/master') 
+from modules.ctb_functions import *
 
 ### Notes
 ### When I have species and annotation in a header, I should come up with
@@ -112,18 +117,28 @@ class Fasta(File):
         fastadict. 
         '''
         
-        infile = self.openfile()
         
+
+        infile = self.openfile()
+        i = 1
+
         for line in infile:
             line = line.rstrip()
-            if line[0] == '>':
-                headersplit = line.split()
-                seqname = headersplit[0][1:]
-                self.fastadict[seqname] = ''
-            else: 
-                self.fastadict[seqname] = self.fastadict[seqname] + line
+
+            if len(line) > 1:
+
+                if line[0] == '>':
+                    headersplit = line.split()
+                    seqname = headersplit[0][1:]
+                    self.fastadict[seqname] = ''
+                    i = i + 1
                 
+                else: 
+                    self.fastadict[seqname] = self.fastadict[seqname] + line
+
         return self.fastadict
+  
+        
         
     def fasta2headermap(self):
         
@@ -168,7 +183,52 @@ class Fasta(File):
         else:
             print("\n" + 'File exists: ' + self.outputlocation + self.outputname)
 
-    def lengthcutoff(self, replaceheaders = True, length = 500):
+
+    def subsetfasta(self, seqlist = [], headertag='subset'):
+        
+        '''
+         
+        '''
+    
+        if not self.outputexists():
+            fastadic = self.fasta2dict()
+            fastadic = {k: fastadic[k] for k in seqlist}
+
+            outputfile = self.openwritefile()
+            for k,v in fastadic.items():
+                header = k.rstrip()
+                seq = v.rstrip()
+                outputfile.write(">" + k + '_' + headertag + '\n')
+                outputfile.write(v + '\n')
+        else:
+            print("\n" + 'File exists: ' + self.outputlocation + self.outputname)
+
+
+
+    def headerrename(self):
+        
+        '''
+        Number the sequences in each file and rename header with the file name and seq number. 
+        '''
+    
+        if not self.outputexists():
+            fastadic = self.fasta2dict()
+            outputfile = self.openwritefile()
+            i = 1
+            for k,v in fastadic.items():
+                filename_nofasta = self.name.split('.f')[0]
+                header = filename_nofasta + '_' + str(i)
+
+                seq = v.rstrip()
+                outputfile.write(">" + header + '\n')
+                outputfile.write(v + '\n')
+
+                i = i + 1
+        else:
+            print("\n" + 'File exists: ' + self.outputlocation + self.outputname)
+
+
+    def lengthcutoff(self, replaceheaders = True, length = 500, direction = 'above'):
         '''
         Calling this function simply saves the files with a specific length cutoff
         in a folder called lengthcutoff. 
@@ -178,17 +238,33 @@ class Fasta(File):
             outputfile = self.openwritefile()
             seqnum = 1
             filename_split = self.name.split('.f')
+
             for k,v in fastadic.items():
                 header = k.rstrip()
                 seq = v.rstrip()
 
-                if len(seq) >= length:
-                    if replaceheaders == True:
-                        outputfile.write(">" + str(filename_split[0]) + '_seq' + str(seqnum) + '\n')
-                    else:
-                        outputfile.write(">" + k + '\n')
-                    outputfile.write(v + '\n')
-                    seqnum = seqnum + 1
+                if direction == 'above':
+
+                    if len(seq) >= length:
+                        if replaceheaders == True:
+                            outputfile.write(">" + str(filename_split[0]) + '_seq' + str(seqnum) + '\n')
+                        else:
+                            outputfile.write(">" + k + '\n')
+                        outputfile.write(v + '\n')
+                        seqnum = seqnum + 1
+
+
+                else: 
+
+                    if len(seq) <= length:
+                        if replaceheaders == True:
+                            outputfile.write(">" + str(filename_split[0]) + '_seq' + str(seqnum) + '\n')
+                        else:
+                            outputfile.write(">" + k + '\n')
+                        outputfile.write(v + '\n')
+                        seqnum = seqnum + 1
+
+
         else:
             print("\n" + 'File exists: ' + self.outputlocation + self.outputname)
 
@@ -233,7 +309,7 @@ class Fasta(File):
             filename = self.name
             fileoutputname = self.outputname 
 
-            command = '../bin/' + blast  + ' -query ' + indir + filename + ' -db ' + dblocation + db +  ' -max_target_seqs ' + str(max_target_seqs) + " -max_hsps 1 -evalue " + str(evalue)  + " -outfmt '6 qseqid sseqid pident sstart send qstart qend evalue bitscore score qlen length'" + ' -out ' + outdir + fileoutputname
+            command = '../bin/' + blast  + ' -query ' + indir + filename + ' -db ' + dblocation + db +  ' -max_target_seqs ' + str(max_target_seqs) + " -max_hsps 1 -evalue " + str(evalue)  + " -outfmt '6 qseqid sseqid pident sstart send qstart qend evalue bitscore score qlen length sseq'" + ' -out ' + outdir + fileoutputname
             print('Blast command being run:' + '\n' + command)
             process = subprocess.Popen(command, universal_newlines=True, stdout=subprocess.PIPE, shell=True)
             output, error = process.communicate()
@@ -262,6 +338,28 @@ class Fasta(File):
                 with open(outdir + file_save, "w") as out_handle:
                     out_handle.write(result_handle.read())
                     result_handle.close()
+
+    def extract16s(self, threads=6, bit_thresh=0, length_thresh=500, masking=False):
+        '''
+        Use code from https://github.com/christophertbrown/bioscripts to extract 16s using HMMs. 
+        Masking seems to lower case areas that are thought to be insertions. 
+        '''
+
+        bit_thresh = float(bit_thresh)
+        length_thresh = int(length_thresh)
+
+        #filepath = self.location + self.name
+        #outputfile = open(file_obj.outputlocation + file_obj.outputname, 'w')
+
+        outputfile = self.openwritefile()
+        fasta = self.openfile()
+
+        cm = '../databases/ssu-align-0p1.1.cm'
+
+        hmms = run_cmsearch(fasta, threads, cm)
+
+        for seq in find_16S(fasta, hmms, bit_thresh, length_thresh, masking, int(0)):
+            outputfile.write('\n'.join(seq) + '\n')
 
 
 class GenBank(File):

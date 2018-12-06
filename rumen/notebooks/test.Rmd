@@ -1,0 +1,199 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(printr)
+library(ggplot2)
+library(cowplot)
+library(reshape2)
+library(knitr)
+library(pwr)
+library("ggpubr")
+library(stringi)
+library(polycor)
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_complete <- read.csv("~/master/rumen/dataflow/03-asv-table/henderson2015_df_complete_temp.csv")
+df_complete[,1] <- NULL
+
+df_complete$asv_id <- as.character(df_complete$asv_id)
+df_complete$GRCid <- as.character(df_complete$GRCid)
+df_complete$sra_accession <- as.character(df_complete$sra_accession)
+df_complete$LibraryName <- as.character(df_complete$LibraryName)
+
+df_complete <- df_complete %>%
+  rowwise() %>%
+  mutate(replicate = stri_reverse(stri_split_fixed(stri_reverse(LibraryName),".",n = 2)[[1]][2])) 
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_metrics <- df_complete %>% 
+  
+  filter(domain == "Bacteria") %>%
+  
+  unique() %>%
+  
+  mutate(count_norm = (count / non.chimeric)*100) %>%
+  
+  group_by(asv_id, replicate) %>%
+  mutate(n_count = length(asv_id)) %>%
+  ungroup() %>%
+  
+  unite(classification, c("phylum", "family", "genus"), sep = ";", remove = FALSE)
+
+
+df_metrics$classification <- gsub(";NA", "", df_metrics$classification)
+
+df_metrics_select <- df_metrics %>%
+  filter(Simple.classification..animal. == "Cattle") %>%
+  
+  #filter(Age.classification..animal. == "mature") %>%
+  #filter(Gender..animal. == "female") %>%
+  
+  filter(non.chimeric > 500) %>%
+  
+  filter(phylum != "NA") %>%
+  
+  select(asv_id, sra_accession, GRCid, Concentrate.proportion..diet., Forage.concentrate.category..diet., Starch.rich..diet., Weeks.on.diet..diet., non.chimeric, classification, count_norm)
+
+df_metrics_select <- df_metrics_select[complete.cases(df_metrics_select), ]
+names(df_metrics_select) <- c("asv_id", "sra_accession", "GRCid",  "concentrate_proportion", "diet_category", "high_starch", "weeks_diet", "reads", "taxa", "count_norm")
+
+nsamples <- table(df_metrics_select$high_starch)[1]
+ysamples <- table(df_metrics_select$high_starch)[2]
+
+df_metrics_select <- df_metrics_select %>%
+  
+  select(asv_id, taxa, high_starch, count_norm) %>%
+  
+  group_by(asv_id, high_starch) %>%
+  
+  mutate(n_count = length(count_norm)) %>%
+  
+  distinct() %>%
+  
+  filter(n_count > 3)
+
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# df_anova_list <- list()
+# df_anova_list2 <- list()
+# i <- 1
+# k <- 1
+# 
+# for (group in unique(df_metrics_select$asv_id)) {
+# 
+# 
+#   df_anova_select1 <- df_metrics_select %>%
+#     filter(asv_id == group)
+# 
+#   if (length(unique(df_anova_select1$high_starch)) > 1){
+# 
+#       df_anova_select1$pval <- t.test(count_norm ~ high_starch, data = df_anova_select1)$p.value
+# 
+#       df_anova_list[[i]] <- df_anova_select1
+#       i <- i + 1
+# 
+#   } else {
+# 
+#   df_anova_select2 <- df_metrics_select %>%
+#     filter(asv_id == group)
+# 
+#   df_anova_list2[[k]] <- df_anova_select2
+#   k <- k + 1
+# 
+# 
+# }
+# }
+# 
+# 
+# df_ttest <- bind_rows(df_anova_list) %>%
+#   select(-count_norm) %>%
+#   distinct()
+
+
+# df_1_treatment <- bind_rows(df_anova_list2) %>%
+#   group_by(asv_id) %>%
+#   mutate(med_count_norm = median(count_norm)) %>%
+#   ungroup() %>%
+#   select(-count_norm) %>%
+#   distinct() %>%
+#   
+#   filter(med_count_norm > 0.1)  %>%
+#   
+#   filter(n_count > 6)
+# 
+# 
+# df_treatment_plot2 <- inner_join(df_metrics_select, df_1_treatment )
+
+# 
+#write.csv(df_ttest, "~/master/rumen/dataflow/03-asv-table/henderson2015_df_ttest_temp.csv")
+#write.csv(df_1_treatment, "~/master/rumen/dataflow/03-asv-table/henderson2015_df_1_treatmentt_temp.csv")
+
+```
+
+
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_ttest <- read.csv("~/master/rumen/dataflow/03-asv-table/henderson2015_df_ttest_temp.csv")
+df_ttest[,1] <- NULL
+
+df_treatment_plot <- inner_join(df_metrics_select, df_ttest) %>%
+  filter(pval < 0.0005) %>%
+  arrange(pval)  
+
+groups <- unique(df_treatment_plot$taxa)
+plots <- list()
+i <- 1
+
+for (group in groups){
+  
+    df_p <- df_treatment_plot %>%
+      filter(taxa == group)
+    
+    taxa <- unique(df_p$taxa)
+    
+plot <- ggboxplot(df_p, x = "high_starch", y = "count_norm", color = "high_starch", outlier.shape = NA) +
+          ylab("Normalized Count") +
+          xlab("Diet Category") +
+          theme(strip.text = element_text(size = 20),
+          plot.title = element_text(size = 20),
+          axis.text.x = element_text(angle = 90, hjust = 1, size = 20),
+          axis.text.y = element_text(size = 20),
+          axis.title.x = element_text(size = 20),
+          axis.title.y = element_text(size = 20)) +
+
+          ggtitle(taxa) + 
+  
+          ylim(0,0.6)  + 
+  
+          facet_grid(asv_id ~ .)
+
+
+    
+
+plots[[i]] <- plot
+    
+    i <- i + 1
+}
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=20, fig.height=25}
+for (i in 1:length(plots)) {
+  plot(plots[[i]])
+  cat("\r\n\r\n")
+}
+```
+
+
