@@ -1,0 +1,34 @@
+
+
+## Design of experiments
+
+- Controlled inputs: vary the input with replicates and repeating the experiment.
+- Uncontrolled but observed inputs: blocking and analysis of covariance.
+- Uncontrolled and unobserved inputs: randomization so that the effect averages out to zero.
+
+*We design experiments to get the most information from the least data*
+- Does the experiment have enough statistical power to answer the research question.
+
+**DOE for regression**
+- Want the smallest standard errors
+- Without knowing the model, it is good to distribute the variables evenly. But, if you just wanted to fit a linear model, it would be better to cluster the X points and the beginning and end (dumbbell model).
+- Quadradic design (20% higher error, but then you know if its actually linear).
+- If you dont have a model in mind, just spread out the data.
+
+**Blocking**
+- The idea of blocking is to make just the variance of two variable affected by an unwanted treatment co-vary.
+- Often do co-variate analysis to check if a variable is significant.
+- The typical example of blocking is testing two different soles for shoes: you could randomly distribute the soles to different people, or give each person one of each sole. Giving one person a sole each is blocking.
+
+> Block what you can, randomize what you cannot.
+
+**Exploratory design**
+- Screens for the key factors
+- Use up to 25% of the data in screening
+- Want to know whats important
+- 1 variable at a time does not let us know if the variables are interacting.
+- most complete way of testing multiple variables is the full factorial design.
+- a two factorial design runs just the min and max of each factor, which means that you can only detect linear variations, but see all the interactions.
+- fractional factorial design gives you the main effects and some interactions. for example, a half factorial design removes half of the variables, but masks the interactions.
+
+[lectures link](http://www.lithoguru.com/scientist/statistics/course.html)
