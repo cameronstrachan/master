@@ -5,7 +5,6 @@ table2=$2
 seqs1=$3
 seqs2=$4
 
-conda activate qiime2-2018.11
 
 qiime feature-table merge \
   --i-tables dataflow/02-qiime-merge/$table1 \
@@ -69,4 +68,3 @@ qiime feature-table tabulate-seqs \
   --i-data dataflow/02-qiime-merge/rep-seqs-dn-97.qza \
   --o-visualization dataflow/02-qiime-merge/rep-seqs-dn-97.qzv
 
-conda deactivate qiime2-2018.11
