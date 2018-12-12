@@ -1,18 +1,20 @@
 #!/bin/bash
 
-lengthcutoff1=$1
-lengthcutoff2=$2
-numthreads=$3
+lengthcutoff1r1=$1
+lengthcutoff1r2=$2
+lengthcutoff2r1=$3
+lengthcutoff2r2=$4
+numthreads=$5
 
 source activate qiime2-2018.8
 
 # data2
 qiime dada2 denoise-paired \
 	--i-demultiplexed-seqs dataflow/02-qiime/demux-paired-end.qza \
-	--p-trim-left-f $lengthcutoff1 \
-	--p-trim-left-r $lengthcutoff1 \
-	--p-trunc-len-f $lengthcutoff2 \
-	--p-trunc-len-r $lengthcutoff2 \
+	--p-trim-left-f $lengthcutoff1r1 \
+	--p-trim-left-r $lengthcutoff1r2 \
+	--p-trunc-len-f $lengthcutoff2r1 \
+	--p-trunc-len-r $lengthcutoff2r2 \
 	--o-representative-sequences dataflow/02-qiime/rep-seqs-dada2.qza \
 	--o-table dataflow/02-qiime/table-dada2.qza \
 	--o-denoising-stats dataflow/02-qiime/stats-dada2.qza \
