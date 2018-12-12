@@ -10,7 +10,7 @@ from shutil import copyfile
 
 # custom libraries
 sys.path.insert(0, '/home/strachan/master/') 
-from modules import seq_core as sc
+from modules import seq_core_lin as sc
 
 def concat(inputfolder='path/to/input/', outputpath='path/to/output/file.txt', filenames=[]):
 	
