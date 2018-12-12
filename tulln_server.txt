@@ -22,4 +22,8 @@ scp -r /Users/cameronstrachan/master/wolf/dataflow/* strachan@biodatascience.tul
 scp -r /Users/cameronstrachan/master/wolf/dataflow/01-fastq/wetzels2018/* strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/wolf/dataflow/01-fastq/wetzels2018
 
 
+scp -r /Users/cameronstrachan/master/modules strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master
+
+
+
 https://github.com/cameronstrachan/master.git
