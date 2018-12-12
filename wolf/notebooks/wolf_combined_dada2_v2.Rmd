@@ -101,7 +101,7 @@ df_metrics <- df_complete %>%
   
   unite(classification, c("phylum", "family", "genus"), sep = ";", remove = FALSE)
 
-df_metrics$classification <- gsub(";NA", "", df_metrics$classification)
+#df_metrics$classification <- gsub(";NA", "", df_metrics$classification)
 ```
 
 \newpage
@@ -135,16 +135,49 @@ ggplot() + geom_bar(
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-df_vegan_counts <- df_metrics %>%
+df_phlycounts_counts <- df_metrics %>%
   select(asv_id, sra_accession, count_norm) %>%
-  spread(asv_id, count_norm)
+  spread(sra_accession, count_norm)
 
-df_vegan_counts_samples <- df_vegan[,1]
-df_vegan <- df_vegan[,-1]
+df_phlycounts_counts <- df_phlycounts_counts[order(df_phlycounts_counts$asv_id),] 
+
+otumat <- as.matrix(df_phlycounts_counts[,2:59])
+rownames(otumat) <- df_phlycounts_counts[,1]
+
+df_phlycounts_tax <- df_metrics %>%
+  select(asv_id, phylum, family, genus) %>%
+  unique()
+
+df_phlycounts_tax$phylum <- as.character(df_phlycounts_tax$phylum)
+df_phlycounts_tax$family <- as.character(df_phlycounts_tax$family)
+df_phlycounts_tax$genus <- as.character(df_phlycounts_tax$genus)
+
+df_phlycounts_tax[is.na(df_phlycounts_tax)] <- "NotAssigned"
+
+df_phlycounts_tax <- df_phlycounts_tax[order(df_phlycounts_tax$asv_id),] 
+
+taxmat <- as.matrix(df_phlycounts_tax[,2:4])
+rownames(taxmat) <- df_phlycounts_tax[,1]
 ```
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=20, fig.height=10}
+library("phyloseq")
+OTU = otu_table(otumat, taxa_are_rows = TRUE)
+TAX = tax_table(taxmat)
+physeq = phyloseq(OTU, TAX)
+plot_bar(physeq, fill = "phylum")
 ```
 
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=10}
+phylum.sum = tapply(taxa_sums(physeq), tax_table(physeq)[, "phylum"], sum, na.rm=TRUE)
+top5phyla = names(sort(phylum.sum, TRUE))[1:5]
+physeq1 = prune_taxa((tax_table(physeq)[, "phylum"] %in% top5phyla), physeq)
 
+
+physeq.ord <- ordinate(physeq1, "NMDS", "bray")
+p1 = plot_ordination(physeq, physeq.ord, type="taxa", color="phylum", title="taxa")
+p1 + facet_wrap(~phylum, 3)
+
+p2 = plot_ordination(physeq1, physeq.ord, type="samples") 
+p2 + geom_polygon(aes()) + geom_point(size=5) + ggtitle("samples")
+```

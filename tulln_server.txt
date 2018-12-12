@@ -24,6 +24,8 @@ scp -r /Users/cameronstrachan/master/wolf/dataflow/01-fastq/wetzels2018/* strach
 
 scp -r /Users/cameronstrachan/master/modules strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master
 
-
+scp -r /Users/cameronstrachan/Downloads/Miniconda3-latest-Linux-x86_64.sh strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master
 
 https://github.com/cameronstrachan/master.git
+
+--prefix /apps/anaconda3/envs/py36
