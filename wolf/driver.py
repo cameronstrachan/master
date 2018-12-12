@@ -4,7 +4,7 @@ import subprocess
 import pandas as pd
 
 # custom libraries
-sys.path.insert(0, '/Users/cameronstrachan/master/') 
+sys.path.insert(0, '/home/strachan/master/') 
 from modules import seq_core as sc
 from modules import seq_gen as sg
 from modules import seq_scrape as ss
