@@ -19,6 +19,7 @@ library("ggpubr")
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 df_meta <- read.csv("~/master/wolf/dataflow/00-meta/wetzels2018_wu201fastq.csv")
 colnames(df_meta)[1] <- "sra_accession"
+df_meta <- df_meta[,1:7]
 df_meta$sra_accession <- as.character(df_meta$sra_accession)
 
 df_classification  <- read.csv("~/master/wolf/dataflow/03-asv-taxonomy/wetzels2018_wu2018-97-rdp.csv")
@@ -94,7 +95,7 @@ df_metrics <- df_complete %>%
   filter(type == "Wolf") %>%
   filter(sample == "fecal") %>%
   
-  filter(count > 0) %>%
+  #filter(count > 0) %>%
   
   mutate(count_norm = (count / total_16s_reads)*100) %>%
   
@@ -112,11 +113,12 @@ df_metrics$classification <- gsub(";NA", "", df_metrics$classification)
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.height=3}
 df_metrics_phylum <- df_metrics %>%
+  filter(count_norm > 0.1) %>%
   group_by(sra_accession, phylum) %>%
   mutate(phylum_percent = sum(count_norm)) %>%
   ungroup() %>%
   select(sra_accession, phylum, phylum_percent, study) %>%
-  distinct()
+  distinct() 
 
 
 ggplot() + geom_bar(
@@ -132,24 +134,17 @@ ggplot() + geom_bar(
   xlab("Individual Sample")
 ```
 
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_vegan_counts <- df_metrics %>%
+  select(asv_id, sra_accession, count_norm) %>%
+  spread(asv_id, count_norm)
 
-### abundant sequences
-
-- The next thing I noticed is that there are some very abundant OTUs in both datasets.
-- Here are OTUs that represent more that 20% of their sample, coloured at the family level. It is clear even from looking at just a few of the abundant OTUs, that the Wolf Science scienter samples are very different from those in China.
-- Also, in the inner mongolia data, there are 3 OTUs in 3 samples that make up almost 70% if the data. This is very strange. 
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.height=3}
-df_abundant_plot <- df_metrics %>%
-  filter(count_norm > 20)
-
-
-ggplot(data=df_abundant_plot, aes(x=reorder(sra_accession, count_norm), y=count_norm, fill=family)) +
-  geom_bar(stat="identity")+
-  scale_fill_brewer(palette="Paired")+
-  theme_minimal() +
-  theme(axis.text.x = element_blank())  + 
-     facet_wrap(.~region, scales="free") +
-  ylab("Percentage of Sample") +
-  xlab("Individual Sample")
+df_vegan_counts_samples <- df_vegan[,1]
+df_vegan <- df_vegan[,-1]
 ```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+
