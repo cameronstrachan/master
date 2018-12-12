@@ -6,7 +6,6 @@ lengthcutoff2r1=$3
 lengthcutoff2r2=$4
 numthreads=$5
 
-conda activate qiime2-2018.11
 
 # data2
 qiime dada2 denoise-paired \
@@ -86,4 +85,3 @@ qiime feature-table tabulate-seqs \
   --i-data dataflow/02-qiime/rep-seqs-dn-97.qza \
   --o-visualization dataflow/02-qiime/rep-seqs-dn-97.qzv
 
-conda deactivate qiime2-2018.11
