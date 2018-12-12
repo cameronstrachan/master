@@ -3,7 +3,7 @@ df <- read.delim("~/master/rumen/dataflow/03-blast-tables/lacto_prevo_100_mapped
 colnames(df) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
 
 df_select <- df %>%
-  filter(length > 320) %>%
+  filter(length > 323) %>%
   filter(pident > 97)
 
 

@@ -1,0 +1,141 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(printr)
+library(ggplot2)
+library(cowplot)
+library(reshape2)
+library(knitr)
+library(pwr)
+library("ggpubr")
+library(stringi)
+library(polycor)
+library(gridExtra)
+library(grid)
+```
+
+```{r global_options, R.options=knitr::opts_chunk$set(warning=FALSE, message=FALSE)}
+```   
+
+Two sequences were selected from the analysis henderson2015_lactobacillus_grouping.Rmd. Since these sequences were representatives from 97% indentity clusters, I blasted them against the 100% asvs and then pulled out all the seqs above 97% identity here. Then the sequences were given new headers.  
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df <- read.delim("~/master/rumen/dataflow/03-blast-tables/lacto_prevo_100_mapped", header=FALSE)
+
+colnames(df) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+
+df_select <- df %>%
+  filter(length > 323) %>%
+  filter(pident > 97)
+
+
+df_select <- as.data.frame(df_select)
+df_select$sseq <- as.character(df_select$sseq)
+df_select$qseqid <- as.character(df_select$qseqid)
+
+df_select_list <- list()
+k <- 1
+
+for (j in 1:nrow(df_select)) {
+  
+  seq_id <- df_select[j,1]
+  
+  if (seq_id == "cebd44fd058a519d1dc298117fae3289_negative_correlation" ){ 
+      header <- paste(">", 'CEB_N.', toString(j), sep = "") }
+   else {
+      header <- paste(">", '8CB_P.', toString(j), sep = "") }
+
+  
+  df_select_list[[k]] <- header
+  k <- k + 1
+  
+  seq <- df_select[j,13]
+  
+  df_select_list[[k]] <- seq
+  k <- k + 1
+  
+  
+  
+}
+
+
+selected_long <- as.matrix(unlist(rbind(df_select_list)))
+selected_long <- gsub("\"", "", selected_long)
+
+write.table(selected_long, "~/master/rumen/dataflow/01-nucl/lacto_prevo_100.fasta", row.names = FALSE, 
+            col.names = FALSE, quote = FALSE)
+```
+
+The resulting file was blasted against the rumen genome database as well as all of the Prevotellaceae genomes from NCBI. 
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df1 <- read.delim("~/master/rumen/dataflow/03-blast-tables/lacto_prevo_100_prevo_genomes_mapped", header=FALSE)
+df1$database <- "Prevotella"
+
+df2 <- read.delim("~/master/rumen/dataflow/03-blast-tables/lacto_prevo_100_rumen_genomes_mapped", header=FALSE)
+df2$database <- "Rumen"
+
+
+df <- bind_rows(df1, df2)
+
+colnames(df) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq", "database")
+
+df$length <- as.numeric(df$length)
+df$pident <- as.numeric(df$pident)
+df$bitscore <- as.numeric(df$bitscore)
+
+df_select <- df %>%
+  filter(length > 300) %>%
+  filter(pident > 93) %>%
+  rowwise() %>%
+  mutate(seq_num = stri_reverse(stri_split_fixed(stri_reverse(sseqid),"_",n = 2)[[1]][1])) %>%
+  mutate(genome = stri_reverse(stri_split_fixed(stri_reverse(sseqid),"_",n = 2)[[1]][2])) 
+
+df_select$genome <- gsub("_genomic", "", df_select$genome)
+df_select$genome <- gsub("-submission.assembly", "", df_select$genome)
+df_select$genome <- gsub("_annotated_assembly", "", df_select$genome)
+
+
+
+
+
+df_select <- as.data.frame(df_select)
+df_select$sseq <- as.character(df_select$sseq)
+
+df_select_list <- list()
+k <- 1
+
+for (j in 1:nrow(df_select)) {
+  
+  database <- df_select[j,14]
+  genome <- df_select[j,16]
+  header <- paste(">", database, "_", genome,  sep = "")
+
+  
+  df_select_list[[k]] <- header
+  k <- k + 1
+  
+  seq <- df_select[j,13]
+  
+  df_select_list[[k]] <- seq
+  k <- k + 1
+  
+  
+  
+}
+
+
+selected_long <- as.matrix(unlist(rbind(df_select_list)))
+selected_long <- gsub("\"", "", selected_long)
+
+write.table(selected_long, "~/master/rumen/dataflow/01-nucl/lacto_prevo_100_genomes_blast.fasta", row.names = FALSE, 
+            col.names = FALSE, quote = FALSE)
+
+
+```
