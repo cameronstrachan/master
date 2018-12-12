@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from Bio import SearchIO
+#from Bio import SearchIO
 import os,sys
 import pandas as pd
 import numpy as np
