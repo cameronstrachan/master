@@ -75,9 +75,9 @@ def runqiime(inputfolderloc='path/to/input', paired=True, numcores=7):
 	foldername = inputfolder.split('/')[2]
 
 	if paired == True:
-		subprocess.call(['/home/strachan/master/master/bash/qiime_import_paired.sh', inputfolder])
+		subprocess.call(['/home/strachan/master/bash/qiime_import_paired.sh', inputfolder])
 	else: 
-		subprocess.call(['/home/strachan/master/master/bash/qiime_import_single.sh', inputfolder])
+		subprocess.call(['/home/strachan/master/bash/qiime_import_single.sh', inputfolder])
 
 	print("\n" + "Visualize dataflow/02-qiime/demux-single-end.qzv using online too at:" + "\n")
 	print("https://view.qiime2.org/" + "\n")
@@ -120,11 +120,11 @@ def runqiime(inputfolderloc='path/to/input', paired=True, numcores=7):
 
 
 	if paired == True:
-		subprocess.call(['/home/strachan/master/master/bash/run_qiime_paired.sh', str(lengthcutoff1), str(lengthcutoff2), str(lengthcutoff3), str(lengthcutoff4), str(numcores)])
+		subprocess.call(['/home/strachan/master/bash/run_qiime_paired.sh', str(lengthcutoff1), str(lengthcutoff2), str(lengthcutoff3), str(lengthcutoff4), str(numcores)])
 	else:
-		subprocess.call(['/home/strachan/master/master/bash/run_qiime_single.sh', str(lengthcutoff1), str(lengthcutoff2), str(numcores)])
+		subprocess.call(['/home/strachan/master/bash/run_qiime_single.sh', str(lengthcutoff1), str(lengthcutoff2), str(numcores)])
 
-	subprocess.call('/home/strachan/master/master/bash/qiime_export.sh')
+	subprocess.call('/home/strachan/master/bash/qiime_export.sh')
 
 	table_merge = 'dataflow/02-qiime-merge/' + 'table' + '_' + foldername + '.qza' 
 	copyfile('dataflow/02-qiime/table.qza', table_merge)
