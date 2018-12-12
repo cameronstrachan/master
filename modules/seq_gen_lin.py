@@ -75,9 +75,9 @@ def runqiime(inputfolderloc='path/to/input', paired=True, numcores=7):
 	foldername = inputfolder.split('/')[2]
 
 	if paired == True:
-		subprocess.call(['/home/strachan/master/bash/qiime_import_paired.sh', inputfolder])
+		subprocess.call(['/home/strachan/master/bash/qiime_import_paired_lin.sh', inputfolder])
 	else: 
-		subprocess.call(['/home/strachan/master/bash/qiime_import_single.sh', inputfolder])
+		subprocess.call(['/home/strachan/master/bash/qiime_import_single_lin.sh', inputfolder])
 
 	print("\n" + "Visualize dataflow/02-qiime/demux-single-end.qzv using online too at:" + "\n")
 	print("https://view.qiime2.org/" + "\n")
@@ -120,11 +120,11 @@ def runqiime(inputfolderloc='path/to/input', paired=True, numcores=7):
 
 
 	if paired == True:
-		subprocess.call(['/home/strachan/master/bash/run_qiime_paired.sh', str(lengthcutoff1), str(lengthcutoff2), str(lengthcutoff3), str(lengthcutoff4), str(numcores)])
+		subprocess.call(['/home/strachan/master/bash/run_qiime_paired_lin.sh', str(lengthcutoff1), str(lengthcutoff2), str(lengthcutoff3), str(lengthcutoff4), str(numcores)])
 	else:
-		subprocess.call(['/home/strachan/master/bash/run_qiime_single.sh', str(lengthcutoff1), str(lengthcutoff2), str(numcores)])
+		subprocess.call(['/home/strachan/master/bash/run_qiime_single_lin.sh', str(lengthcutoff1), str(lengthcutoff2), str(numcores)])
 
-	subprocess.call('/home/strachan/master/bash/qiime_export.sh')
+	subprocess.call('/home/strachan/master/bash/qiime_export_lin.sh')
 
 	table_merge = 'dataflow/02-qiime-merge/' + 'table' + '_' + foldername + '.qza' 
 	copyfile('dataflow/02-qiime/table.qza', table_merge)
@@ -151,8 +151,8 @@ def runqiimemerge(file1folder='wetzels2018', file2folder='wu2018'):
 	seqs1 = 'rep-seqs_' + file1folder + '.qza'
 	seqs2 = 'rep-seqs_' + file2folder + '.qza'
 
-	subprocess.call(['/home/strachan/master/bash/merge_qiime.sh', str(table1), str(table2), str(seqs1), str(seqs2)])
-	subprocess.call('/home/strachan/master/bash/qiime_export_merge.sh')
+	subprocess.call(['/home/strachan/master/bash/merge_qiime_lin.sh', str(table1), str(table2), str(seqs1), str(seqs2)])
+	subprocess.call('/home/strachan/master/bash/qiime_export_merge_lin.sh')
 
 	outputprefixseqs = 'dataflow/03-asv-seqs-merge/' + file1folder + '_' + file2folder
 	outputprefixstabs = 'dataflow/03-asv-table-merge/' + file1folder + '_' + file2folder
