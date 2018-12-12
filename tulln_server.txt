@@ -1,0 +1,25 @@
+VPN
+L2TP über IPSec
+vpn.tulln.fhwn.ac.at
+
+user
+strachan
+J5uZUfVJHx
+
+computer
+campustulln
+
+
+set all trafic
+
+ssh strachan@biodatascience.tulln.fhwn.ac.at
+scp -r /Users/cameronstrachan/master/* strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master
+
+
+scp -r /Users/cameronstrachan/master/wolf/dataflow/* strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/wolf
+
+
+scp -r /Users/cameronstrachan/master/wolf/dataflow/01-fastq/wetzels2018/* strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/wolf/dataflow/01-fastq/wetzels2018
+
+
+https://github.com/cameronstrachan/master.git
