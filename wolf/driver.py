@@ -10,7 +10,7 @@ from modules import seq_gen_lin as sg
 #from modules import seq_scrape as ss
 #from modules.ctb_functions import *
 
-
+print("On linux, before running, type:  conda activate qiime2-2018.11")
 
 ### RUN QIIME
 runqiime = input("\n" + "Run Qiime on data from Wetzels et al. 2018? (y or n):")
