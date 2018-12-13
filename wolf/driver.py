@@ -22,7 +22,7 @@ if runqiime == 'y':
 runqiime = input("\n" + "Run Qiime on data from Wu et al. 2017? (y or n):")
 
 if runqiime == 'y':
-	sg.runqiime(inputfolderloc='dataflow/01-fastq/wu2017', paired=False, numcores=24)
+	sg.runqiime(inputfolderloc='dataflow/01-fastq/wu2018', paired=False, numcores=40)
 
 ### RUN QIIME
 runmerge = input("\n" + "Run merge on wetzels and wu? (y or n):")
