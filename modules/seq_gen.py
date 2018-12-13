@@ -132,7 +132,7 @@ def runqiime(inputfolderloc='path/to/input', paired=True, numcores=7):
 	seq_merge = 'dataflow/02-qiime-merge/' + 'rep-seqs' + '_' +foldername + '.qza' 
 	copyfile('dataflow/02-qiime/rep-seqs.qza', seq_merge)	
 
-	os.rename('dataflow/03-asv-table/taxonomy.tsv', outputprefixstaxa + '-fc-gg-full.txt')
+	#os.rename('dataflow/03-asv-table/taxonomy.tsv', outputprefixstaxa + '-fc-gg-full.txt')
 
 	os.rename('dataflow/03-asv-seqs/dna-sequences-100.fasta', outputprefixseqs + '-100.fasta')
 	os.rename('dataflow/03-asv-seqs/dna-sequences-99.fasta', outputprefixseqs + '-99.fasta')

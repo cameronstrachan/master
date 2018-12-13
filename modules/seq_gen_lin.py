@@ -75,9 +75,9 @@ def runqiime(inputfolderloc='path/to/input', paired=True, numcores=7):
 	foldername = inputfolder.split('/')[2]
 
 	if paired == True:
-		subprocess.call(['/home/strachan/master/bash/qiime_import_paired_lin.sh', inputfolder])
+		#subprocess.call(['/home/strachan/master/bash/qiime_import_paired_lin.sh', inputfolder])
 	else: 
-		subprocess.call(['/home/strachan/master/bash/qiime_import_single_lin.sh', inputfolder])
+		#subprocess.call(['/home/strachan/master/bash/qiime_import_single_lin.sh', inputfolder])
 
 	print("\n" + "Visualize dataflow/02-qiime/demux-single-end.qzv using online too at:" + "\n")
 	print("https://view.qiime2.org/" + "\n")
@@ -120,9 +120,9 @@ def runqiime(inputfolderloc='path/to/input', paired=True, numcores=7):
 
 
 	if paired == True:
-		subprocess.call(['/home/strachan/master/bash/run_qiime_paired_lin.sh', str(lengthcutoff1), str(lengthcutoff2), str(lengthcutoff3), str(lengthcutoff4), str(numcores)])
+		#subprocess.call(['/home/strachan/master/bash/run_qiime_paired_lin.sh', str(lengthcutoff1), str(lengthcutoff2), str(lengthcutoff3), str(lengthcutoff4), str(numcores)])
 	else:
-		subprocess.call(['/home/strachan/master/bash/run_qiime_single_lin.sh', str(lengthcutoff1), str(lengthcutoff2), str(numcores)])
+		#subprocess.call(['/home/strachan/master/bash/run_qiime_single_lin.sh', str(lengthcutoff1), str(lengthcutoff2), str(numcores)])
 
 	subprocess.call('/home/strachan/master/bash/qiime_export_lin.sh')
 
@@ -132,7 +132,7 @@ def runqiime(inputfolderloc='path/to/input', paired=True, numcores=7):
 	seq_merge = 'dataflow/02-qiime-merge/' + 'rep-seqs' + '_' +foldername + '.qza' 
 	copyfile('dataflow/02-qiime/rep-seqs.qza', seq_merge)	
 
-	os.rename('dataflow/03-asv-table/taxonomy.tsv', outputprefixstaxa + '-fc-gg-full.txt')
+	#os.rename('dataflow/03-asv-table/taxonomy.tsv', outputprefixstaxa + '-fc-gg-full.txt')
 
 	os.rename('dataflow/03-asv-seqs/dna-sequences-100.fasta', outputprefixseqs + '-100.fasta')
 	os.rename('dataflow/03-asv-seqs/dna-sequences-99.fasta', outputprefixseqs + '-99.fasta')
