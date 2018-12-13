@@ -75,11 +75,11 @@ def runqiime(inputfolderloc='path/to/input', paired=True, numcores=7):
 	foldername = inputfolder.split('/')[2]
 
 	if paired == True:
-		#subprocess.call(['/home/strachan/master/bash/qiime_import_paired_lin.sh', inputfolder])
-		pass
+		subprocess.call(['/home/strachan/master/bash/qiime_import_paired_lin.sh', inputfolder])
+		#pass
 	else: 
-		#subprocess.call(['/home/strachan/master/bash/qiime_import_single_lin.sh', inputfolder])
-		pass
+		subprocess.call(['/home/strachan/master/bash/qiime_import_single_lin.sh', inputfolder])
+		#pass
 
 	print("\n" + "Visualize dataflow/02-qiime/demux-single-end.qzv using online too at:" + "\n")
 	print("https://view.qiime2.org/" + "\n")
@@ -122,11 +122,11 @@ def runqiime(inputfolderloc='path/to/input', paired=True, numcores=7):
 
 
 	if paired == True:
-		#subprocess.call(['/home/strachan/master/bash/run_qiime_paired_lin.sh', str(lengthcutoff1), str(lengthcutoff2), str(lengthcutoff3), str(lengthcutoff4), str(numcores)])
-		pass
+		subprocess.call(['/home/strachan/master/bash/run_qiime_paired_lin.sh', str(lengthcutoff1), str(lengthcutoff2), str(lengthcutoff3), str(lengthcutoff4), str(numcores)])
+		#pass
 	else:
-		#subprocess.call(['/home/strachan/master/bash/run_qiime_single_lin.sh', str(lengthcutoff1), str(lengthcutoff2), str(numcores)])
-		pass
+		subprocess.call(['/home/strachan/master/bash/run_qiime_single_lin.sh', str(lengthcutoff1), str(lengthcutoff2), str(numcores)])
+		#pass
 
 	subprocess.call('/home/strachan/master/bash/qiime_export_lin.sh')
 
