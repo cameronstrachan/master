@@ -1,0 +1,245 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(printr)
+library(ggplot2)
+library(cowplot)
+library(reshape2)
+library(knitr)
+library(gmodels)
+```
+
+
+# UniFrac Plots Unweighted
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_meta <- read.csv("~/master/wolf/dataflow/00-meta/wetzels2018_wu2018_fastq.csv")
+df_unifrac <- read.csv("~/master/wolf/dataflow/03-distance/unifrac_matrix_unweighted.csv")
+
+colnames(df_unifrac)[1] <- "id1"
+
+df_unifrac <- melt(df_unifrac, by = "id1")
+colnames(df_unifrac)[2:3] <- c("id2", "UniFrac")
+
+df_meta_trim1 <- df_meta %>%
+  filter(study == "wetzels2018") %>%
+  select(sample_id, sample, pack, sibling)
+
+colnames(df_meta_trim1) <- c("id1", "sample1", "pack1", "sibling1") 
+
+df_meta_trim2 <- df_meta %>%
+  filter(study == "wetzels2018") %>%
+  select(sample_id, sample, pack, sibling)
+
+colnames(df_meta_trim2) <- c("id2", "sample2", "pack2", "sibling2") 
+
+df_unifrac <- df_unifrac %>%
+  filter(UniFrac != 0) %>%
+  inner_join(df_meta_trim1) %>%
+  inner_join(df_meta_trim2)
+
+df_unifrac_test <- df_unifrac %>%
+  
+  rowwise() %>%
+  mutate(same_pack = ifelse(pack1 == pack2, "SamePack", "DifferentPack")) %>%
+  ungroup() %>%
+  
+  rowwise() %>%
+  mutate(same_sample = ifelse(sample1 == sample2, "SameSample", "DifferentSample")) %>%
+  ungroup() %>%
+  
+  group_by(same_sample) %>%
+  
+  mutate(mean_sample_unifrac = mean(UniFrac)) %>%
+  mutate(sd_sample_unifrac = sd(UniFrac)) %>%
+  mutate(ci_sample_unifrac_low = ci(UniFrac)[2]) %>%
+  mutate(ci_sample_unifrac_high = ci(UniFrac)[3]) %>%
+  
+  ungroup() 
+
+
+df_unifrac_test_same_sample <- df_unifrac_test %>%
+  
+  filter(same_sample == "SameSample") %>%
+  
+  group_by(same_pack, sample1) %>%
+  
+  mutate(mean_pack_unifrac = mean(UniFrac)) %>%
+  mutate(sd_pack_unifrac = sd(UniFrac)) %>%
+  mutate(ci_pack_unifrac_low = ci(UniFrac)[2]) %>%
+  mutate(ci_pack_unifrac_high = ci(UniFrac)[3]) %>%
+  
+  ungroup() %>%
+  
+  group_by(same_pack, sample1, pack1) %>%
+  
+  mutate(mean_perpack_unifrac = mean(UniFrac)) %>%
+  mutate(sd_perpack_unifrac = sd(UniFrac)) %>%
+  mutate(ci_perpack_unifrac_low = ci(UniFrac)[2]) %>%
+  mutate(ci_perpack_unifrac_high = ci(UniFrac)[3]) %>%
+  
+  ungroup()
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=3.5}
+ggplot(df_unifrac_test, aes(x=same_sample, y=mean_sample_unifrac, fill=same_sample)) + 
+            geom_bar(position="dodge", stat="identity") + 
+            geom_errorbar(aes(ymax = ci_sample_unifrac_high, ymin = ci_sample_unifrac_low ), position="dodge", width=0.2, size=1, color="blue") + 
+            labs(title="Same or Different Sample Site (Skin Vs Fecal)", x="", y="Mean Unweighted UniFrac Distance (95% CI)") + 
+            theme(legend.position="none") +
+             coord_flip() 
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=3.5}
+ggplot(df_unifrac_test_same_sample, aes(x=same_pack, y=mean_pack_unifrac, fill=same_pack)) + 
+            geom_bar(position="dodge", stat="identity") + 
+            geom_errorbar(aes(ymax = ci_pack_unifrac_high, ymin = ci_pack_unifrac_low ), position="dodge", width=0.2, size=1, color="blue") + 
+            labs(title="Same or Different Pack (Skin and Fecal)", x="", y="Mean Unweighted UniFrac Distance (95% CI)") + 
+            theme(legend.position="none")  + 
+  facet_grid(. ~ sample1) +
+             coord_flip() 
+```
+
+\newpage
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=7}
+ggplot(df_unifrac_test_same_sample, aes(x=pack1, y=mean_perpack_unifrac, fill=same_pack, group = same_pack)) + 
+            geom_bar(position="dodge", stat="identity") + 
+            geom_errorbar(aes(ymax = ci_perpack_unifrac_high, ymin = ci_perpack_unifrac_low ), position = position_dodge(0.75),  stat="identity", width=0.2, size=1, color="blue") + 
+            labs(title="Same or Different Pack (Skin and Fecal)", x="", y="Mean Unweighted UniFrac Distance (95% CI)") + 
+  facet_grid(. ~ sample1) +
+             coord_flip() +
+  theme(legend.title=element_blank())
+```
+
+\newpage
+
+
+# UniFrac Plots Weighted
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(printr)
+library(ggplot2)
+library(knitr)
+library("ggpubr")
+library(gmodels)
+library(reshape2)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_meta <- read.csv("~/master/wolf/dataflow/00-meta/wetzels2018_wu2018_fastq.csv")
+df_unifrac <- read.csv("~/master/wolf/dataflow/03-distance/unifrac_matrix_weighted.csv")
+
+colnames(df_unifrac)[1] <- "id1"
+
+df_unifrac <- melt(df_unifrac, by = "id1")
+colnames(df_unifrac)[2:3] <- c("id2", "UniFrac")
+
+df_meta_trim1 <- df_meta %>%
+  filter(study == "wetzels2018") %>%
+  select(sample_id, sample, pack, sibling)
+
+colnames(df_meta_trim1) <- c("id1", "sample1", "pack1", "sibling1") 
+
+df_meta_trim2 <- df_meta %>%
+  filter(study == "wetzels2018") %>%
+  select(sample_id, sample, pack, sibling)
+
+colnames(df_meta_trim2) <- c("id2", "sample2", "pack2", "sibling2") 
+
+df_unifrac <- df_unifrac %>%
+  filter(UniFrac != 0) %>%
+  inner_join(df_meta_trim1) %>%
+  inner_join(df_meta_trim2)
+
+df_unifrac_test <- df_unifrac %>%
+  
+  rowwise() %>%
+  mutate(same_pack = ifelse(pack1 == pack2, "SamePack", "DifferentPack")) %>%
+  ungroup() %>%
+  
+  rowwise() %>%
+  mutate(same_sample = ifelse(sample1 == sample2, "SameSample", "DifferentSample")) %>%
+  ungroup() %>%
+  
+  group_by(same_sample) %>%
+  
+  mutate(mean_sample_unifrac = mean(UniFrac)) %>%
+  mutate(sd_sample_unifrac = sd(UniFrac)) %>%
+  mutate(ci_sample_unifrac_low = ci(UniFrac)[2]) %>%
+  mutate(ci_sample_unifrac_high = ci(UniFrac)[3]) %>%
+  
+  ungroup() 
+
+
+df_unifrac_test_same_sample <- df_unifrac_test %>%
+  
+  filter(same_sample == "SameSample") %>%
+  
+  group_by(same_pack, sample1) %>%
+  
+  mutate(mean_pack_unifrac = mean(UniFrac)) %>%
+  mutate(sd_pack_unifrac = sd(UniFrac)) %>%
+  mutate(ci_pack_unifrac_low = ci(UniFrac)[2]) %>%
+  mutate(ci_pack_unifrac_high = ci(UniFrac)[3]) %>%
+  
+  ungroup() %>%
+  
+  group_by(same_pack, sample1, pack1) %>%
+  
+  mutate(mean_perpack_unifrac = mean(UniFrac)) %>%
+  mutate(sd_perpack_unifrac = sd(UniFrac)) %>%
+  mutate(ci_perpack_unifrac_low = ci(UniFrac)[2]) %>%
+  mutate(ci_perpack_unifrac_high = ci(UniFrac)[3]) %>%
+  
+  ungroup()
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=3.5}
+ggplot(df_unifrac_test, aes(x=same_sample, y=mean_sample_unifrac, fill=same_sample)) + 
+            geom_bar(position="dodge", stat="identity") + 
+            geom_errorbar(aes(ymax = ci_sample_unifrac_high, ymin = ci_sample_unifrac_low ), position="dodge", width=0.2, size=1, color="blue") + 
+            labs(title="Same or Different Sample Site (Skin Vs Fecal)", x="", y="Mean Weighted UniFrac Distance (95% CI)") + 
+            theme(legend.position="none") +
+             coord_flip() 
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=3.5}
+ggplot(df_unifrac_test_same_sample, aes(x=same_pack, y=mean_pack_unifrac, fill=same_pack)) + 
+            geom_bar(position="dodge", stat="identity") + 
+            geom_errorbar(aes(ymax = ci_pack_unifrac_high, ymin = ci_pack_unifrac_low ), position="dodge", width=0.2, size=1, color="blue") + 
+            labs(title="Same or Different Pack (Skin and Fecal)", x="", y="Mean Weighted UniFrac Distance (95% CI)") + 
+            theme(legend.position="none")  + 
+  facet_grid(. ~ sample1) +
+             coord_flip() 
+```
+
+\newpage
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=7}
+ggplot(df_unifrac_test_same_sample, aes(x=pack1, y=mean_perpack_unifrac, fill=same_pack, group = same_pack)) + 
+            geom_bar(position="dodge", stat="identity") + 
+            geom_errorbar(aes(ymax = ci_perpack_unifrac_high, ymin = ci_perpack_unifrac_low ), position = position_dodge(0.75),  stat="identity", width=0.2, size=1, color="blue") + 
+            labs(title="Same or Different Pack (Skin and Fecal)", x="", y="Mean Weighted UniFrac Distance (95% CI)") + 
+  facet_grid(. ~ sample1) +
+             coord_flip() +
+  theme(legend.title=element_blank())
+```
+
+
+

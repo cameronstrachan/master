@@ -1,7 +1,7 @@
 library(rRDP)
 library(tidyverse)
 
-files <- list.files("~/master/wolf/dataflow/03-asv-seqs-merge")
+files <- list.files("~/master/wolf/dataflow/03-asv-seqs")
 
 files_out <- list.files("~/master/wolf/dataflow/03-asv-taxonomy")
 
@@ -13,7 +13,7 @@ for (file in files){
   
   if(!(file_out %in% files_out)){
   
-    seq <- readDNAStringSet(paste("~/master/wolf/dataflow/03-asv-seqs-merge/", file, sep = ""))
+    seq <- readDNAStringSet(paste("~/master/wolf/dataflow/03-asv-seqs/", file, sep = ""))
     pred <- predict(rdp(), seq)
     conf <- attr(pred, "confidence")
     
