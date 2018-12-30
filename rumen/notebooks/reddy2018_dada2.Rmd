@@ -280,7 +280,11 @@ for (seq in seqs){
     taxa <- unique(df_p$classification)
     
 plot <- ggboxplot(df_p, x = "treatment", y = "count_norm",
+<<<<<<< HEAD
           palette = c("#00AFBB", "#E7B800")) +
+=======
+          , outlier.shape = NA, add="jitter") +
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
           ylab("Percent of Sample") + 
           xlab("Day") +
           theme(strip.text = element_text(size = 20),

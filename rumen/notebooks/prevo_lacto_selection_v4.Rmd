@@ -1,0 +1,188 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(printr)
+library(ggplot2)
+library(cowplot)
+library(reshape2)
+library(knitr)
+library(pwr)
+library("ggpubr")
+library(stringi)
+library(polycor)
+library(gridExtra)
+library(grid)
+```
+
+```{r global_options, R.options=knitr::opts_chunk$set(warning=FALSE, message=FALSE)}
+```   
+
+### Exploring patterns of Lactobacillus containing samples
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_complete <- read.csv("~/master/rumen/dataflow/03-asv-table/henderson2015_df_complete_temp.csv")
+df_complete[,1] <- NULL
+
+df_complete$asv_id <- as.character(df_complete$asv_id)
+df_complete$GRCid <- as.character(df_complete$GRCid)
+df_complete$sra_accession <- as.character(df_complete$sra_accession)
+df_complete$LibraryName <- as.character(df_complete$LibraryName)
+
+df_complete <- df_complete %>%
+  rowwise() %>%
+  mutate(replicate = stri_reverse(stri_split_fixed(stri_reverse(LibraryName),".",n = 2)[[1]][2])) 
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_metrics <- df_complete %>% 
+  
+  filter(domain == "Bacteria") %>%
+  
+  unique() %>%
+  
+  mutate(count_norm = (count / non.chimeric)*100) %>%
+  
+  group_by(asv_id, replicate) %>%
+  mutate(n_count = length(asv_id)) %>%
+  ungroup() %>%
+  
+  unite(classification, c("phylum", "family"), sep = ";", remove = FALSE) 
+
+
+df_metrics$classification <- gsub(";NA", "", df_metrics$classification)
+
+df_samples <- df_metrics %>%
+  select(GRCid, Starch.rich..diet., Concentrate.proportion..diet.) %>%
+  distinct() 
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_lacto_samples <- df_metrics %>%
+  filter(genus == "Lactobacillus") %>%
+  filter(count > 10) %>%
+  distinct() 
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+lacto_samples <- unique(df_lacto_samples$GRCid)
+
+df_extreme_diet <- df_metrics %>%
+  filter(Starch.rich..diet. == "y") %>%
+  rowwise() %>%
+  mutate(lacto_signal = ifelse(GRCid %in% lacto_samples, "pos", "neg")) %>%
+  ungroup() 
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_extreme_diet_neg <- df_extreme_diet %>%
+  group_by(asv_id) %>%
+  mutate(ncategory = length(unique(lacto_signal))) %>%
+  ungroup() %>%
+  distinct() %>%
+  filter(ncategory == 1) %>%
+  filter(lacto_signal == "neg") %>%
+  group_by(asv_id) %>%
+  mutate(nsample = length(unique(GRCid))) %>%
+  
+  mutate(avg_asv = mean(count_norm)) %>%
+  ungroup() %>%
+  
+  filter(nsample > 15) %>%
+  
+  filter(avg_asv > 1) %>%
+  
+  filter(family != "NA") %>%
+  filter(family == "Prevotellaceae")
+
+
+
+df_extreme_diet_pos <- df_extreme_diet %>%
+
+  filter(lacto_signal == "pos") %>%
+  
+  group_by(asv_id) %>%
+  
+  mutate(nsample = length(unique(GRCid))) %>%
+  
+  mutate(avg_asv = mean(count_norm)) %>%
+  ungroup() %>%
+  
+  filter(nsample > 15) %>%
+
+  filter(family != "NA") %>%
+  filter(family == "Prevotellaceae") %>%
+  
+  filter(avg_asv > 1)
+
+selected <- c(unique(df_extreme_diet_neg$asv_id), unique(df_extreme_diet_pos$asv_id))
+
+df_treatment_plot <- df_extreme_diet %>%
+  rowwise() %>%
+  mutate(selection = ifelse(asv_id %in% selected , "yes", "no")) %>%
+  filter(selection == "yes")
+```
+
+\vspace{12pt}
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+groups <- unique(df_treatment_plot$asv_id)
+df_treatment_plot$lacto_signal <- factor(df_treatment_plot$lacto_signal, levels = c("neg", "pos"))
+
+plots <- list()
+
+j <- 1
+
+for (group in groups){
+  
+    df_p <- df_treatment_plot %>%
+      filter(asv_id == group)
+    
+    taxa <- unique(df_p$classification)
+    dir <- unique(df_p$lacto_signal)
+
+plot <- ggboxplot(df_p, x = "lacto_signal", y = "count_norm", outlier.shape = NA, add="jitter") +
+          ylab("Normalized Count") +
+          xlab("Lactobacillus Signal") +
+          theme(strip.text = element_text(size = 10),
+          plot.title = element_text(size = 30),
+          axis.text.x = element_text(angle = 90, hjust = 1, size = 20),
+          axis.text.y = element_text(size = 20),
+          axis.title.x = element_text(size = 20),
+          axis.title.y = element_text(size = 20)) + 
+        
+
+          #ggtitle(taxa) +
+  
+          facet_grid(asv_id ~ ., scales = "free")
+    
+
+
+plots[[j]] <- plot
+j <- j + 1
+
+}
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=20, fig.height=25}
+grid.arrange(plots[[1]], plots[[2]], plots[[3]], plots[[4]], plots[[5]], plots[[6]], plots[[7]], ncol = 3, top=textGrob("Prevotellaceae co-occuring with Lactobacillus",gp=gpar(fontsize=20,font=3)))
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_save <- df_treatment_plot %>%
+  select(asv_id) %>%
+  distinct() %>%
+  rowwise() %>%
+  mutate(direction = ifelse(asv_id %in% df_extreme_diet_neg$asv_id, "neg_cor", "pos_cor")) %>%
+  ungroup()
+
+write.csv(df_save,  "~/master/rumen/dataflow/00-meta/henderson2015_lactobacillus_association2.csv")
+```
+
