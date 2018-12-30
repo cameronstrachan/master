@@ -1,0 +1,327 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(printr)
+library(ggplot2)
+library(cowplot)
+library(reshape2)
+library(knitr)
+library(pwr)
+library("ggpubr")
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_meta <- read.csv("~/master/wolf/dataflow/00-meta/wetzels2018_wu2018_fastq.csv")
+colnames(df_meta)[1] <- "sra_accession"
+
+df_meta$sra_accession <- as.character(df_meta$sra_accession)
+df_meta$type <- as.character(df_meta$type)
+df_meta$study <- as.character(df_meta$study)
+df_meta$region <- as.character(df_meta$region)
+df_meta$sample <- as.character(df_meta$sample)
+df_meta$pack <- as.character(df_meta$pack)
+df_meta$sibling <- as.character(df_meta$sibling)
+df_meta$replicate <- as.character(df_meta$replicate)
+df_meta$sample_id <- as.character(df_meta$sample_id)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_classification  <- read.csv("~/master/wolf/dataflow/03-asv-taxonomy/wetzels2018-8_270_8_220-100-rdp.csv")
+df_classification[,1] <- NULL
+
+df_classification <- df_classification %>%
+  select(asv_id, phylum, family, genus)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df <- read.delim("~/master/wolf/dataflow/03-asv-table/wetzels2018-8_270_8_220-100.txt", skip = 1, header = TRUE)
+df$clustering <- 100
+
+colnames(df)[1] <- 'asv_id'
+
+col_to_gather <- names(df)[!(startsWith(names(df), "W"))]
+df <- melt(df, id = col_to_gather)
+colnames(df)[3:4] <- c('sra_accession', 'count')
+
+df$asv_id <- as.character(df$asv_id)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_normalizations <- df %>%
+  filter(clustering == 100) %>%
+  group_by(sra_accession) %>%
+  mutate(total_reads = sum(count)) %>%
+  ungroup() %>%
+  mutate(max_total_reads = max(total_reads)) %>%
+  select(sra_accession, total_reads, max_total_reads) %>%
+  ungroup() %>%
+  distinct() 
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_complete <- inner_join(df, df_meta) %>%
+  inner_join(df_normalizations) %>%
+  inner_join(df_classification)
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.height=3}
+plot <- ggplot(df_normalizations, aes(x=reorder(sra_accession, total_reads))) +
+    theme_few() +
+    geom_point(aes(y = total_reads),
+      stat = "identity", fill = "lightgrey", size = 1) +
+    theme(strip.text = element_text(size = 12),
+          axis.text.y = element_text(size = 12),
+          axis.text.x = element_text(angle = 90, hjust = 1, size = 12),
+          axis.title.y = element_text(size = 12)) +
+    theme(axis.title.x=element_blank()) +
+  ylab("Total Reads Afer DADA2")
+plot
+
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_metrics <- df_complete %>% 
+  
+  mutate(count_norm = (count / total_reads)*max_total_reads) %>%
+  
+  unite(classification, c("phylum", "family", "genus"), sep = ";", remove = FALSE) %>%
+  
+  select(asv_id, sample_id, count, count_norm, sample, pack, sibling, phylum, family) %>%
+  
+  distinct() %>%
+  
+  mutate(non_zero = ifelse(count == 0, 0, 1)) %>%
+  
+  group_by(asv_id) %>%
+  
+  mutate(sum_non_zero = sum(non_zero)) %>%
+  
+  ungroup() %>%
+  
+  filter(pack == "W_pack_B" | pack == "W_pack_D" | pack == "W_pack_E") %>%
+  
+  filter(sum_non_zero > 2) %>%
+  
+  filter(sample == "skin")
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+one_way_anova_extract <- function(df, value = 1, y = "NA", factor1 = "NA"){
+
+  
+  df <- as.data.frame(df)
+  # rename the columns to generalize the method
+  colnames(df)[which(names(df) == y)] <- "dependant"
+  colnames(df)[which(names(df) == factor1)] <- "category1"
+
+  res.aov <- lm(dependant ~ category1, data = df)
+  sum <- anova(res.aov)
+  
+  # extract p value
+  pvalue <- sum$"Pr(>F)"[1]
+  
+  # only return p value for now 
+  return(pvalue)
+}
+
+
+df_metrics$pack<- as.factor(df_metrics$pack)
+df_anova_list <- list()
+i <- 1
+
+for (seq in unique(df_metrics$asv_id)) {
+  
+  df_anova_select1 <- df_metrics %>% 
+    select(asv_id, pack, count_norm) %>% 
+    filter(asv_id == seq) 
+
+  df_anova_select1$treatment_anova <- one_way_anova_extract(df_anova_select1, 
+        value = 1, y = "count_norm", factor1 = "pack")
+      
+      df_anova_list[[i]] <- df_anova_select1
+      i <- i + 1
+
+}
+
+df_anova <- bind_rows(df_anova_list) %>%
+  select(-count_norm) %>%
+  distinct()
+
+df_metrics <- inner_join(df_metrics, df_anova)
+```
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_treatment_plot <- df_metrics %>%
+  filter(treatment_anova < 0.01)
+  
+
+seqs <- unique(df_treatment_plot$asv_id)
+plots <- list()
+i <- 1
+
+for (seq in seqs){
+  
+    df_p <- df_treatment_plot %>%
+      filter(asv_id == seq)
+  
+    taxa <- unique(df_p$family)
+    
+plot <- ggboxplot(df_p, x = "pack", y = "count_norm",
+          outlier.shape = NA) +
+          ylab("Percent of Sample") + 
+          xlab("Day") +
+          theme(strip.text = element_text(size = 20),
+          plot.title = element_text(size = 20), 
+          axis.text.x = element_text(angle = 90, hjust = 1, size = 20),  
+          axis.text.y = element_text(size = 20), 
+          axis.title.x = element_text(size = 20), 
+          axis.title.y = element_text(size = 20)) + 
+          ggtitle(taxa)
+    
+
+plots[[i]] <- plot
+    
+    i <- i + 1
+}
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6}
+for (i in 1:length(plots)) {
+  plot(plots[[i]])
+  cat("\r\n\r\n")
+}
+```
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=20, fig.height=12}
+df_metrics_phylum <- df_metrics %>%
+  group_by(sample_id, phylum) %>%
+  mutate(phylum_percent = sum(count_norm)) %>%
+  ungroup() %>%
+  select(sample_id, phylum, phylum_percent, sample, pack) %>%
+  distinct() 
+
+
+df_metrics_family <- df_metrics %>%
+  group_by(sample_id, family) %>%
+  mutate(family_percent = sum(count_norm)) %>%
+  ungroup() %>%
+  select(sample_id, family, family_percent, sample, pack) %>%
+  distinct() 
+
+ggplot() + geom_bar(
+  aes(y = phylum_percent, x = sample_id, fill = phylum),
+  data = df_metrics_phylum,
+  stat = "identity" ,
+  position = "fill"
+)  +labs(x="Category" , y= "Percentage (%)")+
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8)) + 
+     facet_wrap(.~sample*pack, scales="free")+
+  ylab("Percentage of Sample") +
+  xlab("Individual Sample")
+
+ggplot() + geom_bar(
+  aes(y = family_percent, x = sample_id, fill = family),
+  data = df_metrics_family,
+  stat = "identity" ,
+  position = "fill"
+)  +labs(x="Category" , y= "Percentage (%)")+
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8)) + 
+     facet_wrap(.~pack, scales="free")+
+  ylab("Percentage of Sample") +
+  xlab("Individual Sample")
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_phlycounts_counts <- df_metrics %>%
+  select(asv_id, sample_id, count_norm) %>%
+  spread(sample_id, count_norm)
+
+df_phlycounts_counts <- df_phlycounts_counts[order(df_phlycounts_counts$asv_id),] 
+
+otumat <- as.matrix(df_phlycounts_counts[,2:10])
+rownames(otumat) <- as.data.frame(df_phlycounts_counts)[,1]
+
+df_phlycounts_tax <- df_metrics %>%
+  select(asv_id, phylum, family) %>%
+  unique()
+
+df_phlycounts_tax$phylum <- as.character(df_phlycounts_tax$phylum)
+df_phlycounts_tax$family <- as.character(df_phlycounts_tax$family)
+
+df_phlycounts_tax[is.na(df_phlycounts_tax)] <- "NotAssigned"
+
+df_phlycounts_tax <- df_phlycounts_tax[order(df_phlycounts_tax$asv_id),] 
+
+taxmat <- as.matrix(df_phlycounts_tax[,2:3])
+rownames(taxmat) <- as.data.frame(df_phlycounts_tax)[,1]
+
+df_phylocounts_meta <- df_metrics %>% 
+  select(sample_id, sample, pack, sibling) %>%
+  unique() %>%
+  rowwise() %>%
+  ungroup()
+
+df_phylocounts_meta <- as.data.frame(df_phylocounts_meta)
+
+row.names(df_phylocounts_meta) <- df_phylocounts_meta[,1]
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=20, fig.height=8}
+library("phyloseq")
+library("ape")
+library(plyr)
+OTU = otu_table(otumat, taxa_are_rows = TRUE)
+TAX = tax_table(taxmat)
+physeq = phyloseq(OTU, TAX)
+random_tree = rtree(ntaxa(physeq), rooted=TRUE, tip.label=taxa_names(physeq))
+samplesdata <- sample_data(df_phylocounts_meta)
+physeq = phyloseq(OTU, TAX, samplesdata, random_tree)
+```
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=5, fig.height=8}
+net <- make_network(physeq, "samples", max.dist=0.8)
+plot_network(net, physeq , color="pack", shape="sample", line_weight=0.3, label=NULL)
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=10}
+dist = "bray"
+ord_meths = c("DCA", "CCA", "RDA", "DPCoA", "NMDS", "MDS", "PCoA")
+plist = llply(as.list(ord_meths), function(i, physeq, dist){
+        ordi = ordinate(physeq, method=i, distance=dist)
+        plot_ordination(physeq, ordi, "samples", color="pack")
+}, physeq, dist)
+names(plist) <- ord_meths
+
+pdataframe = ldply(plist, function(x){
+    df = x$data[, 1:2]
+    colnames(df) = c("Axis_1", "Axis_2")
+    return(cbind(df, x$data))
+})
+names(pdataframe)[1] = "method"
+
+p = ggplot(pdataframe, aes(Axis_1, Axis_2, color=pack, shape=sample, fill=pack))
+p = p + geom_point(size=4) #+ geom_polygon()
+p = p + facet_wrap(~method, scales="free")
+p = p + scale_fill_brewer(type="qual", palette="Set1")
+p = p + scale_colour_brewer(type="qual", palette="Set1")
+p
+```

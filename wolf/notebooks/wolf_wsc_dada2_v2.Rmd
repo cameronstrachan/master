@@ -1,0 +1,294 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(printr)
+library(ggplot2)
+library(cowplot)
+library(reshape2)
+library(knitr)
+library(pwr)
+library("ggpubr")
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_meta <- read.csv("~/master/wolf/dataflow/00-meta/wetzels2018_wu2018_fastq.csv")
+colnames(df_meta)[1] <- "sra_accession"
+
+df_meta$sra_accession <- as.character(df_meta$sra_accession)
+df_meta$type <- as.character(df_meta$type)
+df_meta$study <- as.character(df_meta$study)
+df_meta$region <- as.character(df_meta$region)
+df_meta$sample <- as.character(df_meta$sample)
+df_meta$pack <- as.character(df_meta$pack)
+df_meta$sibling <- as.character(df_meta$sibling)
+df_meta$replicate <- as.character(df_meta$replicate)
+df_meta$sample_id <- as.character(df_meta$sample_id)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_classification  <- read.csv("~/master/wolf/dataflow/03-asv-taxonomy/wetzels2018-8_270_8_220-100-rdp.csv")
+df_classification[,1] <- NULL
+
+df_classification <- df_classification %>%
+  select(asv_id, phylum, family, genus)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df <- read.delim("~/master/wolf/dataflow/03-asv-table/wetzels2018-8_270_8_220-100.txt", skip = 1, header = TRUE)
+df$clustering <- 100
+
+colnames(df)[1] <- 'asv_id'
+
+col_to_gather <- names(df)[!(startsWith(names(df), "W"))]
+df <- melt(df, id = col_to_gather)
+colnames(df)[3:4] <- c('sra_accession', 'count')
+
+df$asv_id <- as.character(df$asv_id)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_normalizations <- df %>%
+  filter(clustering == 100) %>%
+  group_by(sra_accession) %>%
+  mutate(total_reads = sum(count)) %>%
+  ungroup() %>%
+  mutate(max_total_reads = max(total_reads)) %>%
+  select(sra_accession, total_reads, max_total_reads) %>%
+  ungroup() %>%
+  distinct() 
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_complete <- inner_join(df, df_meta) %>%
+  inner_join(df_normalizations) %>%
+  inner_join(df_classification)
+```
+
+## summary
+
+- The Wolf skin and fecal samples (Wolf Science Centre - WSC), as well as the Wolf and Dog fecal samples from Wu 2018, we're processed with dada2.
+- Since the Wu 2018 data had longer reads after quality control, the data was trimmed to the same 275 basepairs as the WSC data. 
+- All the data, after processing, was clustered together at 97% identity and taxonomically classified using RDB.
+
+### number of sequences
+
+- The first thing I noticed was that many of the samples from Wu 2018 have very few remaining reads after processing.
+- The following plot is coloured by the study (our group or the Wu 2018 paper), with the area where the samples were collected on the x axis. 
+- It is clear in Wu 2018 that there are far fewer sequences for the Henan area, so these will be removed. 
+- Also, since there are no dogs in the WSC data I currently have and no Skin samples in the Wu 2018 data, I will be removing Dog and Skin samples for the sake of comparison.
+
+\vspace{12pt}
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.height=3}
+plot <- ggplot(df_normalizations, aes(x=reorder(sra_accession, total_reads))) +
+    theme_few() +
+    geom_point(aes(y = total_reads),
+      stat = "identity", fill = "lightgrey", size = 1) +
+    theme(strip.text = element_text(size = 12),
+          axis.text.y = element_text(size = 12),
+          axis.text.x = element_text(angle = 90, hjust = 1, size = 12),
+          axis.title.y = element_text(size = 12)) +
+    theme(axis.title.x=element_blank()) +
+  ylab("Total Reads Afer DADA2")
+plot
+
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_metrics <- df_complete %>% 
+  
+  mutate(count_norm = (count / total_reads)*max_total_reads) %>%
+  
+  unite(classification, c("phylum", "family", "genus"), sep = ";", remove = FALSE) %>%
+  
+  select(asv_id, sample_id, count, count_norm, sample, pack, sibling, phylum, family) %>%
+  
+  distinct() %>%
+  
+  mutate(non_zero = ifelse(count == 0, 0, 1)) %>%
+  
+  group_by(asv_id) %>%
+  
+  mutate(sum_non_zero = sum(non_zero)) %>%
+  
+  ungroup() %>%
+  
+  filter(pack == "W_pack_B" | pack == "W_pack_D" | pack == "W_pack_E") %>%
+  
+  filter(sum_non_zero > 2)
+```
+
+
+
+\newpage
+
+### phylum level grouping
+
+- Looking at the percentage of the sample at a phylum level makes is very clear that the wolf communities from China and here are very distinct.  
+- There is one sample from the WSC (W4f) that looks a bit more like the Wu data, based on the amount of bacteroidetes, fusobacteria and actinobacteria predominatly.
+- Further, dogs and wolfs from china seems to be more similar as wolfs from the WSC. 
+
+\vspace{12pt}
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=20, fig.height=20}
+df_metrics_phylum <- df_metrics %>%
+  group_by(sample_id, phylum) %>%
+  mutate(phylum_percent = sum(count_norm)) %>%
+  ungroup() %>%
+  select(sample_id, phylum, phylum_percent, sample, pack) %>%
+  distinct() 
+
+
+df_metrics_family <- df_metrics %>%
+  group_by(sample_id, family) %>%
+  mutate(family_percent = sum(count_norm)) %>%
+  ungroup() %>%
+  select(sample_id, family, family_percent, sample, pack) %>%
+  distinct() 
+
+ggplot() + geom_bar(
+  aes(y = phylum_percent, x = sample_id, fill = phylum),
+  data = df_metrics_phylum,
+  stat = "identity" ,
+  position = "fill"
+)  +labs(x="Category" , y= "Percentage (%)")+
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8)) + 
+     facet_wrap(.~sample*pack, scales="free")+
+  ylab("Percentage of Sample") +
+  xlab("Individual Sample")
+
+ggplot() + geom_bar(
+  aes(y = family_percent, x = sample_id, fill = family),
+  data = df_metrics_family,
+  stat = "identity" ,
+  position = "fill"
+)  +labs(x="Category" , y= "Percentage (%)")+
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8)) + 
+     facet_wrap(.~sample*pack, scales="free")+
+  ylab("Percentage of Sample") +
+  xlab("Individual Sample")
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_phlycounts_counts <- df_metrics %>%
+  select(asv_id, sample_id, count_norm) %>%
+  spread(sample_id, count_norm)
+
+df_phlycounts_counts <- df_phlycounts_counts[order(df_phlycounts_counts$asv_id),] 
+
+otumat <- as.matrix(df_phlycounts_counts[,2:19])
+rownames(otumat) <- as.data.frame(df_phlycounts_counts)[,1]
+
+df_phlycounts_tax <- df_metrics %>%
+  select(asv_id, phylum, family) %>%
+  unique()
+
+df_phlycounts_tax$phylum <- as.character(df_phlycounts_tax$phylum)
+df_phlycounts_tax$family <- as.character(df_phlycounts_tax$family)
+
+df_phlycounts_tax[is.na(df_phlycounts_tax)] <- "NotAssigned"
+
+df_phlycounts_tax <- df_phlycounts_tax[order(df_phlycounts_tax$asv_id),] 
+
+taxmat <- as.matrix(df_phlycounts_tax[,2:3])
+rownames(taxmat) <- as.data.frame(df_phlycounts_tax)[,1]
+
+df_phylocounts_meta <- df_metrics %>% 
+  select(sample_id, sample, pack, sibling) %>%
+  unique() %>%
+  rowwise() %>%
+  ungroup()
+
+df_phylocounts_meta <- as.data.frame(df_phylocounts_meta)
+
+row.names(df_phylocounts_meta) <- df_phylocounts_meta[,1]
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=20, fig.height=8}
+library("phyloseq")
+library("ape")
+library(plyr)
+OTU = otu_table(otumat, taxa_are_rows = TRUE)
+TAX = tax_table(taxmat)
+physeq = phyloseq(OTU, TAX)
+random_tree = rtree(ntaxa(physeq), rooted=TRUE, tip.label=taxa_names(physeq))
+samplesdata <- sample_data(df_phylocounts_meta)
+physeq = phyloseq(OTU, TAX, samplesdata, random_tree)
+```
+
+This is quite obvious is I make a network, where W4f calls between the WSC samples and the China samples.  
+
+\vspace{12pt}
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=5, fig.height=8}
+net <- make_network(physeq, "samples", max.dist=0.8)
+plot_network(net, physeq , color="pack", shape="sample", line_weight=0.3, label=NULL)
+```
+
+- We can also build all the different types of ordinations. Here, I will make the shape the region, as the two different regions in China seems to be more similar, and colour by the study. In the second version of the plot, I will colour by animals, as the dogs to stand out in a few ordinations. 
+
+\vspace{12pt}
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=10}
+physeq_skin <- subset_samples(physeq, sample=="skin")
+
+dist = "bray"
+ord_meths = c("DCA", "CCA", "RDA", "DPCoA", "NMDS", "MDS", "PCoA")
+plist = llply(as.list(ord_meths), function(i, physeq, dist){
+        ordi = ordinate(physeq, method=i, distance=dist)
+        plot_ordination(physeq, ordi, "samples", color="pack")
+}, physeq_skin, dist)
+names(plist) <- ord_meths
+
+pdataframe = ldply(plist, function(x){
+    df = x$data[, 1:2]
+    colnames(df) = c("Axis_1", "Axis_2")
+    return(cbind(df, x$data))
+})
+names(pdataframe)[1] = "method"
+
+p = ggplot(pdataframe, aes(Axis_1, Axis_2, color=pack, shape=sample, fill=pack))
+p = p + geom_point(size=4) #+ geom_polygon()
+p = p + facet_wrap(~method, scales="free")
+p = p + scale_fill_brewer(type="qual", palette="Set1")
+p = p + scale_colour_brewer(type="qual", palette="Set1")
+p
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=10}
+physeq_skin <- subset_samples(physeq, sample=="fecal")
+
+dist = "bray"
+ord_meths = c("DCA", "CCA", "RDA", "DPCoA", "NMDS", "MDS", "PCoA")
+
+plist = llply(as.list(ord_meths), function(i, physeq, dist){
+        ordi = ordinate(physeq, method=i, distance=dist)
+        plot_ordination(physeq, ordi, "samples", color="pack")
+}, physeq_skin, dist)
+
+names(plist) <- ord_meths
+
+pdataframe = ldply(plist, function(x){
+    df = x$data[, 1:2]
+    colnames(df) = c("Axis_1", "Axis_2")
+    return(cbind(df, x$data))
+})
+names(pdataframe)[1] = "method"
+
+p = ggplot(pdataframe, aes(Axis_1, Axis_2, color=pack, shape=sample, fill=pack))
+p = p + geom_point(size=4) #+ geom_polygon()
+p = p + facet_wrap(~method, scales="free")
+p = p + scale_fill_brewer(type="qual", palette="Set1")
+p = p + scale_colour_brewer(type="qual", palette="Set1")
+p
+```
