@@ -1,0 +1,295 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(printr)
+library(ggplot2)
+library(cowplot)
+library(reshape2)
+library(knitr)
+library(pwr)
+library("ggpubr")
+library(stringi)
+library(polycor)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+one_way_anova_extract <- function(df, value = 1, y = "NA", factor1 = "NA"){
+
+  
+  df <- as.data.frame(df)
+  # rename the columns to generalize the method
+  colnames(df)[which(names(df) == y)] <- "dependant"
+  colnames(df)[which(names(df) == factor1)] <- "category1"
+
+  res.aov <- lm(dependant ~ category1, data = df)
+  sum <- anova(res.aov)
+  
+  # extract p value
+  pvalue <- sum$"Pr(>F)"[1]
+  
+  # only return p value for now 
+  return(pvalue)
+}
+
+```
+
+## plot of sequence quality
+
+- Plotting the median phred quality score from the sequencing. I typically find that you don't want to go below a quality score of 35, which presents somewhere between 99.9 and 99.99% accuracy.  
+- It looks like these were reads that were already collapsed from the paried-end sequences.  
+- The is a massive drop in quality at the end of the sequence, so I will trim from 1 to 325 basepairs, as this is probably the only safe region to work with.  
+
+\vspace{12pt}
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=20, fig.height=5}
+quality_qiime <- read.csv("~/master/rumen/dataflow/02-qiime/henderson2015-seq-quality-summary.csv", header=FALSE)
+quality_qiime <- as.data.frame(t(quality_qiime))
+
+quality_qiime[, ] <- lapply(quality_qiime[, ], as.character)
+
+
+quality_qiime[1,] <- gsub("\\%", "", quality_qiime[1,])
+
+colnames(quality_qiime) <- quality_qiime[1,]
+
+quality_qiime <- quality_qiime[-1,]
+
+colnames(quality_qiime)[1] <- "position"
+
+quality_qiime$'50' <- as.numeric(quality_qiime$'50')
+
+xbreaks <- quality_qiime$position[seq(1, length(quality_qiime$position), 10)]
+
+qplot(quality_qiime$position, quality_qiime$'50') + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 18),
+        axis.text.y = element_text(size = 18), 
+        axis.title.x = element_text(size = 25), 
+        axis.title.y = element_text(size = 25)) +
+  scale_x_discrete("Position",  breaks = xbreaks) +
+  ylab("Median Quality Score")
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# df_meta <- read.csv("~/master/rumen/dataflow/00-meta/henderson2015_fastq.csv")
+# 
+# df_classification <- read.csv("~/master/rumen/dataflow/03-asv-taxonomy/henderson2015-1_315-100-rdp.csv")
+# df_classification[,1] <- NULL
+# 
+# df_readsqc <- read.csv("~/master/rumen/dataflow/00-meta/henderson2015_readsqc.csv") 
+# 
+# df <- read.delim("~/master/rumen/dataflow/03-asv-table/henderson2015-1_315-97.txt", skip = 1, header = TRUE)
+# colnames(df)[1] <- 'asv_id'
+# df$clustering <- 97
+# 
+# df$asv_id <- as.character(df$asv_id)
+# 
+# col_to_gather <- names(df)[!startsWith(names(df), "SRX")]
+# df <- melt(df, id = col_to_gather)
+# 
+# colnames(df)[3:4] <- c('sra_accession', 'count')
+# 
+# df <- df %>%
+#  filter(count != 0)
+# 
+# df$sra_accession <- as.character(df$sra_accession)
+# df_readsqc$sra_accession <- as.character(df_readsqc$sra_accession)
+# 
+# df_classification <- df_classification %>%
+#   select(asv_id, domain, phylum, family, genus)
+# 
+# df_classification$asv_id <- as.character(df_classification$asv_id)
+# 
+# df_meta <- df_meta %>%
+#   select(Run, Experiment, LibraryName, GRCid, Simple.classification..animal., Age.classification..animal., Gender..animal., Forage.proportion..diet., Concentrate.proportion..diet., Forage.concentrate.category..diet., Forage.concentrate.category..diet.,Starch.rich..diet., Pectin.rich...diet., Weeks.on.diet..diet., Latitude..location., Longitude..location., Season..location., Contact.with.other.animals..location.) 
+# 
+# colnames(df_meta)[2] <- "sra_accession"
+# df_meta$sra_accession <- as.character(df_meta$sra_accession)
+# df_meta$GRCid <- as.character(df_meta$GRCid)
+# 
+# df_complete <- inner_join(df, df_meta, by = "sra_accession") %>%
+#   inner_join(df_readsqc, by = "sra_accession") %>%
+#   inner_join(df_classification, by = "asv_id")
+# 
+# rm(list=setdiff(ls(), "df_complete"))
+#write.csv(df_complete, "~/master/rumen/dataflow/03-asv-table/henderson2015_df_complete_temp.csv")
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_complete <- read.csv("~/master/rumen/dataflow/03-asv-table/henderson2015_df_complete_temp.csv")
+df_complete[,1] <- NULL
+
+df_complete$asv_id <- as.character(df_complete$asv_id)
+df_complete$GRCid <- as.character(df_complete$GRCid)
+df_complete$sra_accession <- as.character(df_complete$sra_accession)
+df_complete$LibraryName <- as.character(df_complete$LibraryName)
+
+df_complete <- df_complete %>%
+  rowwise() %>%
+  mutate(replicate = stri_reverse(stri_split_fixed(stri_reverse(LibraryName),".",n = 2)[[1]][2])) 
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_metrics <- df_complete %>% 
+  
+  filter(domain == "Bacteria") %>%
+  
+  unique() %>%
+  
+  mutate(count_norm = (count / non.chimeric)*100) %>%
+  
+  group_by(asv_id, replicate) %>%
+  mutate(n_count = length(asv_id)) %>%
+  ungroup() %>%
+  
+  unite(classification, c("phylum", "family", "genus"), sep = ";", remove = FALSE)
+
+
+df_metrics$classification <- gsub(";NA", "", df_metrics$classification)
+
+df_metrics_select <- df_metrics %>%
+  filter(Simple.classification..animal. == "Cattle") %>%
+  #filter(Age.classification..animal. == "mature") %>%
+  #filter(Gender..animal. == "female") %>%
+  
+  filter(non.chimeric > 500) %>%
+  
+  filter(phylum != "NA") %>%
+  
+  select(asv_id, sra_accession, GRCid, Concentrate.proportion..diet., Forage.concentrate.category..diet., Starch.rich..diet., Weeks.on.diet..diet., non.chimeric, classification, count_norm)
+
+df_metrics_select <- df_metrics_select[complete.cases(df_metrics_select), ]
+names(df_metrics_select) <- c("asv_id", "sra_accession", "GRCid",  "concentrate_proportion", "diet_category", "high_starch", "weeks_diet", "reads", "taxa", "count_norm")
+
+df_metrics_select_anova <- df_metrics_select %>%
+  
+  select(asv_id, taxa, high_starch, taxa, count_norm) %>%
+  
+  group_by(asv_id, high_starch) %>%
+  
+  mutate(n_count = length(count_norm)) %>%
+  
+  distinct() %>%
+  
+  filter(n_count > 5)
+  
+  
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# df_anova_list <- list()
+# i <- 1
+# 
+# for (group in unique(df_metrics_select_anova$asv_id)) {
+#   
+#   
+#   df_anova_select1 <- df_metrics_select_anova %>% 
+#     filter(asv_id == group)
+#   
+#   if (length(unique(df_anova_select1$high_starch)) > 1){
+#       
+#       df_anova_select1$treatment_anova <- one_way_anova_extract(df_anova_select1, 
+#         value = 1, y = "count_norm", factor1 = "high_starch")
+#       
+#       df_anova_list[[i]] <- df_anova_select1
+#       i <- i + 1
+# 
+#   } else {
+#   
+#   df_anova_select2 <- df_metrics_select_anova %>% 
+#     filter(asv_id == group)
+#   
+#   df_anova_select2$high_starch <- "n"
+#   df_anova_select2$count_norm <- 0
+#   
+#   df_anova_select3 <- df_metrics_select_anova %>% 
+#     filter(asv_id == group)
+#   
+#   
+#   df_anova_select4 <- bind_rows(df_anova_select2, df_anova_select3)
+#   
+#   if (length(unique(df_anova_select4$high_starch)) > 1){
+#       
+#       df_anova_select4$treatment_anova <- one_way_anova_extract(df_anova_select4, 
+#         value = 1, y = "count_norm", factor1 = "high_starch")
+#       
+#       df_anova_list[[i]] <- df_anova_select4
+#       i <- i + 1
+#   
+#     
+# }
+# }
+# }
+# 
+# df_anova <- bind_rows(df_anova_list) %>%
+#   select(-count_norm) %>%
+#   distinct()
+# 
+# write.csv(df_anova, "~/master/rumen/dataflow/03-asv-table/henderson2015_df_anova_temp.csv")
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_anova <- read.csv("~/master/rumen/dataflow/03-asv-table/henderson2015_df_anova_temp.csv")
+df_anova[,1] <- NULL
+
+df_treatment_plot <- inner_join(df_metrics_select_anova, df_anova) %>%
+  filter(treatment_anova < 0.0005) %>%
+  arrange(treatment_anova)  %>%
+  
+  group_by(asv_id) %>%
+  mutate(median_count_norm = median(count_norm)) %>%
+  ungroup() %>%
+  
+  filter(median_count_norm > 0.3)
+
+groups <- unique(df_treatment_plot$taxa)
+plots <- list()
+i <- 1
+
+for (group in groups){
+  
+    df_p <- df_treatment_plot %>%
+      filter(taxa == group)
+    
+    taxa <- unique(df_p$taxa)
+    
+plot <- ggboxplot(df_p, x = "high_starch", y = "count_norm", color = "high_starch", outlier.shape = NA) +
+          ylab("Normalized Count") +
+          xlab("Diet Category") +
+          theme(strip.text = element_text(size = 20),
+          plot.title = element_text(size = 20),
+          axis.text.x = element_text(angle = 90, hjust = 1, size = 20),
+          axis.text.y = element_text(size = 20),
+          axis.title.x = element_text(size = 20),
+          axis.title.y = element_text(size = 20)) +
+
+          ggtitle(taxa) + 
+  
+          ylim(0,0.5)  + 
+  
+          facet_grid(asv_id ~ .)
+
+
+    
+
+plots[[i]] <- plot
+    
+    i <- i + 1
+}
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6}
+for (i in 1:length(plots)) {
+  plot(plots[[i]])
+  cat("\r\n\r\n")
+}
+```
+
+

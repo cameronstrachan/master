@@ -1,0 +1,183 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(printr)
+library(ggplot2)
+library(cowplot)
+library(reshape2)
+library(knitr)
+library(pwr)
+library("ggpubr")
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_meta <- read.csv("~/master/wolf/dataflow/00-meta/wetzels2018_wu201fastq.csv")
+colnames(df_meta)[1] <- "sra_accession"
+df_meta <- df_meta[,1:7]
+df_meta$sra_accession <- as.character(df_meta$sra_accession)
+
+df_classification  <- read.csv("~/master/wolf/dataflow/03-asv-taxonomy/wetzels2018_wu2018-97-rdp.csv")
+df_classification[,1] <- NULL
+
+df_97 <- read.delim("~/master/wolf/dataflow/03-asv-table-merge/wetzels2018_wu2018-97.txt", skip = 1, header = TRUE)
+df_97$clustering <- 97
+
+df <- df_97
+
+colnames(df)[1] <- 'asv_id'
+
+col_to_gather <- names(df)[!(startsWith(names(df), "SRR") |  startsWith(names(df), "W"))]
+df <- melt(df, id = col_to_gather)
+colnames(df)[3:4] <- c('sra_accession', 'count')
+
+df$asv_id <- as.character(df$asv_id)
+df_meta$type <- as.character(df_meta$type)
+df_meta$study <- as.character(df_meta$study)
+df_meta$region <- as.character(df_meta$region)
+df_meta$sample <- as.character(df_meta$sample)
+
+df_normalization <- df %>%
+  filter(clustering == 97) %>%
+  group_by(sra_accession) %>%
+  mutate(total_16s_reads = sum(count)) %>%
+  ungroup() %>%
+  select(sra_accession, total_16s_reads) %>%
+  ungroup() %>%
+  distinct() 
+
+df_classification <- df_classification %>%
+  select(asv_id, phylum, family, genus)
+
+
+df_complete <- inner_join(df, df_meta) %>%
+  inner_join(df_normalization) %>%
+  inner_join(df_classification)
+
+df_normalization_plot <- inner_join(df_normalization, df_meta)
+```
+
+## summary
+
+- The Wolf skin and fecal samples (Wolf Science Centre - WSC), as well as the Wolf and Dog fecal samples from Wu 2018, we're processed with dada2.
+- Since the Wu 2018 data had longer reads after quality control, the data was trimmed to the same 275 basepairs as the WSC data. 
+- All the data, after processing, was clustered together at 97% identity and taxonomically classified using RDB.
+
+### number of sequences
+
+- The first thing I noticed was that many of the samples from Wu 2018 have very few remaining reads after processing.
+- The following plot is coloured by the study (our group or the Wu 2018 paper), with the area where the samples were collected on the x axis. 
+- It is clear in Wu 2018 that there are far fewer sequences for the Henan area, so these will be removed. 
+- Also, since there are no dogs in the WSC data I currently have and no Skin samples in the Wu 2018 data, I will be removing Dog and Skin samples for the sake of comparison.
+
+\vspace{12pt}
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.height=3}
+plot <- ggplot(df_normalization_plot, aes(x=reorder(sra_accession, total_16s_reads))) +
+    theme_few() +
+    geom_point(aes(x=region, y = total_16s_reads, colour = study),
+      stat = "identity", fill = "lightgrey", size = 1) +
+    theme(strip.text = element_text(size = 12),
+          axis.text.y = element_text(size = 12), 
+          axis.title.y = element_text(size = 12)) +
+    theme(axis.title.x=element_blank()) +
+  ylab("Total Reads Afer DADA2")
+plot
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_metrics <- df_complete %>% 
+  filter(type == "Wolf") %>%
+  filter(sample == "fecal") %>%
+  
+  #filter(count > 0) %>%
+  
+  mutate(count_norm = (count / total_16s_reads)*100) %>%
+  
+  unite(classification, c("phylum", "family", "genus"), sep = ";", remove = FALSE)
+
+#df_metrics$classification <- gsub(";NA", "", df_metrics$classification)
+```
+
+\newpage
+
+### phylum level grouping
+
+- Looking at the percentage of the sample at a phylum level makes is very clear that the wolf communities from China and here are very distinct. This is especially true with the ratio of Bacteroidetes to Fermicutes (why is the Wolf feces here so Firmicute dominated?)
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.height=3}
+df_metrics_phylum <- df_metrics %>%
+  filter(count_norm > 0.1) %>%
+  group_by(sra_accession, phylum) %>%
+  mutate(phylum_percent = sum(count_norm)) %>%
+  ungroup() %>%
+  select(sra_accession, phylum, phylum_percent, study) %>%
+  distinct() 
+
+
+ggplot() + geom_bar(
+  aes(y = phylum_percent, x = sra_accession, fill = phylum),
+  data = df_metrics_phylum,
+  stat = "identity" ,
+  position = "fill"
+)  +labs(x="Category" , y= "Percentage (%)")+
+  theme_minimal() +
+  theme(axis.text.x = element_blank()) + 
+     facet_wrap(.~study, scales="free")+
+  ylab("Percentage of Sample") +
+  xlab("Individual Sample")
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_phlycounts_counts <- df_metrics %>%
+  select(asv_id, sra_accession, count_norm) %>%
+  spread(sra_accession, count_norm)
+
+df_phlycounts_counts <- df_phlycounts_counts[order(df_phlycounts_counts$asv_id),] 
+
+otumat <- as.matrix(df_phlycounts_counts[,2:59])
+rownames(otumat) <- df_phlycounts_counts[,1]
+
+df_phlycounts_tax <- df_metrics %>%
+  select(asv_id, phylum, family, genus) %>%
+  unique()
+
+df_phlycounts_tax$phylum <- as.character(df_phlycounts_tax$phylum)
+df_phlycounts_tax$family <- as.character(df_phlycounts_tax$family)
+df_phlycounts_tax$genus <- as.character(df_phlycounts_tax$genus)
+
+df_phlycounts_tax[is.na(df_phlycounts_tax)] <- "NotAssigned"
+
+df_phlycounts_tax <- df_phlycounts_tax[order(df_phlycounts_tax$asv_id),] 
+
+taxmat <- as.matrix(df_phlycounts_tax[,2:4])
+rownames(taxmat) <- df_phlycounts_tax[,1]
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=20, fig.height=10}
+library("phyloseq")
+OTU = otu_table(otumat, taxa_are_rows = TRUE)
+TAX = tax_table(taxmat)
+physeq = phyloseq(OTU, TAX)
+plot_bar(physeq, fill = "phylum")
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=10}
+phylum.sum = tapply(taxa_sums(physeq), tax_table(physeq)[, "phylum"], sum, na.rm=TRUE)
+top5phyla = names(sort(phylum.sum, TRUE))[1:5]
+physeq1 = prune_taxa((tax_table(physeq)[, "phylum"] %in% top5phyla), physeq)
+
+
+physeq.ord <- ordinate(physeq1, "NMDS", "bray")
+p1 = plot_ordination(physeq, physeq.ord, type="taxa", color="phylum", title="taxa")
+p1 + facet_wrap(~phylum, 3)
+
+p2 = plot_ordination(physeq1, physeq.ord, type="samples") 
+p2 + geom_polygon(aes()) + geom_point(size=5) + ggtitle("samples")
+```

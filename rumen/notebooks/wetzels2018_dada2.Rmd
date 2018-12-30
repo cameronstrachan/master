@@ -1,0 +1,377 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(printr)
+library(ggplot2)
+library(cowplot)
+library(printr)
+library(reshape2)
+library(knitr)
+library(pwr)
+```
+
+## plot of sequence quality
+
+- Plotting the median phred quality score from the sequencing. I typically find that you don't want to go below a quality score of 35, which presents somewhere between 99.9 and 99.99% accuracy.  
+- It looks like these were reads that were already collapsed from the paried-end sequences.  
+- The is a massive drop in quality in the middle of the sequence, so I will trimmed from 0 to 200 basepairs, as this is probably the only safe region to work with.  
+
+\vspace{12pt}
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=20, fig.height=5}
+quality_qiime <- read.csv("~/master/rumen/dataflow/02-qiime/wetzels2018-seq-quality-summary.csv", header=FALSE)
+quality_qiime <- as.data.frame(t(quality_qiime))
+
+quality_qiime[, ] <- lapply(quality_qiime[, ], as.character)
+
+
+quality_qiime[1,] <- gsub("\\%", "", quality_qiime[1,])
+
+colnames(quality_qiime) <- quality_qiime[1,]
+
+quality_qiime <- quality_qiime[-1,]
+
+colnames(quality_qiime)[1] <- "position"
+
+quality_qiime$'50' <- as.numeric(quality_qiime$'50')
+
+xbreaks <- quality_qiime$position[seq(1, length(quality_qiime$position), 10)]
+
+qplot(quality_qiime$position, quality_qiime$'50') + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 18),
+        axis.text.y = element_text(size = 18), 
+        axis.title.x = element_text(size = 25), 
+        axis.title.y = element_text(size = 25)) +
+  scale_x_discrete("Position",  breaks = xbreaks) +
+  ylab("Median Quality Score")
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_meta <- read.csv("~/master/rumen/dataflow/00-meta/wetzels2018_fastq.csv")
+
+df_100 <- read.delim("~/master/rumen/dataflow/03-asv-table/wetzels2017-1_195-100.txt", skip = 1, header = TRUE)
+df_100$clustering <- 100
+
+df_99 <- read.delim("~/master/rumen/dataflow/03-asv-table/wetzels2017-1_195-99.txt", skip = 1, header = TRUE)
+df_99$clustering <- 99
+
+df_97 <- read.delim("~/master/rumen/dataflow/03-asv-table/wetzels2017-1_195-97.txt", skip = 1, header = TRUE)
+df_97$clustering <- 97
+
+df <- bind_rows(df_100, df_99, df_97)
+
+colnames(df)[1] <- 'asv_id'
+
+col_to_gather <- names(df)[!startsWith(names(df), "ERX")]
+df <- melt(df, id = col_to_gather)
+colnames(df)[3:4] <- c('sra_accession', 'count')
+
+df$asv_id <- as.character(df$asv_id)
+df_meta$day <- as.character(df_meta$day)
+df_meta$treatment <- as.character(df_meta$treatment)
+
+df_normalization <- df %>%
+  filter(clustering == 100) %>%
+  group_by(sra_accession) %>%
+  mutate(total_16s_reads = sum(count)) %>%
+  ungroup() %>%
+  select(sra_accession, total_16s_reads) %>%
+  ungroup() %>%
+  distinct() 
+
+df_complete <- inner_join(df, df_meta) %>%
+  inner_join(df_normalization)
+```
+
+
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_metrics <- df_complete %>% 
+  
+  filter(count > 0) %>%
+  
+  mutate(count = (count / total_16s_reads)*100000) %>%
+  
+
+  
+  group_by(asv_id, clustering, day, treatment) %>%
+  mutate(med_count = median(count)) %>%
+  mutate(sd_count = sd(count)) %>%
+  mutate(cv_count =  (sd(count) / mean(count))*100) %>%
+  mutate(n_count = length(count)) %>%
+  ungroup() %>%
+  filter(n_count == 3) %>%
+  select(-total_16s_reads)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=5, fig.height=3.5}
+sd_checks <- df_metrics %>%
+  filter(cv_count < 100)
+
+qplot(df_metrics$count, df_metrics$cv_count)
+
+hist(df_metrics$sd_count[df_metrics$sd_count < 20])
+
+df_metrics <- df_metrics %>%
+  filter(cv_count < 100)
+```
+
+## data clean up
+
+- Data with no counts for a sequence were removed.  
+- Data without triplicates remaining was also removed.  
+
+## plot of approximate abundances
+
+\vspace{12pt}
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=5, fig.height=3.5}
+df_abundance <- df_metrics %>%
+  select(asv_id, clustering, med_count) %>%
+  unique() %>%
+  arrange(med_count)
+
+df_abundance$clustering <- as.factor(df_abundance$clustering)
+
+plot <- ggplot(df_abundance, aes(x=reorder(asv_id, med_count))) +
+    theme_few() +
+    geom_point(aes(y = med_count, colour = clustering),
+      stat = "identity", fill = "lightgrey", size = 1.5) +
+    theme(axis.text.y = element_text(size = 20), 
+         axis.title.y = element_text(size = 20)) +
+    theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+plot
+```
+
+
+## looking for rough differences
+
+- The following plots are only showing that data where there was a significant t-test for one of the time points between infected and non-infected.  
+- The median count of tags across the whole experiment (all time points) for each sequence was also trimmed to be above 100.  
+- A line was fit to the data and data was trimmed to an r squared of over 0.1. This was just to make focus on data that showed a bit of a consistent trend over the days.  
+
+\vspace{12pt}
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_count_summary <- df_metrics %>%
+  select(-sample_id, -sra_accession) %>%
+  
+  group_by_at(vars(-count)) %>%
+  summarize(count = list(unique(count))) %>%
+  ungroup() %>%
+  select(asv_id, clustering, day, count, treatment) %>%
+  
+  rowwise() %>%
+  mutate(n = as.numeric(length(unlist(count)))) 
+
+df_control <- df_count_summary %>%
+  filter(treatment == 'non-infected') %>%
+  select(-treatment) %>%
+  rename(count_control = count)
+
+df_treatment <- df_count_summary %>%
+  filter(treatment == 'infected') %>%
+  select(-treatment) %>%
+  rename(count_treatment = count)
+
+df_ttest <- inner_join(df_control, df_treatment) %>%
+  rowwise() %>%
+  mutate(ncontrol = length(unlist(count_control))) %>%
+  mutate(ntreatment = length(unlist(count_treatment))) %>%
+  filter(ncontrol == 3) %>%
+  filter(ntreatment == 3) %>%
+  mutate(pvalue_test = t.test(count_treatment, count_control, paired = FALSE)$p.value) %>%
+  ungroup() 
+
+df_power <- df_ttest %>%
+  rowwise() %>%
+  mutate(mean_dif = mean(unlist(count_treatment)) - mean(unlist(count_control))) %>%
+  mutate(sd_pooled = (sqrt((sd(unlist(count_control))**2 + sd(unlist(count_treatment))**2) / 2 ))) %>%
+  mutate(delta = mean_dif / sd_pooled) %>%
+  mutate(power = pwr.2p.test(h=delta, n=3,  sig.level = 0.05)$power)
+
+
+## seems like I just need to fit a two way anova (time and treatment). then turkeys?
+
+
+
+df_ttest <- df_ttest%>%
+  filter(pvalue < 0.05)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_plot <- df_ttest %>%
+  select(asv_id, clustering) %>% 
+  distinct() %>%
+  inner_join(df_metrics) %>%
+  group_by(asv_id, clustering) %>%
+  mutate(exp_med = median(med_count)) %>%
+  ungroup() %>%
+  filter(exp_med > 100) %>%
+  group_by(asv_id, clustering) %>%
+  mutate(n_days = length(unique(day))) %>%
+  ungroup() %>%
+  
+  filter(n_days > 4) %>%
+  group_by(asv_id, clustering) %>%
+  mutate(rsqr = summary(lm(day ~ count))$r.squared) %>%
+  ungroup() %>%
+  arrange(desc(rsqr)) %>%
+  filter(rsqr > 0.1)
+
+df_plot$day <- as.numeric(df_plot$day)
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# dummy data frames to fix facet in plotting. 
+df_dummy <- df_plot %>%
+  select(clustering, sample_id, day) %>%
+  unique()
+
+df_dummy_100 <- df_dummy  %>%
+  filter(clustering == 100)
+
+df_dummy_99 <- df_dummy  %>%
+  filter(clustering == 99)
+
+df_dummy_97 <- df_dummy  %>%
+  filter(clustering == 97)
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=20, fig.height=25}
+seqs <- unique(df_plot$asv_id)
+plots <- list()
+i <- 1
+
+for (seq in seqs){
+  
+    df_p <- df_plot %>%
+      filter(asv_id == seq)
+  
+    if( !(100 %in% unique(df_p$clustering)) ){
+      df_p <- bind_rows(df_p, df_dummy_100 )
+    }
+    
+    if( !(99 %in% unique(df_p$clustering)) ){
+      df_p <- bind_rows(df_p, df_dummy_99 )
+    }
+    
+    if( !(97 %in% unique(df_p$clustering)) ){
+      df_p <- bind_rows(df_p, df_dummy_97 )
+    }
+
+plot <- ggplot(df_p, aes(x=day)) +
+    theme_few() +
+    geom_errorbar(aes(ymin = med_count -
+                      sd_count, ymax =  med_count +
+                      sd_count), width = 0.05, size = 0.25) +
+    geom_point(aes(y = med_count, colour = treatment, shape = treatment),
+      stat = "identity", fill = "lightgrey", size = 5) +
+    theme(strip.text = element_text(size = 20),
+      plot.title = element_text(size = 20), 
+      axis.text.x = element_text(angle = 90, hjust = 1, size = 20),  
+      axis.text.y = element_text(size = 20), 
+      axis.title.x = element_text(size = 20), 
+      axis.title.y = element_text(size = 20)) + 
+  
+  facet_grid(. ~ clustering) + 
+  ggtitle(seq)
+
+plots[[i]] <- plot
+    
+    i <- i + 1
+}
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=20, fig.height=6}
+for (i in 1:length(plots)) {
+  plot(plots[[i]])
+  cat("\r\n\r\n")
+}
+```
+
+\newpage
+
+## plotting data without treatment to look for trends
+
+- The median count of tags across the whole experiment (all time points) for each sequence was also trimmed to be above 100.  
+- A line was fit to the data and data was trimmed to an r squared of over 0.1. This was just to make focus on data that showed a bit of a consistent trend over the days.  
+
+\vspace{12pt}
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_ignore_treatment <- df_metrics %>%
+  filter(treatment != "non-infected") %>%
+  filter(clustering == 100) %>%
+  select(-treatment, -sra_accession, -sample_id) %>%
+  group_by(asv_id, clustering) %>%
+  mutate(n_days = length(unique(day))) %>%
+  ungroup() %>%
+  group_by(asv_id, clustering) %>%
+  mutate(exp_med = median(med_count)) %>%
+  ungroup() %>%
+  filter(exp_med > 100) %>%
+  filter(n_days > 2) %>%
+  group_by(asv_id) %>%
+  mutate(rsqr = summary(lm(day ~ count))$r.squared) %>%
+  ungroup() %>%
+  arrange(desc(rsqr)) %>%
+  filter(rsqr > 0.1)
+  
+
+
+df_ignore_treatment$day <- as.numeric(df_ignore_treatment $day)
+```
+
+
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+datalist_plots_gfp = list()
+i <- 1
+
+for (seq in unique(df_ignore_treatment$asv_id)){
+  
+  df_plot <- df_ignore_treatment %>%
+    filter(asv_id == seq)
+
+plot <- ggplot(df_plot, aes(x=day)) +
+    theme_few() +
+    geom_errorbar(aes(ymin = med_count -
+                      sd_count, ymax =  med_count +
+                      sd_count), width = 0.05, size = 0.25) +
+    geom_point(aes(y = med_count),
+      stat = "identity", fill = "lightgrey", size = 4) +
+    theme(plot.title = element_text(size = 12), 
+          axis.text.x = element_text(angle = 90, hjust = 1, size = 16),  
+          axis.text.y = element_text(size = 16), 
+          axis.title.x = element_text(size = 16), 
+          axis.title.y = element_text(size = 16)) +
+  
+    ggtitle(seq)
+
+  datalist_plots_gfp[[i]] <- plot_grid(plot, ncol = 1)
+  i <- i + 1
+}
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=3, fig.width=5}
+for (i in 1:length(datalist_plots_gfp)) {
+  plot(datalist_plots_gfp[[i]])
+  cat("\r\n\r\n")
+}
+```

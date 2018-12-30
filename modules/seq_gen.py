@@ -5,12 +5,14 @@ from Bio import SearchIO
 import os,sys
 import pandas as pd
 import numpy as np
+import subprocess
 
 # custom libraries
 sys.path.insert(0, '/Users/cameronstrachan/master/') 
 from modules import seq_core as sc
 
 def concat(inputfolder='path/to/input/', outputpath='path/to/output/file.txt', filenames=[]):
+	
 	if not os.path.exists(outputpath):
 		with open(outputpath, 'w') as outfile:
 		    for file in filenames:
@@ -63,3 +65,52 @@ def blastxmltotable(xmlinputfolder='path/to/input/', blastinputfolder= 'path/to/
 	    
 	df = df.dropna()
 	df.to_csv(outputpath)
+
+def runqiime(inputfolderloc='path/to/input', paired=True, numcores=7):
+
+	# data must be in form ERX1660185_1_L001_R1_001.fastq.gz
+
+	inputfolder = inputfolderloc
+
+	if paired == True:
+		subprocess.call(['/Users/cameronstrachan/master/bash/qiime_import_paired.sh', inputfolder])
+	else: 
+		subprocess.call(['/Users/cameronstrachan/master/bash/qiime_import_single.sh', inputfolder])
+
+	print("\n" + "Visualize dataflow/02-qiime/demux-single-end.qzv using online too at:" + "\n")
+	print("https://view.qiime2.org/" + "\n")
+
+	forwardlengthcutoff = input("\n" + "Forward Length Cutoff? (interger):")
+
+	lengthcutoff1 = int(forwardlengthcutoff)
+
+	reverselengthcutoff = input("\n" + "Reverse Length Cutoff? (interger):")
+
+	lengthcutoff2 = int(reverselengthcutoff)
+
+	if paired == True:
+		subprocess.call(['/Users/cameronstrachan/master/bash/run_qiime_paired.sh', str(lengthcutoff1), str(lengthcutoff2), str(numcores)])
+	else:
+		subprocess.call(['/Users/cameronstrachan/master/bash/run_qiime_single.sh', str(lengthcutoff1), str(lengthcutoff2), str(numcores)])
+
+	subprocess.call('/Users/cameronstrachan/master/bash/qiime_export.sh')
+
+
+	foldername = inputfolder.split('/')[2] + '-'
+
+	outputprefixseqs = 'dataflow/03-asv-seqs/' + foldername + str(lengthcutoff1) + '_' + str(lengthcutoff2)
+	outputprefixstabs = 'dataflow/03-asv-table/' + foldername + str(lengthcutoff1) + '_' + str(lengthcutoff2)
+
+	outputprefixstaxa = 'dataflow/03-asv-taxonomy/' + foldername + str(lengthcutoff1) + '_' + str(lengthcutoff2)
+
+	os.rename('dataflow/03-asv-table/taxonomy.tsv', outputprefixstaxa + '-fc-gg-full.txt')
+
+	os.rename('dataflow/03-asv-seqs/dna-sequences-100.fasta', outputprefixseqs + '-100.fasta')
+	os.rename('dataflow/03-asv-seqs/dna-sequences-99.fasta', outputprefixseqs + '-99.fasta')
+	os.rename('dataflow/03-asv-seqs/dna-sequences-97.fasta', outputprefixseqs + '-97.fasta')
+	os.rename('dataflow/03-asv-table/feature-table-100.txt', outputprefixstabs + '-100.txt')
+	os.rename('dataflow/03-asv-table/feature-table-99.txt', outputprefixstabs + '-99.txt')
+	os.rename('dataflow/03-asv-table/feature-table-97.txt', outputprefixstabs + '-97.txt')
+
+
+
