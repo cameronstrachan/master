@@ -25,19 +25,32 @@ mv dataflow/02-qiime/rep-seqs-dada2.qza dataflow/02-qiime/rep-seqs.qza
 mv dataflow/02-qiime/table-dada2.qza dataflow/02-qiime/table.qza
 
 # classify seqs
+<<<<<<< HEAD
 qiime feature-classifier classify-sklearn \
   --i-classifier ../databases/gg-13-8-99-nb-classifier.qza \
   --i-reads dataflow/02-qiime/rep-seqs.qza \
   --o-classification dataflow/02-qiime/gg-taxonomy.qza
+=======
+#qiime feature-classifier classify-sklearn \
+#  --i-classifier ../databases/gg-13-8-99-nb-classifier.qza \
+#  --i-reads dataflow/02-qiime/rep-seqs.qza \
+#  --o-classification dataflow/02-qiime/gg-taxonomy.qza
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
 
 #qiime feature-classifier classify-sklearn \
 #  --i-classifier ../databases/silva-132-99-nb-classifier.qza \
 #  --i-reads dataflow/02-qiime/rep-seqs.qza \
 #  --o-classification dataflow/02-qiime/silva-taxonomy.qza
 
+<<<<<<< HEAD
 qiime metadata tabulate \
   --m-input-file dataflow/02-qiime/gg-taxonomy.qza \
   --o-visualization dataflow/02-qiime/gg-taxonomy.qzv
+=======
+#qiime metadata tabulate \
+#  --m-input-file dataflow/02-qiime/gg-taxonomy.qza \
+#  --o-visualization dataflow/02-qiime/gg-taxonomy.qzv
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
 
 #qiime metadata tabulate \
 #  --m-input-file dataflow/02-qiime/silva-taxonomy.qza \

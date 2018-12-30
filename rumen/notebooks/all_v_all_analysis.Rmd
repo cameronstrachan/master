@@ -11,11 +11,23 @@ output:
 library(tidyverse)
 library(ggthemes)
 library(stringi)
+<<<<<<< HEAD
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 blastdir <- '../dataflow/02-blast/'
 files <- list.files(blastdir)
+=======
+library(ggplot2)
+library(ggdendro)
+library(reshape2)
+library(grid)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+blastdir <- '~/master/rumen/dataflow/02-blast/'
+files <- list.files(blastdir, pattern = "\\.txt$")
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
 dflist <- list()
 
 i <- 1
@@ -31,12 +43,27 @@ for (file in files){
 df_compiled <- bind_rows(dflist)
 colnames(df_compiled)[1:13] <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
 
+<<<<<<< HEAD
 df_compiled$file <- gsub(".txt", "", df_compiled$file)
 
 
 
 df_compiled <- df_compiled %>%
   separate(file, into = c("file1", "file2"), sep = "\\.") 
+=======
+df_compiled$file <- gsub("submission.assembly", "", df_compiled$file)
+df_compiled$file <- gsub("\\.1", "1", df_compiled$file)
+df_compiled$file <- gsub("\\.2", "2", df_compiled$file)
+df_compiled$file <- gsub("\\.0", "0", df_compiled$file)
+df_compiled$file <- gsub("_rename", "", df_compiled$file)
+df_compiled$file <- gsub("_genomic", "", df_compiled$file)
+df_compiled$file <- gsub("-", "", df_compiled$file)
+df_compiled$file <- gsub("\\.txt", "", df_compiled$file)
+
+df_compiled <- df_compiled %>%
+  separate(file, into = c("file1", "file2"), sep = "\\.") %>%
+  filter(length > 100)
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
 
 df_compiled$sseq <- NULL
 ```
@@ -65,6 +92,7 @@ df_rbh <- inner_join(df_forward, df_reverse) %>%
   filter(mean_pi > 40)
 ```
 
+<<<<<<< HEAD
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 # header_dir <- '../dataflow/02-headers/'
 # files <- list.files(header_dir)
@@ -95,6 +123,128 @@ df_complete <- df_complete %>%
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
+=======
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=15, fig.height=10}
+df_complete <- df_rbh 
+
+df_complete$sseqid[is.na(df_complete$sseqid)] <- "None"
+df_complete$file2[is.na(df_complete$file2)] <- "None"
+df_complete$mean_pi[is.na(df_complete$mean_pi)] <- 0.0
+
+#df_complete <- df_complete %>%
+#  separate(qseqid, into = c("genome",  "contig", "gene"), remove = FALSE)
+
+df_pi_shared <- df_rbh %>%
+  select(file1, file2, mean_pi) %>%
+  group_by(file1, file2) %>%
+  mutate(mean_mean_pi = mean(mean_pi)) %>%
+  ungroup() %>%
+  select(-mean_pi) %>%
+  distinct()
+
+
+df_pi_shared_spread <- df_pi_shared %>%
+  spread(file2, mean_mean_pi)
+
+df_pi_shared_spread[is.na(df_pi_shared_spread)] <- 100
+
+df_pi_shared_spread_scaled <- df_pi_shared_spread
+df_pi_shared_spread[,2:12] <- scale(df_pi_shared_spread[,2:12])
+
+df_pi_shared_spread.matrix <- as.matrix(df_pi_shared_spread[, -c(1)])
+rownames(df_pi_shared_spread.matrix) <- df_pi_shared_spread$file1
+df_pi_shared_spread.matrix.dendro <- as.dendrogram(hclust(d = dist(x = df_pi_shared_spread.matrix)))
+
+dendro.plot <- ggdendrogram(data = df_pi_shared_spread.matrix.dendro, rotate = TRUE) 
+
+
+
+df_pi_shared [is.na(df_pi_shared )] <- 100
+
+
+
+
+
+order <- order.dendrogram(df_pi_shared_spread.matrix.dendro)
+
+df_pi_shared$file1 <- factor(df_pi_shared$file1,
+                               levels = df_pi_shared_spread_scaled$file1[order], 
+                               ordered = TRUE)
+
+heatmap.plot <- ggplot(data = df_pi_shared, aes(x = file2, y = file1)) +
+  geom_tile(aes(fill = mean_mean_pi)) +
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 12),  
+        axis.text.y = element_text(size = 12)) +
+  scale_fill_gradient2() +
+  theme(legend.position = "top")
+
+
+dendro.plot 
+heatmap.plot
+
+#grid.newpage()
+#print(heatmap.plot, vp = viewport(x = 0.4, y = 0.5, width = 0.8, height = 1.0))
+#print(dendro.plot, vp = viewport(x = 0.90, y = 0.445, width = 0.2, height = 1.0))
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+# rumen_group <- c("4300076", "4300142", "GCF_0000259251_ASM2592v1")
+# vagina_group <- c("GCF_0007628651_04_NF40_HMP671v01", "GCF_0015465652_ASM154656v2")
+# pos_group <- c("GCF_0001429651_ASM14296v1", "GCF_0002430151_Prev_macu_OT_289_V1", "GCF_0006135051_ASM61350v1", "GCF_0018146851_ASM181468v1", "GCF_0018148551_ASM181485v1", "GCF_0018153151_ASM181531v1")
+# 
+# df_list <- list()
+# j <- 1
+# 
+# for (orf in unique(df_complete$qseqid)){
+#   orf_df <- df_complete %>%
+#   filter(qseqid == orf)
+# 
+#   orf_df$rumen_group <- sum(orf_df$file2 %in% rumen_group)
+#   orf_df$vagina_group <- sum(orf_df$file2 %in% vagina_group)
+#   orf_df$pos_group <- sum(orf_df$file2 %in% pos_group)
+# 
+#   df_list[[j]] <- orf_df
+#   j <- j + 1
+# }
+# 
+# df_complete_group_counts <- bind_rows(df_list)
+# 
+# write.csv(df_complete_group_counts, "~/Desktop/df_complete_group_counts.csv")
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+df_complete_group_counts  <- read.csv("~/master/rumen/dataflow/03-blast-tables/df_complete_group_counts.csv") %>%
+  select(-genome, -contig, -gene)
+
+# these should be genes from one of the rumen genomes that is in all 5 non positive genomes
+
+df_complete_group_counts_grouping <- df_complete_group_counts %>%
+  mutate(non_pos = ifelse(pos_group == 0 & rumen_group == 2 & vagina_group == 2, "y", "n")) 
+
+
+df_non_pos <- df_complete_group_counts_grouping %>%
+  filter(non_pos == "y") %>%
+  filter(file1 == "GCF_0000259251_ASM2592v1" | file1 == "4300076")
+
+seqs <- as.data.frame(unique(df_non_pos$qseqid))
+  
+colnames(seqs) <- "prot_id"
+
+write.csv(seqs, "~/master/rumen/dataflow/00-meta/non_positive_group.csv")
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+df_complete <- df_complete %>%
+  filter(file1 == "GCF_0000259251_ASM2592v1" | file1 == "4300076" | file1 == "4300142" | file1 == "GCF_0007628651_04_NF40_HMP671v01") %>%
+  filter(file2 == "GCF_0000259251_ASM2592v1" | file2 == "4300076" | file2 == "4300142" | file2 == "GCF_0007628651_04_NF40_HMP671v01") 
+
+
+df_complete$qseqid <- gsub("-submission.assembly", "", df_complete$qseqid)
+df_complete$qseqid <- gsub("_ASM2592v1_genomic", "", df_complete$qseqid)
+
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
 genomes <- unique(df_complete$file1)
 plots <- list()
 i <- 1
@@ -111,7 +261,11 @@ for (genome1 in genomes){
     
       theme_few() +
       
+<<<<<<< HEAD
       geom_point(aes(y = mean_pi, colour = file2), stat = "identity", size = 2) +
+=======
+      geom_point(aes(y = mean_pi, colour = file2), stat = "identity", size = 5) +
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
       
       theme(plot.title = element_text(size = 25), 
         axis.text.x = element_text(angle = 90, hjust = 1, size = 12),  
@@ -138,6 +292,7 @@ for (genome1 in genomes){
   
 ```
 
+<<<<<<< HEAD
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=20, fig.height=4}
 for (i in 1:length(plots)) {
   plot(plots[[i]])
@@ -194,3 +349,13 @@ for (i in 1:length(plots)) {
 
 
 
+=======
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=20, fig.height=5}
+# for (i in 1:length(plots)) {
+#   plot(plots[[i]])
+#   cat("\r\n\r\n")
+# }
+
+plot(plots[[1]])
+```
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4

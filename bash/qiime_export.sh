@@ -3,9 +3,15 @@
 source activate qiime2-2018.8
 
 # export taxa tables
+<<<<<<< HEAD
 qiime tools export \
   --input-path dataflow/02-qiime/gg-taxonomy.qza \
   --output-path dataflow/03-asv-table
+=======
+#qiime tools export \
+#  --input-path dataflow/02-qiime/gg-taxonomy.qza \
+#  --output-path dataflow/03-asv-table
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
 
 #qiime tools export \
 #  --input-path dataflow/02-qiime/silva-taxonomy.qza \
