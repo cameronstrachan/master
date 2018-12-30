@@ -1,0 +1,312 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(printr)
+library(ggplot2)
+library(cowplot)
+library(reshape2)
+library(knitr)
+library(pwr)
+library("ggpubr")
+library(stringi)
+library(polycor)
+library(gridExtra)
+library(grid)
+```
+
+```{r global_options, R.options=knitr::opts_chunk$set(warning=FALSE, message=FALSE)}
+```   
+
+### Exploring patterns of Lactobacillus containing samples
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_complete <- read.csv("~/master/rumen/dataflow/03-asv-table/henderson2015_df_complete_temp.csv")
+df_complete[,1] <- NULL
+
+df_complete$asv_id <- as.character(df_complete$asv_id)
+df_complete$GRCid <- as.character(df_complete$GRCid)
+df_complete$sra_accession <- as.character(df_complete$sra_accession)
+df_complete$LibraryName <- as.character(df_complete$LibraryName)
+
+df_complete <- df_complete %>%
+  rowwise() %>%
+  mutate(replicate = stri_reverse(stri_split_fixed(stri_reverse(LibraryName),".",n = 2)[[1]][2])) 
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_metrics <- df_complete %>% 
+  
+  filter(domain == "Bacteria") %>%
+  
+  unique() %>%
+  
+  mutate(count_norm = (count / non.chimeric)*100) %>%
+  
+  group_by(asv_id, replicate) %>%
+  mutate(n_count = length(asv_id)) %>%
+  ungroup() %>%
+  
+  unite(classification, c("phylum", "family"), sep = ";", remove = FALSE) 
+
+
+df_metrics$classification <- gsub(";NA", "", df_metrics$classification)
+
+df_samples <- df_metrics %>%
+  select(GRCid, Starch.rich..diet., Concentrate.proportion..diet.) %>%
+  distinct()
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_lacto_samples <- df_metrics %>%
+  filter(genus == "Lactobacillus") %>%
+  
+  group_by(GRCid) %>%
+  mutate(med_count_norm = median(count_norm)) %>%
+  ungroup() %>%
+  
+  select(-asv_id, -count, -count_norm, -LibraryName) %>%
+  distinct()
+
+
+percent_lacto_samples_starch <- (table(df_lacto_samples$Starch.rich..diet.)[2]  / (table(df_lacto_samples$Starch.rich..diet.)[1] + table(df_lacto_samples$Starch.rich..diet.)[2])) * 100
+
+
+percent_all_samples_starch <- (table(df_samples$Starch.rich..diet.)[2]  / (table(df_samples$Starch.rich..diet.)[1] + table(df_samples$Starch.rich..diet.)[2])) * 100
+```
+
+Where high starch samples make up `r percent_all_samples_starch` percent of the entire data set, if you subset the data set to only those samples where Lactobacillus is detected, then `r percent_lacto_samples_starch` are classified as high starch samples.  
+  
+I was then interested to subset the data to only high starch and then group then as with or without detectable Lactobacillus. Here, detectable Lactobacillus are being used for a marker of lower rumen heath.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+lacto_samples <- unique(df_lacto_samples$GRCid)
+
+df_extreme_diet <- df_metrics %>%
+  filter(Starch.rich..diet. == "y") %>%
+  rowwise() %>%
+  mutate(lacto_signal = ifelse(GRCid %in% lacto_samples, "pos", "neg")) %>%
+  ungroup() %>%
+  filter(Simple.classification..animal. == "Cattle")
+```
+
+Since all the data is subsetted to a similar diet, we can now look through each sequence or taxonomic group for difference between the Lactobacillus positive and Lactobacillus negative samples. This is asking the question which groups co-occur with Lactobacillus.
+
+The dataset will be first be subsetted to only cows, and then those samples that have at least triplicates of the samples positive and negative for lactobacillus. Also I am focusing only on the Prevotellaceae as these are abundant, often implicated in SARA and have many groups in the data set. 
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_extreme_diet <- df_extreme_diet %>%
+  group_by(asv_id, lacto_signal) %>%
+  mutate(n_lacto_signal = length(count_norm)) %>%
+  ungroup() %>%
+  filter(n_lacto_signal > 3) %>%
+  
+  group_by(asv_id) %>%
+  
+  mutate(nlevels = length(unique(lacto_signal))) %>%
+  
+  ungroup() %>%
+  
+  filter(nlevels == 2) %>%
+  
+  filter(family != "NA")
+
+
+df_extreme_diet_samples <- df_extreme_diet %>%
+  
+  group_by(GRCid) %>%
+  mutate(med_count_norm = median(count_norm)) %>%
+  ungroup() %>%
+  
+  select(-asv_id, -count, -count_norm, -LibraryName, -med_count_norm, -classification, -domain, -phylum, -family, -genus, -n_lacto_signal) %>%
+  distinct()
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_ttest_list <- list()
+i <- 1
+
+for (group in unique(df_extreme_diet$asv_id)) {
+
+
+  df_ttest<- df_extreme_diet %>%
+    filter(asv_id == group)
+
+
+      df_ttest$pval <- t.test(count_norm ~ lacto_signal, data = df_ttest)$p.value
+
+      df_ttest_list[[i]] <- df_ttest
+      i <- i + 1
+
+}
+
+
+df_ttest <- bind_rows(df_ttest_list) %>%
+  distinct()
+```
+
+After doing t-tests between all of the sequences and plotting whose with differences, I noticed that the a few very abundant groups of Prevotellaceae positevely correlated with the detection of Lactobacillus, while many less abundant groups negatively correlate.
+
+\vspace{12pt}
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_treatment_plot <- df_ttest  %>%
+  filter(pval < 0.01) %>%
+  arrange(pval) %>%
+  filter(family == "Prevotellaceae") %>%
+  distinct() %>%
+  group_by(asv_id) %>%
+  mutate(mean_seq = mean(count_norm)) %>%
+  ungroup() %>%
+  filter(mean_seq > 1)
+
+df_direction <- df_treatment_plot %>%
+  select(asv_id, lacto_signal, count_norm) %>%
+  group_by(asv_id, lacto_signal) %>%
+  mutate(med_count_norm = median( count_norm)) %>%
+  ungroup() %>%
+  select(-count_norm) %>%
+  distinct()
+
+df_dir_list <- list()
+i <- 1
+
+for(seq in unique(df_direction$asv_id)){
+  
+  df_pos <- df_direction %>%
+    filter(asv_id == seq) %>%
+    filter(lacto_signal == "pos")
+  
+  df_neg <- df_direction %>%
+    filter(asv_id == seq) %>%
+    filter(lacto_signal == "neg")
+  
+  pos_med <- as.numeric(unique(df_pos$med_count_norm))
+  neg_med <- as.numeric(unique(df_neg$med_count_norm))
+  
+  df_direction_seq <- df_direction %>%
+    filter(asv_id == seq)
+  
+  if(pos_med > neg_med){
+    
+    df_direction_seq$direction <- "pos_cor"
+    
+  } else {
+    df_direction_seq$direction <- "neg_cor"
+  }
+  
+  df_dir_list[[i]] <- df_direction_seq
+  i <- i + 1
+  
+}
+
+df_direction <- bind_rows(df_dir_list) %>%
+  select(asv_id, direction)
+
+df_treatment_plot <- inner_join(df_treatment_plot, df_direction) 
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+groups <- unique(df_treatment_plot$asv_id)
+df_treatment_plot$lacto_signal <- factor(df_treatment_plot$lacto_signal, levels = c("neg", "pos"))
+
+plots_neg <- list()
+plots_pos <- list()
+
+i <- 1
+j <- 1
+
+for (group in groups){
+  
+    df_p <- df_treatment_plot %>%
+      filter(asv_id == group)
+    
+    taxa <- unique(df_p$classification)
+    dir <- unique(df_p$direction)
+# plot <- ggboxplot(df_p, x = "lacto_signal", y = "count_norm", outlier.shape = NA, add = "dotplot", add.params = list(color = "Gender..animal.")) +
+#           ylab("Normalized Count") +
+#           xlab("Lactobacillus Signal") +
+#           theme(strip.text = element_text(size = 15),
+#           plot.title = element_text(size = 30),
+#           axis.text.x = element_text(angle = 90, hjust = 1, size = 20),
+#           axis.text.y = element_text(size = 20),
+#           axis.title.x = element_text(size = 20),
+#           axis.title.y = element_text(size = 20)) + 
+#         
+# 
+#           #ggtitle(taxa) +
+#   
+#           facet_grid(asv_id ~ ., scales = "free")
+
+
+plot <- ggboxplot(df_p, x = "lacto_signal", y = "count_norm", outlier.shape = NA) +
+          ylab("Normalized Count") +
+          xlab("Lactobacillus Signal") +
+          theme(strip.text = element_text(size = 15),
+          plot.title = element_text(size = 30),
+          axis.text.x = element_text(angle = 90, hjust = 1, size = 20),
+          axis.text.y = element_text(size = 20),
+          axis.title.x = element_text(size = 20),
+          axis.title.y = element_text(size = 20)) + 
+        
+
+          #ggtitle(taxa) +
+  
+          facet_grid(asv_id ~ ., scales = "free")
+    
+
+if(dir == "neg_cor"){
+plots_neg[[j]] <- plot
+j <- j + 1
+} else{
+plots_pos[[i]] <- plot
+i <- i + 1
+}
+}
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=7}
+grid.arrange(grobs = plots_pos, ncol = 1, top=textGrob("Prevotellaceae co-occuring with Lactobacillus",gp=gpar(fontsize=20,font=3)))
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=25, fig.height=25}
+grid.arrange(grobs = plots_neg, ncol = 1, top=textGrob("Prevotellaceae negatively correlated with Lactobacillus",gp=gpar(fontsize=20,font=3)))
+```
+
+Now I need to check what of the other factors I have in my dataset correlate with the presence of lactobacillus. This is essentially to understand what variables could be confounding this effect.  
+  
+Appears that there is some correlation between the pectin rich diets, age and the Lactobacillus signal. 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_multi_correlation <- df_treatment_plot %>%
+  select(Age.classification..animal., Gender..animal., Forage.proportion..diet., Concentrate.proportion..diet., Pectin.rich...diet., Weeks.on.diet..diet., Season..location., lacto_signal) %>%
+  distinct()
+
+df_multi_correlation$Concentrate.proportion..diet. <- as.numeric(df_multi_correlation$Concentrate.proportion..diet.)
+
+df_multi_correlation <- as.data.frame(df_multi_correlation)
+df_multi_correlation <- df_multi_correlation[complete.cases(df_multi_correlation), ]
+
+
+
+df_het_cor <- as.data.frame(hetcor(df_multi_correlation)$correlations)
+
+df_het_cor
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_direction <- df_direction %>%
+  inner_join(df_treatment_plot) %>%
+  select(asv_id, direction) %>%
+  distinct()
+
+write.csv(df_direction,  "~/master/rumen/dataflow/00-meta/henderson2015_lactobacillus_association.csv")
+```

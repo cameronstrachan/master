@@ -1,0 +1,196 @@
+---
+title: "Reciprocal Blast Hit Analysis"
+author: "Anna Mueller"
+date: '2018-11-09'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(stringi)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+blastdir <- '../dataflow/02-blast/'
+files <- list.files(blastdir)
+dflist <- list()
+
+i <- 1
+for (file in files){
+  df <- read.table(paste(blastdir, file, sep = ''))
+  df$file <- file
+  df$V1 <- as.character(df$V1)
+  df$V2 <- as.character(df$V2)
+  dflist[[i]] <- df
+  i <- i+1
+}
+
+df_compiled <- bind_rows(dflist)
+colnames(df_compiled)[1:13] <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+
+df_compiled$file <- gsub(".txt", "", df_compiled$file)
+
+
+
+df_compiled <- df_compiled %>%
+  separate(file, into = c("file1", "file2"), sep = "\\.") 
+
+df_compiled$sseq <- NULL
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+df_forward <- df_compiled %>%
+  select(qseqid, sseqid,file1, file2, pident) %>%
+  rename(forward_pi = pident) %>%
+  distinct()
+
+df_reverse <- df_compiled %>%
+  select(qseqid, sseqid, file1, file2, pident) %>%
+  rename(reverse_pi = pident) %>%
+  distinct()
+
+colnames(df_reverse)[1:4] <- c("sseqid", "qseqid", "file2", "file1")
+
+df_rbh <- inner_join(df_forward, df_reverse) %>%
+  mutate(mean_pi = (forward_pi + reverse_pi)/2) %>%
+  select(-forward_pi, -reverse_pi) %>%
+  distinct() %>%
+  rowwise() %>%
+  mutate(samefile = ifelse(file1 == file2, "yes", "no")) %>%
+  filter(samefile != "yes") %>%
+  select(-samefile) %>%
+  filter(mean_pi > 40)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+# header_dir <- '../dataflow/02-headers/'
+# files <- list.files(header_dir)
+# dflist <- list()
+# 
+# i <- 1
+# for (file in files){
+#   df <- read.csv(paste(header_dir, file, sep = ''), header = TRUE)
+#   dflist[[i]] <- df
+#   i <- i+1
+# }
+# 
+# df_headers<- bind_rows(dflist)
+# colnames(df_headers) <- c("qseqid", "header", "file1")
+# 
+# df_headers$file1 <- gsub(".fasta", "", df_headers$file1)
+# df_headers$file1 <- gsub("_rename", "", df_headers$file1)
+# 
+ df_complete <- df_rbh #%>%
+   #full_join(df_headers)
+
+df_complete$sseqid[is.na(df_complete$sseqid)] <- "None"
+df_complete$file2[is.na(df_complete$file2)] <- "None"
+df_complete$mean_pi[is.na(df_complete$mean_pi)] <- 0.0
+
+df_complete <- df_complete %>%
+  separate(qseqid, into = c("genome",  "contig", "gene"), remove = FALSE)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+genomes <- unique(df_complete$file1)
+plots <- list()
+i <- 1
+
+for (genome1 in genomes){
+  
+    df_plot <- df_complete %>%
+      filter(file1 == genome1)
+    
+    
+    xbreaks <- df_plot$qseqid[seq(1, length(df_plot$qseqid), 100)]
+    
+    plot <- ggplot(df_plot, aes(x=qseqid)) +
+    
+      theme_few() +
+      
+      geom_point(aes(y = mean_pi, colour = file2), stat = "identity", size = 2) +
+      
+      theme(plot.title = element_text(size = 25), 
+        axis.text.x = element_text(angle = 90, hjust = 1, size = 12),  
+        axis.text.y = element_text(size = 20), 
+        axis.title.x = element_text(size = 20), 
+        axis.title.y = element_text(size = 20)) + 
+      
+      ggtitle(paste(genome1)) + 
+      
+      ylab("Percent identity (%)") + 
+      
+      ylim(50,100) +
+      
+      #theme(legend.position="none") +
+      
+      theme(legend.text=element_text(size=20)) + 
+      theme(legend.title=element_text(size=20)) +
+      scale_x_discrete("Ordered genes",  breaks = xbreaks)
+    
+    plots[[i]] <- plot
+    
+    i <- i + 1
+}
+  
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=20, fig.height=4}
+for (i in 1:length(plots)) {
+  plot(plots[[i]])
+  cat("\r\n\r\n")
+}
+
+#plot(plots[[1]])
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+# genomes <- unique(df_rbh$file1)
+# plots <- list()
+# i <- 1
+# 
+# for (genome1 in genomes){
+#   remaining_genomes <- genomes[!(genomes %in% genome1)]
+#   for (genome2 in remaining_genomes){
+#     df_plot <- df_rbh %>%
+#       filter(file1 == genome1 & file2 == genome2)
+#     
+#     df_plot <- df_plot[order(df_plot$qseqid),]
+#     df_plot$gene_num <- 1:nrow(df_plot) 
+#     
+#     plot <- ggplot(df_plot, aes(x=gene_num)) +
+#     
+#       theme_few() +
+#       
+#       geom_point(aes(y = mean_pi), stat = "identity", fill = "lightgrey", size = 2) +
+#       
+#       theme(plot.title = element_text(size = 25), 
+#         axis.text.x = element_text(angle = 90, hjust = 1, size = 15),  
+#         axis.text.y = element_text(size = 20), 
+#         axis.title.x = element_text(size = 20), 
+#         axis.title.y = element_text(size = 20)) + 
+#       
+#       ggtitle(paste(genome1, genome2, sep = "  v  ")) + 
+#       
+#       ylab("Percent identity (%)") + 
+#     
+#       xlab("Gene Number (order of genes)") + 
+#       
+#       theme(legend.text=element_text(size=20)) + 
+#       theme(legend.title=element_text(size=20)) 
+#     
+#     plots[[i]] <- plot
+#     
+#     i <- i + 1
+#   }
+#   
+#   
+# }
+```
+
+
+

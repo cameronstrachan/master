@@ -1,10 +1,14 @@
 #!/bin/bash
 
+lengthcutoff1=$1
+lengthcutoff2=$2
+inputfolder=$3
+
 source activate qiime2-2018.8
 
 qiime tools import \
-  --type 'SampleData[SequencesWithQuality]' \
-  --input-path dataflow/01-fastq \
+  --type 'SampleData[PairedEndSequencesWithQuality]' \
+  --input-path $inputfolder \
   --input-format CasavaOneEightSingleLanePerSampleDirFmt \
   --output-path dataflow/02-qiime/demux-single-end.qza
   
@@ -14,11 +18,12 @@ qiime demux summarize \
   
 qiime dada2 denoise-single \
   --i-demultiplexed-seqs dataflow/02-qiime/demux-single-end.qza \
-  --p-trim-left 1 \
-  --p-trunc-len 525 \
+  --p-trim-left $lengthcutoff1 \
+  --p-trunc-len $lengthcutoff2 \
   --o-representative-sequences dataflow/02-qiime/rep-seqs-dada2.qza \
   --o-table dataflow/02-qiime/table-dada2.qza \
   --o-denoising-stats dataflow/02-qiime/stats-dada2.qza
+  --p-n-threads 7
   
 qiime metadata tabulate \
   --m-input-file dataflow/02-qiime/stats-dada2.qza \

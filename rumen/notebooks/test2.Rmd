@@ -1,0 +1,201 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(printr)
+library(ggplot2)
+library(cowplot)
+library(reshape2)
+library(knitr)
+library(pwr)
+library("ggpubr")
+library(stringi)
+library(polycor)
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_complete <- read.csv("~/master/rumen/dataflow/03-asv-table/henderson2015_df_complete_temp.csv")
+df_complete[,1] <- NULL
+
+df_complete$asv_id <- as.character(df_complete$asv_id)
+df_complete$GRCid <- as.character(df_complete$GRCid)
+df_complete$sra_accession <- as.character(df_complete$sra_accession)
+df_complete$LibraryName <- as.character(df_complete$LibraryName)
+
+df_complete <- df_complete %>%
+  rowwise() %>%
+  mutate(replicate = stri_reverse(stri_split_fixed(stri_reverse(LibraryName),".",n = 2)[[1]][2])) 
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_metrics <- df_complete %>% 
+  
+  filter(domain == "Bacteria") %>%
+  
+  unique() %>%
+  
+  mutate(count_norm = (count / non.chimeric)*100) %>%
+  
+  group_by(asv_id, replicate) %>%
+  mutate(n_count = length(asv_id)) %>%
+  ungroup() %>%
+  
+  unite(classification, c("phylum", "family"), sep = ";", remove = FALSE) 
+
+
+df_metrics$classification <- gsub(";NA", "", df_metrics$classification)
+
+df_samples <- df_metrics %>%
+  select(GRCid, Starch.rich..diet., Concentrate.proportion..diet.) %>%
+  distinct()
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_lacto_samples <- df_metrics %>%
+  filter(genus == "Lactobacillus") %>%
+  
+  group_by(GRCid) %>%
+  mutate(med_count_norm = median(count_norm)) %>%
+  ungroup() %>%
+  
+  select(-asv_id, -count, -count_norm, -LibraryName) %>%
+  distinct()
+
+
+percent_lacto_samples_starch <- (table(df_lacto_samples$Starch.rich..diet.)[2]  / (table(df_lacto_samples$Starch.rich..diet.)[1] + table(df_lacto_samples$Starch.rich..diet.)[2])) * 100
+
+
+percent_all_samples_starch <- (table(df_samples$Starch.rich..diet.)[2]  / (table(df_samples$Starch.rich..diet.)[1] + table(df_samples$Starch.rich..diet.)[2])) * 100
+```
+
+Where high starch samples make up `r percent_all_samples_starch` percent of the entire data set, if you subset the data set to only those samples where Lactobacillus is detected, then `r percent_lacto_samples_starch` are classified as high starch samples.  
+  
+I was then interested to subset the data to only high starch, 100% concentrate diets and then group then as with or without detectable Lactobacillus. Here, detectable Lactobacillus are being used for a marker of lower rumen heath.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+lacto_samples <- unique(df_lacto_samples$GRCid)
+
+df_extreme_diet <- df_metrics %>%
+  filter(Starch.rich..diet. == "y") %>%
+  filter(Concentrate.proportion..diet. == 100) %>%
+  rowwise() %>%
+  mutate(lacto_signal = ifelse(GRCid %in% lacto_samples, "pos", "neg")) %>%
+  ungroup()
+```
+
+This devided up the dataset fairly equally, with 18 of 39 samples of a signal for lactobacillus. Now, since all the data is subsetted to the same diet, we can now look through each sequence or taxonomic group for difference between the lacto positive and lacto negative samples, only if the sequence is well represented in both groups. This is asking the question, assuming that the presence of lactobacillus is in fact a marker of gut heath, why community members are present in the "heathy" cows with the same diet and then what co-occurs with the Lactos. 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_extreme_diet <- df_extreme_diet %>%
+  group_by(asv_id, lacto_signal) %>%
+  mutate(n_lacto_signal = length(count_norm)) %>%
+  ungroup() %>%
+  filter(n_lacto_signal > 3) %>%
+  
+  group_by(asv_id) %>%
+  
+  mutate(nlevels = length(unique(lacto_signal))) %>%
+  
+  ungroup() %>%
+  
+  filter(nlevels == 2) %>%
+  
+  filter(family != "NA")
+
+
+df_ttest_list <- list()
+i <- 1
+
+for (group in unique(df_extreme_diet$asv_id)) {
+
+
+  df_ttest<- df_extreme_diet %>%
+    filter(asv_id == group)
+
+
+      df_ttest$pval <- t.test(count_norm ~ lacto_signal, data = df_ttest)$p.value
+
+      df_ttest_list[[i]] <- df_ttest
+      i <- i + 1
+
+}
+
+
+df_ttest <- bind_rows(df_ttest_list) %>%
+  distinct()
+```
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_treatment_plot <- df_ttest  %>%
+  filter(pval < 0.1) %>%
+  arrange(pval)  
+
+df_treatment_plot_pos <- df_treatment_plot  %>%
+  filter(lacto_signal == "pos") %>%
+  select(asv_id, Simple.classification..animal., Age.classification..animal.,  Weeks.on.diet..diet., Latitude..location., Longitude..location., classification, count_norm, pval) %>%
+  group_by(asv_id) %>%
+  mutate(count_med_pos = median(count_norm)) %>%
+  ungroup() %>%
+  select(-count_norm) %>%
+  distinct()
+
+df_treatment_plot_neg <- df_treatment_plot  %>%
+  filter(lacto_signal == "neg") %>%
+  select(asv_id, Simple.classification..animal., Age.classification..animal., Weeks.on.diet..diet., Latitude..location., Longitude..location., classification, count_norm, pval) %>%
+  group_by(asv_id) %>%
+  mutate(count_med_neg = median(count_norm)) %>%
+  ungroup() %>%
+  select(-count_norm) %>%
+  distinct()
+
+df_treatment_direction <- inner_join(df_treatment_plot_pos, df_treatment_plot_neg) %>%
+  mutate(diff = count_med_neg - count_med_pos)
+
+groups <- unique(df_treatment_plot$classification)
+plots <- list()
+i <- 1
+
+for (group in groups){
+  
+    df_p <- df_treatment_plot %>%
+      filter(classification == group)
+    
+    taxa <- unique(df_p$classification)
+    
+plot <- ggboxplot(df_p, x = "lacto_signal", y = "count_norm", color = "lacto_signal", outlier.shape = NA, facet.by = "asv_id") +
+          ylab("Normalized Count") +
+          xlab("Lactobacillus Signal") +
+          theme(strip.text = element_text(size = 20),
+          plot.title = element_text(size = 30),
+          axis.text.x = element_text(angle = 90, hjust = 1, size = 20),
+          axis.text.y = element_text(size = 20),
+          axis.title.x = element_text(size = 20),
+          axis.title.y = element_text(size = 20)) +
+
+          ggtitle(taxa) + 
+  
+          ylim(0,0.6)  
+
+
+    
+
+plots[[i]] <- plot
+    
+    i <- i + 1
+}
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=20, fig.height=7}
+for (i in 1:length(plots)) {
+  plot(plots[[i]])
+  cat("\r\n\r\n")
+}
+```
+
