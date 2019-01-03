@@ -6,7 +6,10 @@ import os,sys
 import pandas as pd
 import numpy as np
 import subprocess
+<<<<<<< HEAD
+=======
 from shutil import copyfile
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
 
 # custom libraries
 sys.path.insert(0, '/Users/cameronstrachan/master/') 
@@ -72,7 +75,10 @@ def runqiime(inputfolderloc='path/to/input', paired=True, numcores=7):
 	# data must be in form ERX1660185_1_L001_R1_001.fastq.gz
 
 	inputfolder = inputfolderloc
+<<<<<<< HEAD
+=======
 	foldername = inputfolder.split('/')[2]
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
 
 	if paired == True:
 		subprocess.call(['/Users/cameronstrachan/master/bash/qiime_import_paired.sh', inputfolder])
@@ -82,6 +88,18 @@ def runqiime(inputfolderloc='path/to/input', paired=True, numcores=7):
 	print("\n" + "Visualize dataflow/02-qiime/demux-single-end.qzv using online too at:" + "\n")
 	print("https://view.qiime2.org/" + "\n")
 
+<<<<<<< HEAD
+	forwardlengthcutoff = input("\n" + "Forward Length Cutoff? (interger):")
+
+	lengthcutoff1 = int(forwardlengthcutoff)
+
+	reverselengthcutoff = input("\n" + "Reverse Length Cutoff? (interger):")
+
+	lengthcutoff2 = int(reverselengthcutoff)
+
+	if paired == True:
+		subprocess.call(['/Users/cameronstrachan/master/bash/run_qiime_paired.sh', str(lengthcutoff1), str(lengthcutoff2), str(numcores)])
+=======
 	if paired == True:
 		
 		lengthcutoff = input("\n" + "Forward Read, Left Cutoff? (interger):")
@@ -121,11 +139,23 @@ def runqiime(inputfolderloc='path/to/input', paired=True, numcores=7):
 
 	if paired == True:
 		subprocess.call(['/Users/cameronstrachan/master/bash/run_qiime_paired.sh', str(lengthcutoff1), str(lengthcutoff2), str(lengthcutoff3), str(lengthcutoff4), str(numcores)])
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
 	else:
 		subprocess.call(['/Users/cameronstrachan/master/bash/run_qiime_single.sh', str(lengthcutoff1), str(lengthcutoff2), str(numcores)])
 
 	subprocess.call('/Users/cameronstrachan/master/bash/qiime_export.sh')
 
+<<<<<<< HEAD
+
+	foldername = inputfolder.split('/')[2] + '-'
+
+	outputprefixseqs = 'dataflow/03-asv-seqs/' + foldername + str(lengthcutoff1) + '_' + str(lengthcutoff2)
+	outputprefixstabs = 'dataflow/03-asv-table/' + foldername + str(lengthcutoff1) + '_' + str(lengthcutoff2)
+
+	outputprefixstaxa = 'dataflow/03-asv-taxonomy/' + foldername + str(lengthcutoff1) + '_' + str(lengthcutoff2)
+
+	os.rename('dataflow/03-asv-table/taxonomy.tsv', outputprefixstaxa + '-fc-gg-full.txt')
+=======
 	table_merge = 'dataflow/02-qiime-merge/' + 'table' + '_' + foldername + '.qza' 
 	copyfile('dataflow/02-qiime/table.qza', table_merge)
 
@@ -133,6 +163,7 @@ def runqiime(inputfolderloc='path/to/input', paired=True, numcores=7):
 	copyfile('dataflow/02-qiime/rep-seqs.qza', seq_merge)	
 
 	#os.rename('dataflow/03-asv-table/taxonomy.tsv', outputprefixstaxa + '-fc-gg-full.txt')
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
 
 	os.rename('dataflow/03-asv-seqs/dna-sequences-100.fasta', outputprefixseqs + '-100.fasta')
 	os.rename('dataflow/03-asv-seqs/dna-sequences-99.fasta', outputprefixseqs + '-99.fasta')
@@ -143,6 +174,8 @@ def runqiime(inputfolderloc='path/to/input', paired=True, numcores=7):
 
 
 
+<<<<<<< HEAD
+=======
 def runqiimemerge(file1folder='wetzels2018', file2folder='wu2018'):
 
 	table1 = 'table_' + file1folder + '.qza'
@@ -163,3 +196,4 @@ def runqiimemerge(file1folder='wetzels2018', file2folder='wu2018'):
 	os.rename('dataflow/03-asv-table-merge/feature-table-100.txt', outputprefixstabs + '-100.txt')
 	os.rename('dataflow/03-asv-table-merge/feature-table-99.txt', outputprefixstabs + '-99.txt')
 	os.rename('dataflow/03-asv-table-merge/feature-table-97.txt', outputprefixstabs + '-97.txt')
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
