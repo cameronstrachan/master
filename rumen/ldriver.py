@@ -22,7 +22,7 @@ extractseqs = input("\n" + "Extract seqs with differential abundance between sam
 if extractseqs == 'y':
 
 ### select seq ids from metadata
-	meta_df = pd.read_csv('dataflow/00-meta/lacto_signal_differential.csv.csv', low_memory=False)
+	meta_df = pd.read_csv('dataflow/00-meta/lacto_signal_differential.csv', low_memory=False)
 
 	seqs_neg_cor = meta_df[meta_df['direction'] == 'neg_cor']
 	seqs_neg_cor = seqs_neg_cor['asv_id'].tolist()
