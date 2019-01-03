@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>python_basics_bioinformatics.html</title>
+<style>
+* {
+    overflow: visible !important;
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    box-decoration-break: clone;
+}
+
+html, body {
+    background: #FFF;
+    font-family: "Segoe UI", Arial, freesans, sans-serif;
+    font-size: 10px;
+    line-height: 1.4;
+    color: #333;
+    word-wrap: break-word;
+	hyphens: auto;
+}
+
+hr {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border: 0;
+    border-top: 4px solid #EEE;
+}
+
+code {
+    padding: .1em .4em;
+    display: inline-block;
+    background-color: #f9f2f4;
+    color: #c7254e;
+    border-radius: 3px;
+    border: 0 none;
+    font: 9px Consolas, "Liberation Mono", Menlo, "Courier New", Courier, monospace;
+    hyphens: manual;
+}
+
+pre code {
+    padding: 15px;
+    display: block;
+    background-color: #F9F9F9;
+    color: #555;
+    font-size: 10px;
+    box-shadow: inset -1px -1px 0 rgba(0, 0, 0, .08);
+    word-wrap: normal;
+}
+
+/* replace light background for some hljs themes */
+code.github-css,
+code.github-gist-css,
+code.tomorrow-css,
+code.default-css,
+code.googlecode-css,
+code.ascetic-css,
+code.color-brewer-css,
+code.grayscale-css,
+code.idea-css,
+code.vs-css,
+code.xcode-css {
+    background-color: #F9F9F9 !important;
+}
+
+blockquote {
+    padding: 10px;
+    margin-left: 0;
+    color: #666;
+    border: 0 none;
+    border-left: 4px solid #EEE;
+}
+
+blockquote p:last-child,
+blockquote ul:last-child,
+blockquote ol:last-child {
+    margin-bottom: 0;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    background-color: #FFF;
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 20px;
+    border: 1px solid #DDD;
+}
+
+table div {
+    page-break-inside: avoid;
+}
+
+th, td {
+    text-align: left;
+}
+
+table > thead > tr > th,
+table > tbody > tr > th,
+table > tfoot > tr > th,
+table > thead > tr > td,
+table > tbody > tr > td,
+table > tfoot > tr > td {
+    padding: 8px 14px;
+    vertical-align: top;
+    border-top: 1px solid #DDD;
+}
+
+table > caption + thead > tr:first-child > th,
+table > colgroup + thead > tr:first-child > th,
+table > thead:first-child > tr:first-child > th,
+table > caption + thead > tr:first-child > td,
+table > colgroup + thead > tr:first-child > td,
+table > thead:first-child > tr:first-child > td {
+    border-top: 0;
+}
+
+table > tbody + tbody {
+    border-top: 2px solid #DDD;
+}
+
+table table {
+    background-color: #FFF;
+}
+
+table > thead > tr > th,
+table > tbody > tr > th,
+table > tfoot > tr > th,
+table > thead > tr > td,
+table > tbody > tr > td,
+table > tfoot > tr > td {
+    border: 1px solid #DDD;
+}
+
+table > thead > tr > th,
+table > thead > tr > td {
+    border-bottom-width: 2px;
+    text-align: center;
+    vertical-align: middle;
+    font-weight: bold;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    font-size: 90%;
+}
+
+table > tbody > tr:nth-of-type(odd) {
+    background-color: #F9F9F9;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    vertical-align: middle;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: inherit;
+    font-weight: normal;
+    line-height: 1.1;
+    color: #111;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    padding: 0;
+    page-break-after: avoid;
+}
+
+h1, h2 {
+    border-bottom: 1px solid #EEE;
+    padding-bottom: 7px;
+    margin-top: 10px;
+    margin-bottom: 12px;
+}
+
+h1 {
+    font-size: 22px;
+}
+
+h2 {
+    font-size: 17px;
+}
+
+h3 {
+    font-size: 15px;
+}
+
+h4 {
+    font-size: 11px;
+}
+
+h5, h6 {
+    font-size: 10px;
+    font-weight: bold;
+    color: #666;
+}
+
+p {
+    margin: 0 0 10px;
+}
+
+input[type="checkbox"] {
+    margin-right: 6px;
+    position: relative;
+    bottom: 1px;
+}
+
+ul,
+ol {
+    margin-top: 0;
+    margin-bottom: 10px;
+    padding-left: 20px;
+}
+
+ul li,
+ol li {
+    margin-bottom: 2px;
+}
+
+dl {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+dt {
+    font-weight: bold;
+}
+
+dd {
+    margin-left: 0;
+}
+
+a,
+a:visited {
+    text-decoration: none;
+    color: #4078C0;
+}
+
+.new-page,
+.page-break,
+.next-page,
+.page-end {
+    page-break-before: always;
+}
+
+#pageHeader,
+#pageHeader a,
+#pageHeader a:visited {
+    color: #777;
+}
+
+#pageHeader span {
+    vertical-align: middle;
+}
+
+#pageFooter {
+    border-top: 1px solid #EEE;
+    padding-top: 5px;
+    color: #777;
+    font-size: 80%;
+}
+#pageFooter a,
+#pageFooter a:visited {
+    color: #777;
+}
+
+/**
+ * Your markdown-themeable-pdf custom styles
+ *
+ * The default file can be found in the folder ~/.atom/packages/markdown-themeable-pdf/templates
+ * The base css file can be found in the folder ~/.atom/packages/markdown-themeable-pdf/css
+ * The current highlight.js css file can be found in the folder ~/.atom/packages/markdown-themeable-pdf/node_modules/highlight.js/styles
+ */
+
+/*
+html, body {
+	color: red;
+}
+*/
+
+/*
+
+vim-hybrid theme by w0ng (https://github.com/w0ng/vim-hybrid)
+
+*/
+
+/*background color*/
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  background: #1d1f21;
+}
+
+/*selection color*/
+.hljs::selection,
+.hljs span::selection {
+  background: #373b41;
+}
+
+.hljs::-moz-selection,
+.hljs span::-moz-selection {
+  background: #373b41;
+}
+
+/*foreground color*/
+.hljs {
+  color: #c5c8c6;
+}
+
+/*color: fg_yellow*/
+.hljs-title,
+.hljs-name {
+  color: #f0c674;
+}
+
+/*color: fg_comment*/
+.hljs-comment,
+.hljs-meta,
+.hljs-meta .hljs-keyword {
+  color: #707880;
+}
+
+/*color: fg_red*/
+.hljs-number,
+.hljs-symbol,
+.hljs-literal,
+.hljs-deletion,
+.hljs-link {
+ color: #cc6666
+}
+
+/*color: fg_green*/
+.hljs-string,
+.hljs-doctag,
+.hljs-addition,
+.hljs-regexp,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: #b5bd68;
+}
+
+/*color: fg_purple*/
+.hljs-attribute,
+.hljs-code,
+.hljs-selector-id {
+ color: #b294bb;
+}
+
+/*color: fg_blue*/
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-bullet,
+.hljs-tag {
+ color: #81a2be;
+}
+
+/*color: fg_aqua*/
+.hljs-subst,
+.hljs-variable,
+.hljs-template-tag,
+.hljs-template-variable {
+  color: #8abeb7;
+}
+
+/*color: fg_orange*/
+.hljs-type,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-quote,
+.hljs-section,
+.hljs-selector-class {
+  color: #de935f;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+pre { white-space: pre-wrap !important; word-break: break-word !important; overflow: hidden !important;}
+</style>
+</head>
+<body>
+<div id="pageContent">
+<table>
+<thead>
+<tr>
+<th>Python</th>
+<th>Basics for genome science</th>
+<th>2018-09-27</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+<h3 id="basic-string-operators">Basic string operators</h3>
+<pre><code class="hljs hybrid-css python">+ <span class="hljs-comment">#concatenate strings</span>
+* <span class="hljs-comment">#copy strings</span>
+<span class="hljs-keyword">in</span> <span class="hljs-comment">#true if member</span>
+<span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> <span class="hljs-comment">#true if not a member</span>
+</code></pre>
+<h3 id="slicing">Slicing</h3>
+<ul>
+<li>counting always begins with 0.</li>
+<li>negative numbers begin at the end of the string.</li>
+</ul>
+<pre><code class="hljs hybrid-css python">string[x] <span class="hljs-comment">#indexing</span>
+string[x:y] <span class="hljs-comment">#slicing</span>
+string[X:] <span class="hljs-comment">#until the end of the string</span>
+string[<span class="hljs-number">0</span>:<span class="hljs-number">4</span>:<span class="hljs-number">2</span>] - <span class="hljs-comment">#third number is step argument. skip every two</span>
+string[::<span class="hljs-number">-1</span>] <span class="hljs-comment">#goes from reverse</span>
+</code></pre>
+<h3 id="a-note-on-oop">A note on OOP</h3>
+<ul>
+<li>Objects have methods! String and lists are Objects!</li>
+<li>Remember that the methods often modify the object itself.</li>
+</ul>
+<h3 id="strings">Strings</h3>
+<p><strong>split and join</strong></p>
+<pre><code class="hljs hybrid-css python">split() <span class="hljs-comment">#returns a list of words in a string</span>
+string.split() <span class="hljs-comment">#split by white space</span>
+string.join(list) <span class="hljs-comment">#join together a list can</span>
+<span class="hljs-string">''</span>.join() <span class="hljs-comment">#join to an empty string</span>
+</code></pre>
+<p><strong>other useful methods</strong></p>
+<pre><code class="hljs hybrid-css python">string.count(<span class="hljs-string">'a'</span>)
+string.upper()
+string.find(<span class="hljs-string">'a'</span>, <span class="hljs-number">17</span>) <span class="hljs-comment">#gives location, second argument where to begin</span>
+string.rfind() <span class="hljs-comment">#looks in reverse</span>
+string.replace(<span class="hljs-string">'a'</span>, <span class="hljs-string">'A'</span>)
+</code></pre>
+<h3 id="string-formatting">String formatting</h3>
+<pre><code class="hljs hybrid-css python">%<span class="hljs-number">5.3</span>f% <span class="hljs-comment">#here 5 is the number of digits, 3 is number of decimals, f is for float</span>
+<span class="hljs-comment">#e is for E notation</span>
+<span class="hljs-comment">#d is for integer</span>
+<span class="hljs-comment">#s is for string</span>
+print(<span class="hljs-string">"%s"</span> % dna)
+</code></pre>
+<h3 id="lists">Lists</h3>
+<ul>
+<li>lists are mutable.</li>
+<li>slicing works on lists.</li>
+</ul>
+<pre><code class="hljs hybrid-css python">list = []
+<span class="hljs-keyword">del</span> list[<span class="hljs-number">1</span>] <span class="hljs-comment">#deletes second element</span>
+list.extend(new list) <span class="hljs-comment">#concatenates to the list</span>
+list.count(<span class="hljs-string">'A'</span>) <span class="hljs-comment">#count the occurrence of this string</span>
+list.reverse() <span class="hljs-comment">#return elements in reverse</span>
+list.append() <span class="hljs-comment">#remember that append only adds 1 element (won't extent)</span>
+list.sort()
+list() <span class="hljs-comment">#convert a string to a list</span>
+</code></pre>
+<h3 id="tuples">Tuples</h3>
+<ul>
+<li>tuples are immutable.</li>
+</ul>
+<pre><code class="hljs hybrid-css python">tuple = ()
+</code></pre>
+<h3 id="set">Set</h3>
+<ul>
+<li>list with no duplicate entries.</li>
+<li>are unordered with no index.</li>
+<li>automatically removes any duplicates.</li>
+</ul>
+<pre><code class="hljs hybrid-css python">set = {}
+set1 | set2 <span class="hljs-comment">#union</span>
+set1 &amp; set2 <span class="hljs-comment">#intersection</span>
+set1 - set2 <span class="hljs-comment">#difference</span>
+</code></pre>
+<h3 id="dictionary">Dictionary</h3>
+<ul>
+<li>represents key-value pairs.</li>
+<li>keys are immutable.</li>
+</ul>
+<pre><code class="hljs hybrid-css python">dict = {x:y , x:y}
+dict[<span class="hljs-string">'key'</span>] <span class="hljs-comment">#get value</span>
+<span class="hljs-string">"x"</span> <span class="hljs-keyword">in</span> dict <span class="hljs-comment">#test if key is present with in</span>
+<span class="hljs-keyword">del</span> <span class="hljs-comment">#works on dictionaries</span>
+dict.update(dict) <span class="hljs-comment">#add a new dictionary to the existing one</span>
+list(dict.keys) <span class="hljs-comment">#returns all the keys (same with value)</span>
+</code></pre>
+<h3 id="if-statements">If statements</h3>
+<ul>
+<li>if statement requires TRUE or FALSE.</li>
+</ul>
+<pre><code class="hljs hybrid-css python"><span class="hljs-keyword">if</span> __:
+
+<span class="hljs-keyword">elif</span>:
+
+<span class="hljs-keyword">else</span>:
+</code></pre>
+<h3 id="returning-a-boolean">Returning a boolean</h3>
+<pre><code class="hljs hybrid-css python">== <span class="hljs-comment">#equals</span>
+!= <span class="hljs-comment">#does not equal</span>
+
+<span class="hljs-comment">## membership</span>
+<span class="hljs-keyword">in</span>
+<span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span>
+
+<span class="hljs-comment">## logic</span>
+<span class="hljs-keyword">and</span>
+<span class="hljs-keyword">or</span>
+<span class="hljs-keyword">not</span>
+</code></pre>
+<p><strong>identity tests</strong> point to the same object in memory. useful if copy of object gets modified by a method.</p>
+<pre><code class="hljs hybrid-css python"><span class="hljs-keyword">is</span>
+<span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span>
+</code></pre>
+<h3 id="loops">Loops</h3>
+<p><strong>general</strong></p>
+<pre><code class="hljs hybrid-css python"><span class="hljs-keyword">break</span> <span class="hljs-comment">#breaks the loop</span>
+<span class="hljs-keyword">continue</span> <span class="hljs-comment">#go back to the beginning of the loop</span>
+<span class="hljs-keyword">pass</span> <span class="hljs-comment">#can act like a place holder</span>
+</code></pre>
+<p><strong>for</strong></p>
+<pre><code class="hljs hybrid-css python"><span class="hljs-keyword">for</span> ___ <span class="hljs-keyword">in</span> ___:
+
+<span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> range(length()): <span class="hljs-comment">#standard use</span>
+
+<span class="hljs-comment">## iterating</span>
+range(<span class="hljs-number">4</span>) <span class="hljs-comment">#yields 0,1,2,3</span>
+range(<span class="hljs-number">1</span>,<span class="hljs-number">10</span>,<span class="hljs-number">2</span>) <span class="hljs-comment">#yields 1,3,5,7,9</span>
+
+<span class="hljs-comment">## getting data from a dictionary</span>
+<span class="hljs-keyword">for</span> name, seq <span class="hljs-keyword">in</span> seqs.items(): <span class="hljs-comment">#items get us key and value are a pair</span>
+	print(name, seq)
+</code></pre>
+<p><strong>while</strong></p>
+<ul>
+<li>while a condition is true.</li>
+</ul>
+<pre><code class="hljs hybrid-css python"><span class="hljs-keyword">while</span> ___:
+
+<span class="hljs-keyword">while</span> num &gt; <span class="hljs-number">-1</span>: <span class="hljs-comment">#standard use</span>
+  change num
+</code></pre>
+<h3 id="functions">Functions</h3>
+<ul>
+<li>reusable and allow abstraction.</li>
+<li>variables are local to the function.</li>
+<li>positional arguments specified according to their position.</li>
+<li>keyword arguments has a keyword name for the argument.</li>
+<li>*args means accepting the arbitrary numbers of positional arguments and **kwargs means accepting the arbitrary numbers of keyword arguments. The arguments passed as positional are stored in a list called args, and the arguments passed as keyword are stored in a dict called kwargs.</li>
+</ul>
+<pre><code class="hljs hybrid-css python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">function_name</span><span class="hljs-params">(arguments)</span>:</span>
+	<span class="hljs-string">" documentation "</span>
+	code
+	<span class="hljs-keyword">return</span> output
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">save_ranking</span><span class="hljs-params">(*args, **kwargs)</span>:</span> <span class="hljs-comment">#arbitrary number of arguments</span>
+    print(args)
+    print(kwargs)
+
+save_ranking(<span class="hljs-string">'ming'</span>, <span class="hljs-string">'alice'</span>, <span class="hljs-string">'tom'</span>, fourth=<span class="hljs-string">'wilson'</span>, fifth=<span class="hljs-string">'roy'</span>)
+<span class="hljs-comment"># returns ('ming', 'alice', 'tom') ; {'fourth': 'wilson', 'fifth': 'roy'}</span>
+</code></pre>
+<h3 id="list-comprehensions">List comprehensions</h3>
+<ul>
+<li>provides a concise way to make lists.</li>
+<li>make new list where each element is an operation of an existing list.</li>
+<li>same as looping through a list, applying some operation to each element and appending the results to a new list.</li>
+</ul>
+<pre><code class="hljs hybrid-css python">new_list = [operation(i) <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> old_list <span class="hljs-keyword">if</span> filter(i)]
+</code></pre>
+<h3 id="modules">Modules</h3>
+<ul>
+<li>is a script containing several functions.</li>
+</ul>
+<pre><code class="hljs hybrid-css python"><span class="hljs-keyword">import</span> script_name <span class="hljs-comment">#import does not require .py</span>
+script_name.function(arg) <span class="hljs-comment">#using the functions</span>
+<span class="hljs-keyword">from</span> script_name <span class="hljs-keyword">import</span> * <span class="hljs-comment">#import all functions</span>
+<span class="hljs-keyword">from</span> script_name <span class="hljs-keyword">import</span> function1, function2 <span class="hljs-comment">#import specific functions</span>
+</code></pre>
+<h3 id="packages">Packages</h3>
+<ul>
+<li>packages group modules (or a folder of scripts containing functions).</li>
+<li>each package is a directory which must contain a special file called <strong>init</strong>.py which can be empty, but tells the directory it contains a python package.</li>
+</ul>
+<pre><code class="hljs hybrid-css python"><span class="hljs-keyword">import</span> a.b <span class="hljs-comment">#package a, module b</span>
+a.b.function() <span class="hljs-comment">#example function usuage</span>
+<span class="hljs-keyword">from</span> package <span class="hljs-keyword">import</span> module <span class="hljs-comment">#import a single module</span>
+<span class="hljs-keyword">from</span> package.module <span class="hljs-keyword">import</span> function1 <span class="hljs-comment">#import a single function</span>
+</code></pre>
+<h3 id="reading-in-datasets">Reading in datasets</h3>
+<pre><code class="hljs hybrid-css python">open(filename, mode) <span class="hljs-comment">#r = read, w = write, and a = append</span>
+file.seek(<span class="hljs-number">0</span>) <span class="hljs-comment">#go to beginning of file</span>
+file.write() <span class="hljs-comment">#write to the file</span>
+file.close()
+line=line.rstrip() <span class="hljs-comment">#gets rid of the new line character at the end of the line</span>
+
+<span class="hljs-comment">### common error handling</span>
+<span class="hljs-keyword">try</span>:
+ f = open(<span class="hljs-string">'myfile'</span>)
+ <span class="hljs-keyword">except</span> IOError: <span class="hljs-comment">#IOError is error from operating system</span>
+ 	print(<span class="hljs-string">'the file does not exist'</span>)
+</code></pre>
+
+</div></body>
+</html>
