@@ -39,7 +39,11 @@ if extractseqs == 'y':
 
 	sg.concat(inputfolder='dataflow/01-nucl/', outputpath='dataflow/01-nucl/lacto_prevo.fasta', filenames=["lacto_prevo_negative.fasta", "lacto_prevo_positive.fasta"])
 
+<<<<<<< HEAD
+runmakedb = input("\n" + "Make nucl blast database with asv seqs from Henderson 205 data? (y or n):")
+=======
 runmakedb = input("\n" + "Make nucl blast database with asv seqs from Henderson 2015 data? (y or n):")
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
 
 if runmakedb == 'y':
 	file_obj = sc.Fasta('henderson2015-1_315-100.fasta', 'dataflow/03-asv-seqs/')
@@ -59,15 +63,38 @@ if runblast == 'y':
 	file_obj.runblast(max_target_seqs=100, db='henderson2015-1_315-100_db')
 
 
+<<<<<<< HEAD
+runblast = input("\n" + "Lacto-Prevo 100 blast? (y or n):")
+
+if runblast == 'y':
+	file_obj = sc.Fasta('lacto_prevo_100.fasta', 'dataflow/01-nucl/')
+	file_obj.setOutputName('lacto_prevo_100_genomes_mapped')
+=======
 runblast = input("\n" + "Lacto-Prevo 100 blast against rumen genomes? (y or n):")
 
 if runblast == 'y':
 	file_obj = sc.Fasta('lacto_prevo_100.fasta', 'dataflow/01-nucl/')
 	file_obj.setOutputName('lacto_prevo_100_rumen_genomes_mapped')
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
 	file_obj.setOutputLocation('dataflow/03-blast-tables/')
 	file_obj.runblast(max_target_seqs=100, db='rumen_genomes_db')
 
 
+<<<<<<< HEAD
+runprodigal = input("\n" + "Run prodigal on selected Prevotella MAGS? (y or n):")
+
+if runprodigal == 'y':
+
+	files = ["GCF_000025925.1_ASM2592v1_genomic_rename.fasta",
+"4300142-submission.assembly_rename.fasta",
+"4300076-submission.assembly_rename.fasta",
+"GCF_000762865.1_04_NF40_HMP671v01_genomic_rename.fasta",
+"GCF_001553265.1_ASM155326v1_genomic_rename.fasta",
+"GCF_000177075.1_ASM17707v1_genomic_rename.fasta",
+"GCF_002884635.1_ASM288463v1_genomic_rename.fasta",
+"GCF_000477535.1_PsaliF0493v1.0_genomic_rename.fasta",
+"GCF_000185845.1_ASM18584v1_genomic_rename.fasta"]
+=======
 
 
 
@@ -117,6 +144,7 @@ if runprodigal == 'y':
 	
 
 
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
 
 	for file in files:
 		# contruct object
@@ -137,6 +165,17 @@ runallvallblast = input("\n" + "Run all against all blast with Prevoltella genom
 
 if runallvallblast == 'y':
 
+<<<<<<< HEAD
+	files = ["GCF_000025925.1_ASM2592v1_genomic_rename.fasta",
+"4300142-submission.assembly_rename.fasta",
+"4300076-submission.assembly_rename.fasta",
+"GCF_000762865.1_04_NF40_HMP671v01_genomic_rename.fasta",
+"GCF_001553265.1_ASM155326v1_genomic_rename.fasta",
+"GCF_000177075.1_ASM17707v1_genomic_rename.fasta",
+"GCF_002884635.1_ASM288463v1_genomic_rename.fasta",
+"GCF_000477535.1_PsaliF0493v1.0_genomic_rename.fasta",
+"GCF_000185845.1_ASM18584v1_genomic_rename.fasta"]
+=======
 	files = ['GCF_000762865.1_04_NF40_HMP671v01_genomic_rename.fasta',
 "GCF_000613505.1_ASM61350v1_genomic_rename.fasta",
 "GCF_000142965.1_ASM14296v1_genomic_rename.fasta",
@@ -148,6 +187,7 @@ if runallvallblast == 'y':
 "GCF_000025925.1_ASM2592v1_genomic_rename.fasta",
 "4300076-submission.assembly_rename.fasta",
 "4300142-submission.assembly_rename.fasta"]
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
 
 	# these are the directories we are working with
 	indir = 'dataflow/01-prot/'
@@ -178,6 +218,17 @@ makeheadermap = input("\n" + "Make a header map? (y or n):")
 
 if makeheadermap == 'y':
 
+<<<<<<< HEAD
+	files = ["GCF_000025925.1_ASM2592v1_genomic_rename.fasta",
+"4300142-submission.assembly_rename.fasta",
+"4300076-submission.assembly_rename.fasta",
+"GCF_000762865.1_04_NF40_HMP671v01_genomic_rename.fasta",
+"GCF_001553265.1_ASM155326v1_genomic_rename.fasta",
+"GCF_000177075.1_ASM17707v1_genomic_rename.fasta",
+"GCF_002884635.1_ASM288463v1_genomic_rename.fasta",
+"GCF_000477535.1_PsaliF0493v1.0_genomic_rename.fasta",
+"GCF_000185845.1_ASM18584v1_genomic_rename.fasta"]
+=======
 	files = ['GCF_000762865.1_04_NF40_HMP671v01_genomic_rename.fasta',
 "GCF_000613505.1_ASM61350v1_genomic_rename.fasta",
 "GCF_000142965.1_ASM14296v1_genomic_rename.fasta",
@@ -189,6 +240,7 @@ if makeheadermap == 'y':
 "GCF_000025925.1_ASM2592v1_genomic_rename.fasta",
 "4300076-submission.assembly_rename.fasta",
 "4300142-submission.assembly_rename.fasta"]
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
 
 	indir = 'dataflow/01-prot/'
 	headerfile = 'dataflow/02-headers/'
@@ -247,6 +299,9 @@ if runblast == 'y':
 	file_obj = sc.Fasta('lacto_prevo_100.fasta', 'dataflow/01-nucl/')
 	file_obj.setOutputName('lacto_prevo_100_prevo_genomes_mapped')
 	file_obj.setOutputLocation('dataflow/03-blast-tables/')
+<<<<<<< HEAD
+	file_obj.runblast(max_target_seqs=10, db='prevotella_genomes_db')
+=======
 	file_obj.runblast(max_target_seqs=10, db='prevotella_genomes_db')
 
 
@@ -312,3 +367,4 @@ if combinexml == 'y':
 	blast_files = [f for f in os.listdir('dataflow/02-blast/') if f.endswith(".xml")]
 
 	sg.blastxmltotable(xmlinputfolder='dataflow/02-blast/', blastinputfolder='dataflow/01-prot/',outputpath='dataflow/03-blast-tables/3_genome_nonpos_group_shared_refseq_prot.csv', xmlfilenames=blast_files, blastfilename=prot_files)
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4

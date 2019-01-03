@@ -11,6 +11,13 @@ output:
 library(tidyverse)
 library(ggthemes)
 library(stringi)
+<<<<<<< HEAD
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+blastdir <- '../dataflow/02-blast/'
+files <- list.files(blastdir)
+=======
 library(ggplot2)
 library(ggdendro)
 library(reshape2)
@@ -20,6 +27,7 @@ library(grid)
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 blastdir <- '~/master/rumen/dataflow/02-blast/'
 files <- list.files(blastdir, pattern = "\\.txt$")
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
 dflist <- list()
 
 i <- 1
@@ -35,6 +43,14 @@ for (file in files){
 df_compiled <- bind_rows(dflist)
 colnames(df_compiled)[1:13] <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
 
+<<<<<<< HEAD
+df_compiled$file <- gsub(".txt", "", df_compiled$file)
+
+
+
+df_compiled <- df_compiled %>%
+  separate(file, into = c("file1", "file2"), sep = "\\.") 
+=======
 df_compiled$file <- gsub("submission.assembly", "", df_compiled$file)
 df_compiled$file <- gsub("\\.1", "1", df_compiled$file)
 df_compiled$file <- gsub("\\.2", "2", df_compiled$file)
@@ -47,6 +63,7 @@ df_compiled$file <- gsub("\\.txt", "", df_compiled$file)
 df_compiled <- df_compiled %>%
   separate(file, into = c("file1", "file2"), sep = "\\.") %>%
   filter(length > 100)
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
 
 df_compiled$sseq <- NULL
 ```
@@ -75,6 +92,38 @@ df_rbh <- inner_join(df_forward, df_reverse) %>%
   filter(mean_pi > 40)
 ```
 
+<<<<<<< HEAD
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+# header_dir <- '../dataflow/02-headers/'
+# files <- list.files(header_dir)
+# dflist <- list()
+# 
+# i <- 1
+# for (file in files){
+#   df <- read.csv(paste(header_dir, file, sep = ''), header = TRUE)
+#   dflist[[i]] <- df
+#   i <- i+1
+# }
+# 
+# df_headers<- bind_rows(dflist)
+# colnames(df_headers) <- c("qseqid", "header", "file1")
+# 
+# df_headers$file1 <- gsub(".fasta", "", df_headers$file1)
+# df_headers$file1 <- gsub("_rename", "", df_headers$file1)
+# 
+ df_complete <- df_rbh #%>%
+   #full_join(df_headers)
+
+df_complete$sseqid[is.na(df_complete$sseqid)] <- "None"
+df_complete$file2[is.na(df_complete$file2)] <- "None"
+df_complete$mean_pi[is.na(df_complete$mean_pi)] <- 0.0
+
+df_complete <- df_complete %>%
+  separate(qseqid, into = c("genome",  "contig", "gene"), remove = FALSE)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+=======
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=15, fig.height=10}
 df_complete <- df_rbh 
 
@@ -195,6 +244,7 @@ df_complete <- df_complete %>%
 df_complete$qseqid <- gsub("-submission.assembly", "", df_complete$qseqid)
 df_complete$qseqid <- gsub("_ASM2592v1_genomic", "", df_complete$qseqid)
 
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
 genomes <- unique(df_complete$file1)
 plots <- list()
 i <- 1
@@ -211,7 +261,11 @@ for (genome1 in genomes){
     
       theme_few() +
       
+<<<<<<< HEAD
+      geom_point(aes(y = mean_pi, colour = file2), stat = "identity", size = 2) +
+=======
       geom_point(aes(y = mean_pi, colour = file2), stat = "identity", size = 5) +
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
       
       theme(plot.title = element_text(size = 25), 
         axis.text.x = element_text(angle = 90, hjust = 1, size = 12),  
@@ -238,6 +292,64 @@ for (genome1 in genomes){
   
 ```
 
+<<<<<<< HEAD
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=20, fig.height=4}
+for (i in 1:length(plots)) {
+  plot(plots[[i]])
+  cat("\r\n\r\n")
+}
+
+#plot(plots[[1]])
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+# genomes <- unique(df_rbh$file1)
+# plots <- list()
+# i <- 1
+# 
+# for (genome1 in genomes){
+#   remaining_genomes <- genomes[!(genomes %in% genome1)]
+#   for (genome2 in remaining_genomes){
+#     df_plot <- df_rbh %>%
+#       filter(file1 == genome1 & file2 == genome2)
+#     
+#     df_plot <- df_plot[order(df_plot$qseqid),]
+#     df_plot$gene_num <- 1:nrow(df_plot) 
+#     
+#     plot <- ggplot(df_plot, aes(x=gene_num)) +
+#     
+#       theme_few() +
+#       
+#       geom_point(aes(y = mean_pi), stat = "identity", fill = "lightgrey", size = 2) +
+#       
+#       theme(plot.title = element_text(size = 25), 
+#         axis.text.x = element_text(angle = 90, hjust = 1, size = 15),  
+#         axis.text.y = element_text(size = 20), 
+#         axis.title.x = element_text(size = 20), 
+#         axis.title.y = element_text(size = 20)) + 
+#       
+#       ggtitle(paste(genome1, genome2, sep = "  v  ")) + 
+#       
+#       ylab("Percent identity (%)") + 
+#     
+#       xlab("Gene Number (order of genes)") + 
+#       
+#       theme(legend.text=element_text(size=20)) + 
+#       theme(legend.title=element_text(size=20)) 
+#     
+#     plots[[i]] <- plot
+#     
+#     i <- i + 1
+#   }
+#   
+#   
+# }
+```
+
+
+
+=======
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=20, fig.height=5}
 # for (i in 1:length(plots)) {
 #   plot(plots[[i]])
@@ -246,3 +358,4 @@ for (genome1 in genomes){
 
 plot(plots[[1]])
 ```
+>>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
