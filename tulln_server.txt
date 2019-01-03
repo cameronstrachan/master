@@ -55,4 +55,4 @@ rsync -axv --partial --append --progress -e "ssh -T -o Compression=no -x" /Volum
 
 rsync -haAXi --quiet --delete --delete-during /mnt/ROUTER_WD_2TB/ /mnt/BACKUP_HITACHI_2TB/
 
-rsync -axv --partial --append --progress -e "ssh -T -o Compression=no -x" /Volumes/CamExternal/master2.zip strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/
+rsync -axv --append --progress -e "ssh -T -o Compression=no -x" /Volumes/CamExternal/master2.tar.bz2 strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/
