@@ -79,7 +79,7 @@ runblast = input("\n" + "Blast the 100 percent seqs against prevotella genomes? 
 
 if runblast == 'y':
 	file_obj = sc.Fasta('lacto_signal_differential_all_seqs.fasta', 'dataflow/01-nucl/')
-	file_obj.setOutputName('lacto_signal_differential_all_seqs_genomes_mapped')
+	file_obj.setOutputName('lacto_signal_differential_all_seqs_prevotella_genomes_mapped')
 	file_obj.setOutputLocation('dataflow/03-blast-tables/')
 	file_obj.runblast(max_target_seqs=10, db='prevotella_genomes_db')
 
