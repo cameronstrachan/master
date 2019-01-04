@@ -46,6 +46,8 @@ if extractseqs == 'y':
 	sg.concat(inputfolder='dataflow/01-nucl/', outputpath='dataflow/01-nucl/lacto_signal_differential_seqs.fasta', filenames=["lacto_prevo_decrease.fasta", "lacto_prevo_increase.fasta"])
 
 
+### THIS GOES FROM THE (97% seqs to the 100% seqs)
+
 runmakedb = input("\n" + "Make nucl blast database with asv seqs from Henderson 2015 data (trimmed at 4 and 194)? (y or n):")
 
 if runmakedb == 'y':
@@ -61,3 +63,24 @@ if runblast == 'y':
 	file_obj.setOutputName('lacto_signal_differential_mapped')
 	file_obj.setOutputLocation('dataflow/03-blast-tables/')
 	file_obj.runblast(max_target_seqs=100, db='henderson2015-4_194-100_db')
+
+### HERE FROM RUN R SCRIPT TO EXTRACT THE SEQs from the above blast table
+
+runblast = input("\n" + "Blast the 100 percent seqs against rumen genomes? (y or n):")
+
+if runblast == 'y':
+	file_obj = sc.Fasta('lacto_signal_differential_all_seqs.fasta', 'dataflow/01-nucl/')
+	file_obj.setOutputName('lacto_signal_differential_all_seqs_rumen_genomes_mapped')
+	file_obj.setOutputLocation('dataflow/03-blast-tables/')
+	file_obj.runblast(max_target_seqs=100, db='rumen_genomes_db')
+
+
+runblast = input("\n" + "Blast the 100 percent seqs against prevotella genomes? (y or n):")
+
+if runblast == 'y':
+	file_obj = sc.Fasta('lacto_signal_differential_all_seqs.fasta', 'dataflow/01-nucl/')
+	file_obj.setOutputName('lacto_signal_differential_all_seqs_genomes_mapped')
+	file_obj.setOutputLocation('dataflow/03-blast-tables/')
+	file_obj.runblast(max_target_seqs=10, db='prevotella_genomes_db')
+
+### THEN I RUN R SCRIPT TO EXTRACT THE SEQUENCES FROM THE GENOME HITS
