@@ -18,7 +18,7 @@ df$bitscore <- as.numeric(df$bitscore)
 
 df_select <- df %>%
   filter(length == 190) %>%
-  filter(pident >= 95) %>%
+  filter(pident >= 93) %>%
   rowwise() %>%
   mutate(seq_num = stri_reverse(stri_split_fixed(stri_reverse(sseqid),"_",n = 2)[[1]][1])) %>%
   mutate(genome = stri_reverse(stri_split_fixed(stri_reverse(sseqid),"_",n = 2)[[1]][2])) 
@@ -33,13 +33,16 @@ df_select$sseq <- as.character(df_select$sseq)
 
 df_select_list <- list()
 k <- 1
+already_done <- c()
 
 for (j in 1:nrow(df_select)) {
   
   database <- df_select[j,14]
   genome <- df_select[j,16]
   header <- paste(">", database, "_", genome,  "_", toString(j), sep = "")
-
+  
+  if ( !(genome %in% already_done) ){
+  
   df_select_list[[k]] <- header
   k <- k + 1
   
@@ -48,8 +51,10 @@ for (j in 1:nrow(df_select)) {
   df_select_list[[k]] <- seq
   k <- k + 1
   
+  already_done <- c(already_done, genome)
   
-  
+  }
+
 }
 
 
