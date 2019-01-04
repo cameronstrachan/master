@@ -67,6 +67,7 @@ if runblast == 'y':
 	file_obj.runblast(max_target_seqs=100, db='henderson2015-4_194-100_db')
 
 ### HERE FROM RUN R SCRIPT TO EXTRACT THE SEQs from the above blast table
+print("Run representative_to_all_seqs3.R")
 
 runblast = input("\n" + "Blast the 100 percent seqs against rumen genomes? (y or n):")
 
@@ -86,6 +87,8 @@ if runblast == 'y':
 	file_obj.runblast(max_target_seqs=10, db='prevotella_genomes_db')
 
 ### THEN I RUN R SCRIPT TO EXTRACT THE SEQUENCES FROM THE GENOME HITS (rumen/src/R/genomeblasttables2seqs.R)
+
+print("genomeblasttables2seqs2.R")
 
 runblast = input("\n" + "Concatenate sequences from genomes and? (y or n):")
 
