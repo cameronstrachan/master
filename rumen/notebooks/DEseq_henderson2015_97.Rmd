@@ -155,7 +155,7 @@ row.names(df_phylocounts_meta) <- df_phylocounts_meta[,1]
 ```
 
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=20, fig.height=25}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 library("phyloseq")
 library("ape")
 library("DESeq2")
@@ -183,14 +183,31 @@ rm(list=setdiff(ls(), c("diagdds", "physeq", "df_metrics")))
 diagdds = DESeq(diagdds, fitType = "parametric", test = "Wald", parallel=TRUE)
 
 res = results(diagdds, cooksCutoff = FALSE)
-alpha = 0.01
-sigtab = res[which(res$padj < alpha), ]
-sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(physeq)[rownames(sigtab), ], "matrix"))
+alpha = 0.055
+#sigtab = res[which(res$padj < alpha), ]
+sigtab = res[which(res$pvalue < alpha), ]
+
+sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(physeq)[rownames(sigtab), ], "matrix")) 
 
 selected_seq_ids <- row.names(sigtab)
 
 df_plot <- df_metrics[df_metrics$asv_id %in% selected_seq_ids,]
 
+df_direction <- as.data.frame(sigtab[,2]) 
+colnames(df_direction) <- "fold_change"
+df_direction$asv_id <- selected_seq_ids
+df_direction <- df_direction %>%
+  rowwise() %>%
+  mutate(direction = ifelse(fold_change > 0, "pos_cor", "neg_cor"))
+
+df_plot <- 
+df_plot %>% filter(genus == "Prevotella") %>%
+  inner_join(df_direction)
+```
+
+\newpage
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=20, fig.height=10}
 ggplot(df_plot, aes(x=lacto_signal, y=count_norm)) + 
             geom_point(aes(colour = lacto_signal), size = 5) + 
   facet_wrap( ~ asv_id, scales="free") +
@@ -203,16 +220,12 @@ ggplot(df_plot, aes(x=lacto_signal, y=count_norm)) +
           axis.title.y = element_text(size = 20))
 ```
 
-\newpage
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=20, fig.height=25}
-ggplot(df_plot, aes(x=pack, y=count_norm)) + 
-            geom_point(aes(colour = pack), size = 5) + 
-  facet_wrap( ~ genus, scales="free") +
-          theme(strip.text = element_text(size = 20),
-          plot.title = element_text(size = 30),
-          axis.text.x = element_text(angle = 90, hjust = 1, size = 20),
-          axis.text.y = element_text(size = 20),
-          axis.title.x = element_text(size = 20),
-          axis.title.y = element_text(size = 20))
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_save <- df_plot %>%
+  select(asv_id, direction, fold_change) %>%
+  distinct()
+
+write.csv(df_save, "~/master/rumen/dataflow/00-meta/lacto_signal_differential.csv")
 ```
