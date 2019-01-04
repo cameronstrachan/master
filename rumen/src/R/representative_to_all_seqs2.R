@@ -4,12 +4,9 @@ df <- read.delim("~/master/rumen/dataflow/03-blast-tables/lacto_signal_different
 
 colnames(df) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
 
-lengthinput <- readline(prompt="Length of sequences: ")
-lengthinput <- as.numeric(as.character(lengthinput))
-
 df_select <- df %>%
-  filter(length == lengthinput) %>%
-  filter(pident > 97) %>%
+  filter(length == 190) %>%
+  filter(pident > 97.5) %>%
   separate(qseqid, into = c("qseqid", "direction"), sep = '_')
 
 
