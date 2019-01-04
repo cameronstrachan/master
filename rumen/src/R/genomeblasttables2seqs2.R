@@ -18,7 +18,7 @@ df$bitscore <- as.numeric(df$bitscore)
 
 df_select <- df %>%
   filter(length == 190) %>%
-  filter(pident >= 93) %>%
+  filter(pident >= 95) %>%
   rowwise() %>%
   mutate(seq_num = stri_reverse(stri_split_fixed(stri_reverse(sseqid),"_",n = 2)[[1]][1])) %>%
   mutate(genome = stri_reverse(stri_split_fixed(stri_reverse(sseqid),"_",n = 2)[[1]][2])) 
