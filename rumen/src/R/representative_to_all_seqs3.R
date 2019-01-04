@@ -6,7 +6,7 @@ colnames(df) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qen
 
 df_select <- df %>%
   filter(length == 190) %>%
-  filter(pident > 97.5) %>%
+  filter(pident >= 97) %>%
   separate(qseqid, into = c("qseqid", "direction"), sep = '_')
 
 
