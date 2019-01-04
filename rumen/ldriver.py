@@ -83,4 +83,10 @@ if runblast == 'y':
 	file_obj.setOutputLocation('dataflow/03-blast-tables/')
 	file_obj.runblast(max_target_seqs=10, db='prevotella_genomes_db')
 
-### THEN I RUN R SCRIPT TO EXTRACT THE SEQUENCES FROM THE GENOME HITS
+### THEN I RUN R SCRIPT TO EXTRACT THE SEQUENCES FROM THE GENOME HITS (rumen/src/R/genomeblasttables2seqs.R)
+
+runblast = input("\n" + "Concatenate sequences from genomes and? (y or n):")
+
+if runblast == 'y':
+	sg.concat(inputfolder='dataflow/01-nucl/', outputpath='dataflow/01-nucl/lacto_signal_differential_all_seqs_tags_genomes.fasta', filenames=["lacto_signal_differential_all_seqs_genomes.fasta", "lacto_signal_differential_all_seqs.fasta"])
+
