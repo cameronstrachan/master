@@ -19,7 +19,7 @@ with open('dataflow/01-nucl/lacto_signal_differential_all_seqs_genomes.fasta', '
       
         if (unique_seq in unique_seqs) != True:
             
-            header = ">" + row['Database'] + "_" + str(index)
+            header = ">" + row['Database'] + "_" + row['sseqid']
             file.write(header + "\n")
     
             seq = row['sseq'].replace("-", "")
