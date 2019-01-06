@@ -10,7 +10,7 @@ with open('dataflow/01-nucl/lacto_signal_differential_all_seqs.fasta', 'w') as f
     for index, row in df.iterrows():
     
         header = row['qseqid']
-        asv_id_short = header.split('_')[0][0:5]
+        asv_id_short = header.split('_')[0][0:10]
         tag = header.split('_')[1]
     
         header_short = ">" + asv_id_short + "_" + tag
