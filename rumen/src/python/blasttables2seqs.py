@@ -13,7 +13,7 @@ df = df[(df['pident'] >= 95)]
 with open('dataflow/01-nucl/lacto_signal_differential_all_seqs_genomes.fasta', 'w') as file:
     for index, row in df.iterrows():
     
-        header = row['Database'] + "_" + str(index)
+        header = ">" + row['Database'] + "_" + str(index)
         file.write(header + "\n")
     
         seq = row['sseq'].replace("-", "")
