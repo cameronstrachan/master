@@ -35,7 +35,7 @@ if extractseqs == 'y':
 
 
 
-	file_obj = sc.Fasta('henderson2015-4_194-97.fasta', 'dataflow/03-asv-seqs/')
+	file_obj = sc.Fasta('henderson2015-4_194-99.fasta', 'dataflow/03-asv-seqs/')
 	file_obj.setOutputLocation('dataflow/01-nucl/')
 
 	file_obj.setOutputName('lacto_prevo_decrease.fasta')
