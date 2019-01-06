@@ -114,28 +114,34 @@ if runcommand == 'y':
 
 #####
 
-genomes_df = pd.read_csv('dataflow/00-meta/selected_genomes.csv', low_memory=False)
-genomes = genomes_df['Genome'].tolist()
+runrename = input("\n" + "Run renaming of selected genomes? (y or n):")
 
-files = [item + ".fasta" for item in genomes]
+if runrename == 'y':
 
-for file in files:	
+	genomes_df = pd.read_csv('dataflow/00-meta/selected_genomes.csv', low_memory=False)
+	genomes = genomes_df['Genome'].tolist()
 
-		file_obj = sc.Fasta(file, "dataflow/01-nucl/")
+	files = [item + ".fasta" for item in genomes]
 
-		outfilename = file.split('.f')[0] + '_rename.fasta'
+	for file in files:	
 
-		file_obj.setOutputName(outfilename)
-		file_obj.setOutputLocation("dataflow/01-nucl/")
+			file_obj = sc.Fasta(file, "dataflow/01-nucl/")
 
-		file_obj.headerrename()
+			outfilename = file.split('.f')[0] + '_rename.fasta'
+
+			file_obj.setOutputName(outfilename)
+			file_obj.setOutputLocation("dataflow/01-nucl/")
+
+			file_obj.headerrename()
 	
-
-files = [item + "_rename.fasta" for item in genomes]
 
 runprodigal = input("\n" + "Run prodigal on selected Prevotella genomes? (y or n):")
 
 if runprodigal == 'y':
+
+	genomes_df = pd.read_csv('dataflow/00-meta/selected_genomes.csv', low_memory=False)
+	genomes = genomes_df['Genome'].tolist()
+	files = [item + "_rename.fasta" for item in genomes]
 
 	for file in files:
 		# contruct object
