@@ -1,3 +1,5 @@
+os.system("source activate qiime2-2018.11")
+
 # python libraries
 import os, sys
 import subprocess
@@ -7,8 +9,6 @@ import pandas as pd
 sys.path.insert(0, '/home/strachan/master/') 
 from modules import seq_core_lin as sc
 from modules import seq_gen_lin as sg
-
-#os.system("source activate qiime2-2018.11")
 
 ### RUN QIIME ON HENDERSON DATA
 runqiime = input("\n" + "Run Qiime on data from Henderson et al. 2015? (y or n):")
@@ -93,9 +93,24 @@ runscript = input("\n" + "Extract the genomes seqs from the blast table? (y or n
 if runscript == 'y':
 	os.system("python src/python/blasttables2seqs.py")
 
-runblast = input("\n" + "Concatenate sequences from genomes and? (y or n):")
+runblast = input("\n" + "Concatenate sequences from genomes and Prevotella? (y or n):")
 
 if runblast == 'y':
 	sg.concat(inputfolder='dataflow/01-nucl/', outputpath='dataflow/01-nucl/lacto_signal_differential_all_seqs_tags_genomes.fasta', filenames=["lacto_signal_differential_all_seqs_genomes.fasta", "lacto_signal_differential_all_seqs.fasta"])
 
-#os.system("source deactivate qiime2-2018.11")
+runcommand = input("\n" + "Run muscle? (y or n):")
+
+if runcommand == 'y':
+	os.system("../bin/muscle -in dataflow/01-nucl/lacto_signal_differential_all_seqs_tags_genomes.fasta -out dataflow/03-alignments/lacto_signal_differential_all_seqs_tags_genomes_alignment.afa")
+
+runcommand = input("\n" + "Run Gblocks? (y or n):")
+
+if runcommand == 'y':
+	os.system("../bin/Gblocks dataflow/03-alignments/lacto_signal_differential_all_seqs_tags_genomes_alignment.afa -t=d -b6=n")
+
+runcommand = input("\n" + "Run FastTree? (y or n):")
+
+if runcommand == 'y':
+	os.system("../bin/FastTree -gtr -nt dataflow/03-alignments/lacto_signal_differential_all_seqs_tags_genomes_alignment.afa-gb > dataflow/03-alignments/tree_test.newick")
+
+os.system("source deactivate qiime2-2018.11")
