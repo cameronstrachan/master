@@ -1,7 +1,6 @@
-os.system("source activate qiime2-2018.11")
-
 # python libraries
 import os, sys
+os.system("source activate qiime2-2018.11")
 import subprocess
 import pandas as pd
 
