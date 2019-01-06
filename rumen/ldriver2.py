@@ -26,12 +26,12 @@ if extractseqs == 'y':
 ### select seq ids from metadata
 	meta_df = pd.read_csv('dataflow/00-meta/lacto_signal_differential.csv', low_memory=False)
 
-	seqs_neg_cor = meta_df[meta_df['direction'] == 'neg_cor']
-	seqs_neg_cor = seqs_neg_cor['asv_id'].tolist()
+	seqs_decrease = meta_df[meta_df['direction'] == 'decrease']
+	seqs_decrease = seqs_decrease['asv_id'].tolist()
 
 
-	seqs_pos_cor = meta_df[meta_df['direction'] == 'pos_cor']
-	seqs_pos_cor = seqs_pos_cor['asv_id'].tolist()
+	seqs_increase = meta_df[meta_df['direction'] == 'increase']
+	seqs_increase = seqs_increase['asv_id'].tolist()
 
 
 
@@ -39,10 +39,10 @@ if extractseqs == 'y':
 	file_obj.setOutputLocation('dataflow/01-nucl/')
 
 	file_obj.setOutputName('lacto_prevo_decrease.fasta')
-	file_obj.subsetfasta(seqlist = seqs_neg_cor , headertag='decrease')
+	file_obj.subsetfasta(seqlist = seqs_decrease , headertag='decrease')
 
 	file_obj.setOutputName('lacto_prevo_increase.fasta')
-	file_obj.subsetfasta(seqlist = seqs_pos_cor, headertag='increase')
+	file_obj.subsetfasta(seqlist = seqs_increase, headertag='increase')
 
 
 	sg.concat(inputfolder='dataflow/01-nucl/', outputpath='dataflow/01-nucl/lacto_signal_differential_seqs.fasta', filenames=["lacto_prevo_decrease.fasta", "lacto_prevo_increase.fasta"])
@@ -66,8 +66,10 @@ if runblast == 'y':
 	file_obj.setOutputLocation('dataflow/03-blast-tables/')
 	file_obj.runblast(max_target_seqs=100, db='henderson2015-4_194-100_db')
 
-### HERE FROM RUN R SCRIPT TO EXTRACT THE SEQs from the above blast table
-print("\n RUN: representative_to_all_seqs3.R")
+runscript = input("\n" + "Extract the representative seqs from the blast table? (y or n):")
+
+if runscript == 'y':
+	execfile("src/python/representative2relatedseqs.py")
 
 runblast = input("\n" + "Blast the 100 percent seqs against rumen genomes? (y or n):")
 
@@ -86,9 +88,10 @@ if runblast == 'y':
 	file_obj.setOutputLocation('dataflow/03-blast-tables/')
 	file_obj.runblast(max_target_seqs=10, db='prevotella_genomes_db')
 
-### THEN I RUN R SCRIPT TO EXTRACT THE SEQUENCES FROM THE GENOME HITS (rumen/src/R/genomeblasttables2seqs.R)
+runscript = input("\n" + "Extract the genomes seqs from the blast table? (y or n):")
 
-print("\n RUN: genomeblasttables2seqs2.R")
+if runscript == 'y':
+	execfile("src/python/blasttables2seqs.py")
 
 runblast = input("\n" + "Concatenate sequences from genomes and? (y or n):")
 
