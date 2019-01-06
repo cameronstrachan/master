@@ -6,7 +6,7 @@ df = pd.read_csv('dataflow/03-blast-tables/lacto_signal_differential_mapped', se
 df = df[(df['length'] == 190)]
 df = df[(df['pident'] >= 99)]
 
-with open('dataflow/01-nucl/lacto_signal_differential_all_seqs.fasta', 'w') as file:
+with open('dataflow/01-nucl/lacto_signal_differential_all_seqs_tags.fasta', 'w') as file:
     for index, row in df.iterrows():
     
         header = row['qseqid']

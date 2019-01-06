@@ -298,7 +298,7 @@ class Fasta(File):
         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
         output, error = process.communicate()
 
-    def runblast(self, blast='blastn', db='none', dblocation='dataflow/02-blast-db/', max_target_seqs=1, evalue=1e-3):
+    def runblast(self, blast='blastn', db='none', dblocation='dataflow/02-blast-db/', max_target_seqs=1, evalue=1e-3, num_threads = 8):
         '''
         Run standalone blast
         '''
@@ -309,7 +309,7 @@ class Fasta(File):
             filename = self.name
             fileoutputname = self.outputname 
 
-            command = '../bin/' + blast  + ' -query ' + indir + filename + ' -db ' + dblocation + db +  ' -max_target_seqs ' + str(max_target_seqs) + " -max_hsps 1 -evalue " + str(evalue)  + " -outfmt '6 qseqid sseqid pident sstart send qstart qend evalue bitscore score qlen length sseq'" + ' -out ' + outdir + fileoutputname
+            command = '../bin/' + blast  + ' -query ' + indir + filename + ' -db ' + dblocation + db +  ' -max_target_seqs ' + str(max_target_seqs) + " -max_hsps 1 -evalue " + str(evalue)  + ' -num_threads ' + str(num_threads) + " -outfmt '6 qseqid sseqid pident sstart send qstart qend evalue bitscore score qlen length sseq'" + ' -out ' + outdir + fileoutputname
             print('Blast command being run:' + '\n' + command)
             process = subprocess.Popen(command, universal_newlines=True, stdout=subprocess.PIPE, shell=True)
             output, error = process.communicate()
