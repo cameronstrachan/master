@@ -2,7 +2,7 @@ import pandas as pd
 
 df = pd.read_csv('dataflow/03-blast-tables/lacto_signal_differential_all_seqs_prevotella_genomes_mapped', sep='\t', low_memory=False, names=["qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq"])
 df['Database'] = 'Prevotella'
-df2 = pd.read_csv('master/rumen/dataflow/03-blast-tables/lacto_signal_differential_all_seqs_rumen_genomes_mapped', sep='\t', low_memory=False, names=["qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq"])
+df2 = pd.read_csv('dataflow/03-blast-tables/lacto_signal_differential_all_seqs_rumen_genomes_mapped', sep='\t', low_memory=False, names=["qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq"])
 df2['Database'] = 'Rumen'
 
 df = df.append(df2)
