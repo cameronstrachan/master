@@ -9,11 +9,11 @@ df = df[(df['pident'] >= 99)]
 with open('dataflow/01-nucl/lacto_signal_differential_all_seqs.fasta', 'w') as file:
     for index, row in df.iterrows():
     
-        header = row['sseqid']
+        header = row['qseqid']
         asv_id_short = header.split('_')[0][0:5]
         tag = row['qseqid'].split('_')[1]
     
-        header_short = ">" + asv_id_short + "_" + tag
+        header_short = ">" + asv_id_short + "_" + tag + "_" + str(index)
         file.write(header_short + "\n")
     
         seq = row['sseq'].replace("-", "")
