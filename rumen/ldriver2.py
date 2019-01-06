@@ -69,7 +69,7 @@ if runblast == 'y':
 runscript = input("\n" + "Extract the representative seqs from the blast table? (y or n):")
 
 if runscript == 'y':
-	os.system("src/python/representative2relatedseqs.py")
+	os.system("python src/python/representative2relatedseqs.py")
 
 runblast = input("\n" + "Blast the 100 percent seqs against rumen genomes? (y or n):")
 
@@ -91,7 +91,7 @@ if runblast == 'y':
 runscript = input("\n" + "Extract the genomes seqs from the blast table? (y or n):")
 
 if runscript == 'y':
-	os.system("src/python/blasttables2seqs.py")
+	os.system("python src/python/blasttables2seqs.py")
 
 runblast = input("\n" + "Concatenate sequences from genomes and? (y or n):")
 
