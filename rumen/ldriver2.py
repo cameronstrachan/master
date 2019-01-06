@@ -60,7 +60,7 @@ runblast = input("\n" + "Blast Henderson 97 clustered asvs against 100 clustered
 
 if runblast == 'y':
 	file_obj = sc.Fasta('lacto_signal_differential_seqs.fasta', 'dataflow/01-nucl/')
-	file_obj.setOutputName('lacto_signal_differential_mapped')
+	file_obj.setOutputName('lacto_signal_differential_seqs_mapped')
 	file_obj.setOutputLocation('dataflow/03-blast-tables/')
 	file_obj.runblast(max_target_seqs=100, db='henderson2015-4_194-100_db')
 
@@ -73,7 +73,7 @@ runblast = input("\n" + "Blast the 100 percent seqs against rumen genomes? (y or
 
 if runblast == 'y':
 	file_obj = sc.Fasta('lacto_signal_differential_all_seqs.fasta', 'dataflow/01-nucl/')
-	file_obj.setOutputName('lacto_signal_differential_all_seqs_rumen_genomes_mapped')
+	file_obj.setOutputName('lacto_signal_differential_all_seqs_tags_rumen_genomes_mapped')
 	file_obj.setOutputLocation('dataflow/03-blast-tables/')
 	file_obj.runblast(max_target_seqs=100, db='rumen_genomes_db')
 
@@ -82,7 +82,7 @@ runblast = input("\n" + "Blast the 100 percent seqs against prevotella genomes? 
 
 if runblast == 'y':
 	file_obj = sc.Fasta('lacto_signal_differential_all_seqs.fasta', 'dataflow/01-nucl/')
-	file_obj.setOutputName('lacto_signal_differential_all_seqs_prevotella_genomes_mapped')
+	file_obj.setOutputName('lacto_signal_differential_all_seqs_tags_prevotella_genomes_mapped')
 	file_obj.setOutputLocation('dataflow/03-blast-tables/')
 	file_obj.runblast(max_target_seqs=10, db='prevotella_genomes_db')
 
@@ -94,7 +94,7 @@ if runscript == 'y':
 runblast = input("\n" + "Concatenate sequences from genomes and Prevotella? (y or n):")
 
 if runblast == 'y':
-	sg.concat(inputfolder='dataflow/01-nucl/', outputpath='dataflow/01-nucl/lacto_signal_differential_all_seqs_tags_genomes.fasta', filenames=["lacto_signal_differential_all_seqs_genomes.fasta", "lacto_signal_differential_all_seqs.fasta"])
+	sg.concat(inputfolder='dataflow/01-nucl/', outputpath='dataflow/01-nucl/lacto_signal_differential_all_seqs_tags_genomes.fasta', filenames=["lacto_signal_differential_all_seqs_genomes.fasta", "lacto_signal_differential_all_seqs_tags.fasta"])
 
 runcommand = input("\n" + "Run muscle? (y or n):")
 
@@ -109,4 +109,93 @@ if runcommand == 'y':
 runcommand = input("\n" + "Run FastTree? (y or n):")
 
 if runcommand == 'y':
-	os.system("../bin/FastTree -gtr -nt dataflow/03-alignments/lacto_signal_differential_all_seqs_tags_genomes_alignment.afa-gb > dataflow/03-alignments/tree_test.newick")
+	os.system("../bin/FastTree -gtr -nt dataflow/03-alignments/lacto_signal_differential_all_seqs_tags_genomes_alignment.afa-gb > dataflow/03-trees/lacto_signal_differential_all_seqs_tags_genomes_tree.newick")
+
+
+#####
+
+genomes_df = pd.read_csv('dataflow/00-meta/selected_genomes.csv', low_memory=False)
+genomes = genomes_df['Genome'].tolist()
+
+files = [item + ".fasta" for item in genomes]
+
+for file in files:	
+
+		file_obj = sc.Fasta(file, "dataflow/01-nucl/")
+
+		outfilename = file.split('.f')[0] + '_rename.fasta'
+
+		file_obj.setOutputName(outfilename)
+		file_obj.setOutputLocation("dataflow/01-nucl/")
+
+		file_obj.headerrename()
+	
+
+files = [item + "_rename.fasta" for item in genomes]
+
+runprodigal = input("\n" + "Run prodigal on selected Prevotella genomes? (y or n):")
+
+if runprodigal == 'y':
+
+	for file in files:
+		# contruct object
+		file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
+
+		# set output name, location
+		outputfilename = file.split(".f")[0] + '.fasta'
+		file_obj.setOutputName(outputfilename)
+		file_obj.setOutputLocation('dataflow/01-prot/')
+		
+		# run prodigal 
+		file_obj.runprodigal()
+
+
+runallvallblast = input("\n" + "Run all against all blast with Prevoltella genomes? (y or n):")
+
+if runallvallblast == 'y':
+
+	# these are the directories we are working with
+	indir = 'dataflow/01-prot/'
+	blastdbdir = 'dataflow/02-blast-db/'
+	blastdir = 'dataflow/02-blast/'
+
+	# make blast db for each file
+	for file in files:
+		file_obj = sc.Fasta(file, indir)
+		file_obj.setOutputName(file)
+		file_obj.setOutputLocation(blastdbdir)
+		file_obj.runmakeblastdb(dbtype='prot')
+
+	# blast database names
+	blastdbs = files.copy()
+
+	# blast all files against all blast databases (all against all)
+	for file in files:
+		file_obj = sc.Fasta(file, indir)
+		file_obj.setOutputLocation(blastdir)
+		for blastdb in blastdbs:
+			outputfilename = file.split('.f')[0] + '.' + blastdb.split('.f')[0] + '.txt'
+			file_obj.setOutputName(outputfilename)
+			file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=1, evalue=1e-3, num_threads = 60)
+
+makeheadermap = input("\n" + "Make a header map? (y or n):")
+
+
+if makeheadermap == 'y':
+
+	indir = 'dataflow/01-prot/'
+	headerfile = 'dataflow/02-headers/'
+	#header_dict = dict()
+
+	for file in files:
+		file_obj = sc.Fasta(file, indir)
+		file_obj.setOutputName(file)
+		file_obj.setOutputLocation(headerfile)
+		
+		headers = file_obj.fasta2headermap()
+
+		df = pd.DataFrame.from_dict(headers, orient="index")
+
+		df['file'] = file
+		
+		df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
