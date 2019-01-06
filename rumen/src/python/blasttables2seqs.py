@@ -16,8 +16,7 @@ with open('dataflow/01-nucl/lacto_signal_differential_all_seqs_genomes.fasta', '
     for index, row in df.iterrows():
         
         unique_seq = row['sseqid']
-        print(unique_seq)
-        
+      
         if (unique_seq in unique_seqs) != True:
             
             header = ">" + row['Database'] + "_" + str(index)
