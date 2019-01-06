@@ -11,7 +11,7 @@ with open('dataflow/01-nucl/lacto_signal_differential_all_seqs.fasta', 'w') as f
     
         header = row['sseqid']
         asv_id_short = header.split('_')[0][0:5]
-        tag = header.split('_')[1]
+        tag = row['qseqid'].split('_')[1]
     
         header_short = ">" + asv_id_short + "_" + tag
         file.write(header_short + "\n")
