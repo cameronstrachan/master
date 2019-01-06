@@ -160,6 +160,10 @@ runallvallblast = input("\n" + "Run all against all blast with Prevoltella genom
 
 if runallvallblast == 'y':
 
+	genomes_df = pd.read_csv('dataflow/00-meta/selected_genomes.csv', low_memory=False)
+	genomes = genomes_df['Genome'].tolist()
+	files = [item + "_rename.fasta" for item in genomes]
+
 	# these are the directories we are working with
 	indir = 'dataflow/01-prot/'
 	blastdbdir = 'dataflow/02-blast-db/'
