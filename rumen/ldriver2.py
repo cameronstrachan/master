@@ -1,6 +1,5 @@
 # python libraries
 import os, sys
-os.system("source activate qiime2-2018.11")
 import subprocess
 import pandas as pd
 
@@ -111,5 +110,3 @@ runcommand = input("\n" + "Run FastTree? (y or n):")
 
 if runcommand == 'y':
 	os.system("../bin/FastTree -gtr -nt dataflow/03-alignments/lacto_signal_differential_all_seqs_tags_genomes_alignment.afa-gb > dataflow/03-alignments/tree_test.newick")
-
-os.system("source deactivate qiime2-2018.11")
