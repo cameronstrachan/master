@@ -196,11 +196,9 @@ class Fasta(File):
 
             outputfile = self.openwritefile()
             for k,v in fastadic.items():
-                header = k.rstrip()
-                seq = v.rstrip()
 
                 if length != 0:
-                    header = header[0:length]
+                    k = k[0:length]
 
                 outputfile.write(">" + k + '_' + headertag + '\n')
                 outputfile.write(v + '\n')
