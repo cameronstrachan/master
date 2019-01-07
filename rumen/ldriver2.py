@@ -239,9 +239,8 @@ if runcommand == 'y':
 		if str(key[0:3]) == '16S':
 			l.append(key)
 
-	sg.concat(inputfolder='dataflow/02-16s/', outputpath='dataflow/02-16s/lacto_signal_differential_seqs_genomes_16s_extracted.fasta', filenames=l)
-
 	file_obj.subsetfasta(seqlist = l , headertag='number', replace=':', length=30)
+	
 	file_obj = sc.Fasta('lacto_signal_differential_seqs_genomes_16s_extracted.fasta', 'dataflow/02-16s/')
 	file_obj.setOutputLocation('dataflow/02-16s/')
 	file_obj.setOutputName('lacto_signal_differential_seqs_genomes_16s_extracted_1300.fasta')
