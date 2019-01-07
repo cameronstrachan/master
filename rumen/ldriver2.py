@@ -208,9 +208,9 @@ if makeheadermap == 'y':
 
 		df['file'] = file
 		
-		df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
+		df.to_csv(headerfile + file.splslit('.fa')[0] + '.csv')
 
-runcommand = input("\n" + "Run FastTree? (y or n):")
+runcommand = input("\n" + "Run 16s search? (y or n):")
 
 if runcommand == 'y':
 
@@ -228,4 +228,33 @@ if runcommand == 'y':
 
 	sg.concat(inputfolder='dataflow/02-16s/', outputpath='dataflow/02-16s/lacto_signal_differential_seqs_genomes_16s.fasta', filenames=l)
 
+	file_obj = sc.Fasta('lacto_signal_differential_seqs_genomes_16s.fasta', 'dataflow/02-16s/')
+	file_obj.setOutputName('lacto_signal_differential_seqs_genomes_16s_extracted.fasta')
+	file_obj.setOutputLocation('dataflow/02-16s/')
+
+	headers = file_obj.fasta2headermap()
+	l = []
+
+	for key, value in headers.items():
+		if str(key[0:3]) == '16S':
+			l.append(key)
+
+	file_obj.subsetfasta(seqlist = l , headertag='extracted')
+
+
+
+runcommand = input("\n" + "Run muscle on full 16s seqs? (y or n):")
+
+if runcommand == 'y':
+	os.system("../bin/muscle -in dataflow/02-16s/lacto_signal_differential_seqs_genomes_16s_extracted.fasta -out dataflow/03-alignments/lacto_signal_differential_seqs_genomes_16s_extracted.afa")
+
+runcommand = input("\n" + "Run Gblocks on full 16s seqs? (y or n):")
+
+if runcommand == 'y':
+	os.system("../bin/Gblocks dataflow/03-alignments/lacto_signal_differential_seqs_genomes_16s_extracted.afa -t=d -b6=n")
+
+runcommand = input("\n" + "Run FastTree on full 16s seqs? (y or n):")
+
+if runcommand == 'y':
+	os.system("../bin/FastTree -gtr -nt dataflow/03-alignments/lacto_signal_differential_seqs_genomes_16s_extracted.afa-gb > dataflow/03-trees/lacto_signal_differential_seqs_genomes_16s_extracted.afa.newick")
 

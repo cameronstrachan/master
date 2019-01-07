@@ -1,32 +1,22 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Oct 30 09:33:21 2018
-
-@author: cameronstrachan
-"""
-
 # python libraries
 import os, sys
+import subprocess
 import pandas as pd
 
 # custom libraries
-sys.path.insert(0, '/Users/cameronstrachan/master/') 
-from modules import seq_core as sc
-from modules import seq_gen as sg
-from modules import seq_scrape as ss
+sys.path.insert(0, '/Users/cameronstrachan/master') 
+from modules import seq_core_lin as sc
+from modules import seq_gen_lin as sg
 
-meta_df = pd.read_csv('dataflow/00-meta/seshadri2018_othergenomes.csv', low_memory=False)
-strains = meta_df['genome'].tolist()
+file_obj = sc.Fasta('lacto_signal_differential_seqs_genomes_16s.fasta', 'dataflow/02-16s/')
+file_obj.setOutputName('lacto_signal_differential_seqs_genomes_16s.fasta')
+file_obj.setOutputLocation('dataflow/02-16s/')
 
-not_downloaded = list()
-downloaded = list()
+headers = file_obj.fasta2headermap()
+l = []
 
-for strain in strains:
-    message = ss.ncbigenomescrape(str(strain), searchterm2='genome[title]', location='dataflow/01-gb/')
-    if message == 'No genomes downloaded':
-        not_downloaded.append(strain)
-    else:
-        downloaded.append(strain)
-        
+for key, value in headers.items():
+	if str(key[0:3]) == '16S':
+		l.append(key)
 
+file_obj.subsetfasta(seqlist = l , headertag='extracted')
