@@ -184,12 +184,13 @@ class Fasta(File):
             print("\n" + 'File exists: ' + self.outputlocation + self.outputname)
 
 
-    def subsetfasta(self, seqlist = [], headertag='subset', length=0, replace='NA'):
+    def subsetfasta(self, seqlist = [], headertag='number', length=0, replace='NA'):
         
         '''
          
         '''
-    
+        j = 1
+
         if not self.outputexists():
             fastadic = self.fasta2dict()
             fastadic = {k: fastadic[k] for k in seqlist}
@@ -203,7 +204,12 @@ class Fasta(File):
                 if replace != 'NA':
                     k = k.replace(replace, '')
 
-                outputfile.write(">" + k + '_' + headertag + '\n')
+                if headertag == 'number':
+                    outputfile.write(">" + k + '_' + str(j) + '\n')
+                    j = j + 1
+                else: 
+                    outputfile.write(">" + k + '_' + headertag + '\n')
+                    
                 outputfile.write(v + '\n')
         else:
             print("\n" + 'File exists: ' + self.outputlocation + self.outputname)
