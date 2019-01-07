@@ -129,7 +129,7 @@ class Fasta(File):
 
                 if line[0] == '>':
                     headersplit = line.split()
-                    seqname = headersplit[0][1:].replace(':', '')
+                    seqname = headersplit[0][1:]
                     self.fastadict[seqname] = ''
                     i = i + 1
                 
@@ -184,7 +184,7 @@ class Fasta(File):
             print("\n" + 'File exists: ' + self.outputlocation + self.outputname)
 
 
-    def subsetfasta(self, seqlist = [], headertag='subset', length=0):
+    def subsetfasta(self, seqlist = [], headertag='subset', length=0, replace='NA'):
         
         '''
          
@@ -199,6 +199,9 @@ class Fasta(File):
 
                 if length != 0:
                     k = k[0:length]
+
+                if replace != 'NA':
+                    k = k.replace(replace, '')
 
                 outputfile.write(">" + k + '_' + headertag + '\n')
                 outputfile.write(v + '\n')
