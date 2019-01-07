@@ -129,8 +129,7 @@ class Fasta(File):
 
                 if line[0] == '>':
                     headersplit = line.split()
-                    headersplit = headersplit.replace(':', '')
-                    seqname = headersplit[0][1:]
+                    seqname = headersplit[0][1:].replace(':', '')
                     self.fastadict[seqname] = ''
                     i = i + 1
                 
