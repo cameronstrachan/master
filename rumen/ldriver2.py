@@ -239,7 +239,7 @@ if runcommand == 'y':
 		if str(key[0:3]) == '16S':
 			l.append(key)
 
-	file_obj.subsetfasta(seqlist = l , headertag='extracted')
+	file_obj.subsetfasta(seqlist = l , headertag='extracted', length=30)
 
 
 
