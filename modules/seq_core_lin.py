@@ -189,13 +189,16 @@ class Fasta(File):
         '''
          
         '''
-        j = 1
+        
 
         if not self.outputexists():
             fastadic = self.fasta2dict()
             fastadic = {k: fastadic[k] for k in seqlist}
 
             outputfile = self.openwritefile()
+
+            j = 1
+            
             for k,v in fastadic.items():
 
                 if length != 0:
@@ -209,7 +212,7 @@ class Fasta(File):
                     j = j + 1
                 else: 
                     outputfile.write(">" + k + '_' + headertag + '\n')
-                    
+
                 outputfile.write(v + '\n')
         else:
             print("\n" + 'File exists: ' + self.outputlocation + self.outputname)
