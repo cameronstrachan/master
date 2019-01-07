@@ -248,13 +248,8 @@ runcommand = input("\n" + "Run muscle on full 16s seqs? (y or n):")
 if runcommand == 'y':
 	os.system("../bin/muscle -in dataflow/02-16s/lacto_signal_differential_seqs_genomes_16s_extracted.fasta -out dataflow/03-alignments/lacto_signal_differential_seqs_genomes_16s_extracted.afa")
 
-runcommand = input("\n" + "Run Gblocks on full 16s seqs? (y or n):")
-
-if runcommand == 'y':
-	os.system("../bin/Gblocks dataflow/03-alignments/lacto_signal_differential_seqs_genomes_16s_extracted.afa -t=d -b6=n")
-
 runcommand = input("\n" + "Run FastTree on full 16s seqs? (y or n):")
 
 if runcommand == 'y':
-	os.system("../bin/FastTree -gtr -nt dataflow/03-alignments/lacto_signal_differential_seqs_genomes_16s_extracted.afa-gb > dataflow/03-trees/lacto_signal_differential_seqs_genomes_16s_extracted.afa.newick")
+	os.system("../bin/FastTree -gtr -nt dataflow/03-alignments/lacto_signal_differential_seqs_genomes_16s_extracted.afa > dataflow/03-trees/lacto_signal_differential_seqs_genomes_16s_extracted.afa.newick")
 
