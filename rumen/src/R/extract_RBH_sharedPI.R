@@ -83,5 +83,5 @@ df_pi_shared <- df_rbh %>%
   select(-mean_pi) %>%
   distinct()
 
-write.csv(df_rbh, "dataflow/00-meta/04-analysis-tables/selected_genomes_rbh.csv")
-write.csv(df_pi_shared, "dataflow/00-meta/04-analysis-tables/selected_genomes_sharedPI.csv")
+write.csv(df_rbh, "dataflow/04-analysis-tables/selected_genomes_rbh.csv")
+write.csv(df_pi_shared, "dataflow/04-analysis-tables/selected_genomes_sharedPI.csv")
