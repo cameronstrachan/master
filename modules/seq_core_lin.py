@@ -184,7 +184,7 @@ class Fasta(File):
             print("\n" + 'File exists: ' + self.outputlocation + self.outputname)
 
 
-    def subsetfasta(self, seqlist = [], headertag='subset'):
+    def subsetfasta(self, seqlist = [], headertag='subset', length=0):
         
         '''
          
@@ -198,6 +198,10 @@ class Fasta(File):
             for k,v in fastadic.items():
                 header = k.rstrip()
                 seq = v.rstrip()
+
+                if length != 0:
+                    header = header[0:length]
+
                 outputfile.write(">" + k + '_' + headertag + '\n')
                 outputfile.write(v + '\n')
         else:
