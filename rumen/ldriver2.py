@@ -214,7 +214,7 @@ runcommand = input("\n" + "Run FastTree? (y or n):")
 
 if runcommand == 'y':
 
-	16sfiles = []
+	l = list()
 
 	genomes_df = pd.read_csv('dataflow/00-meta/selected_genomes.csv', low_memory=False)
 	genomes = genomes_df['Genome'].tolist()
@@ -224,8 +224,8 @@ if runcommand == 'y':
 		outputfile = file.split('.fa')[0] + "_16s.fasta"
 		command = '../../barrnap/bin/barrnap --threads 20 --kingdom bac -o dataflow/02-16s/' + outputfile + ' < ' + 'dataflow/01-nucl/' + file
 		os.system(command)
-		16sfiles.append(outputfile)
+		l.append(outputfile)
 
-	sg.concat(inputfolder='dataflow/02-16s/', outputpath='dataflow/02-16s/lacto_signal_differential_seqs_genomes_16s.fasta', filenames=16sfiles)
+	sg.concat(inputfolder='dataflow/02-16s/', outputpath='dataflow/02-16s/lacto_signal_differential_seqs_genomes_16s.fasta', filenames=l)
 
 
