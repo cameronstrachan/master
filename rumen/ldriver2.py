@@ -240,17 +240,16 @@ if runcommand == 'y':
 			l.append(key)
 
 	file_obj.subsetfasta(seqlist = l , headertag='number', replace=':', length=30)
-	
+
 	file_obj = sc.Fasta('lacto_signal_differential_seqs_genomes_16s_extracted.fasta', 'dataflow/02-16s/')
 	file_obj.setOutputLocation('dataflow/02-16s/')
 	file_obj.setOutputName('lacto_signal_differential_seqs_genomes_16s_extracted_1300.fasta')
-	file_obj.lengthcutoff(replaceheaders = False, length = 1300, direction = 'above')
+	file_obj.lengthcutoff(replaceheaders = False, length = 1100, direction = 'above')
 
-	file_obj.subsetfasta(seqlist = l , headertag='number', replace=':')
 	file_obj = sc.Fasta('lacto_signal_differential_seqs_genomes_16s_extracted_1300.fasta', 'dataflow/02-16s/')
 	file_obj.setOutputLocation('dataflow/02-16s/')
 	file_obj.setOutputName('lacto_signal_differential_seqs_genomes_16s_extracted_1300_1700.fasta')
-	file_obj.lengthcutoff(replaceheaders = False, length = 1700, direction = 'below')
+	file_obj.lengthcutoff(replaceheaders = False, length = 1900, direction = 'below')
 
 
 runcommand = input("\n" + "Run muscle on full 16s seqs? (y or n):")
