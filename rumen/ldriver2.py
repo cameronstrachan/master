@@ -239,24 +239,31 @@ if runcommand == 'y':
 		if str(key[0:3]) == '16S':
 			l.append(key)
 
-	file_obj.subsetfasta(seqlist = l , headertag='number', replace=':')
+	file_obj.subsetfasta(seqlist = l , headertag='number', replace=':', length=30)
+	file_obj = sc.Fasta('lacto_signal_differential_seqs_genomes_16s_extracted.fasta', 'dataflow/02-16s/')
+	file_obj.setOutputLocation('dataflow/02-16s/')
 	file_obj.setOutputName('lacto_signal_differential_seqs_genomes_16s_extracted_1300.fasta')
 	file_obj.lengthcutoff(replaceheaders = False, length = 1300, direction = 'above')
 
+	file_obj.subsetfasta(seqlist = l , headertag='number', replace=':')
+	file_obj = sc.Fasta('lacto_signal_differential_seqs_genomes_16s_extracted_1300.fasta', 'dataflow/02-16s/')
+	file_obj.setOutputLocation('dataflow/02-16s/')
+	file_obj.setOutputName('lacto_signal_differential_seqs_genomes_16s_extracted_1300_1700.fasta')
+	file_obj.lengthcutoff(replaceheaders = False, length = 1700, direction = 'below')
 
 
 runcommand = input("\n" + "Run muscle on full 16s seqs? (y or n):")
 
 if runcommand == 'y':
-	os.system("../bin/muscle -in dataflow/02-16s/lacto_signal_differential_seqs_genomes_16s_extracted_1300.fasta -out dataflow/03-alignments/lacto_signal_differential_seqs_genomes_16s_extracted_1300.afa")
+	os.system("../bin/muscle -in dataflow/02-16s/lacto_signal_differential_seqs_genomes_16s_extracted_1300_1700.fasta -out dataflow/03-alignments/lacto_signal_differential_seqs_genomes_16s_extracted_1300_1700.afa")
 
 runcommand = input("\n" + "Run Gblocks on full 16s seqs? (y or n):")
 
 if runcommand == 'y':
-	os.system("../bin/Gblocks dataflow/03-alignments/lacto_signal_differential_seqs_genomes_16s_extracted_1300.afa -t=d -b6=n")
+	os.system("../bin/Gblocks dataflow/03-alignments/lacto_signal_differential_seqs_genomes_16s_extracted_1300_1700.afa -t=d -b6=n")
 
 runcommand = input("\n" + "Run FastTree on full 16s seqs? (y or n):")
 
 if runcommand == 'y':
-	os.system("../bin/FastTree -gtr -nt dataflow/03-alignments/lacto_signal_differential_seqs_genomes_16s_extracted.afa > dataflow/03-trees/lacto_signal_differential_seqs_genomes_16s_extracted.afa.newick")
+	os.system("../bin/FastTree -gtr -nt dataflow/03-alignments/lacto_signal_differential_seqs_genomes_16s_extracted_1300_1700.afa-gb > dataflow/03-trees/lacto_signal_differential_seqs_genomes_16s_extracted_1300_1700.afa.newick")
 
