@@ -9,7 +9,7 @@ from modules import seq_core_lin as sc
 from modules import seq_gen_lin as sg
 
 file_obj = sc.Fasta('lacto_signal_differential_seqs_genomes_16s.fasta', 'dataflow/02-16s/')
-file_obj.setOutputName('lacto_signal_differential_seqs_genomes_16s.fasta')
+file_obj.setOutputName('lacto_signal_differential_seqs_genomes_16s_extracted.fasta')
 file_obj.setOutputLocation('dataflow/02-16s/')
 
 headers = file_obj.fasta2headermap()

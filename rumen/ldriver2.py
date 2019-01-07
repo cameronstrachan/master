@@ -240,13 +240,18 @@ if runcommand == 'y':
 			l.append(key)
 
 	file_obj.subsetfasta(seqlist = l , headertag='number', replace=':')
+	file_obj.setOutputName('lacto_signal_differential_seqs_genomes_16s_extracted_1300.fasta')
+	file_obj.lengthcutoff(replaceheaders = False, length = 1300, direction = 'above')
 
 
 
 runcommand = input("\n" + "Run muscle on full 16s seqs? (y or n):")
 
 if runcommand == 'y':
-	os.system("../bin/muscle -in dataflow/02-16s/lacto_signal_differential_seqs_genomes_16s_extracted.fasta -out dataflow/03-alignments/lacto_signal_differential_seqs_genomes_16s_extracted.afa")
+	os.system("../bin/muscle -in dataflow/02-16s/lacto_signal_differential_seqs_genomes_16s_extracted_1300.fasta -out dataflow/03-alignments/lacto_signal_differential_seqs_genomes_16s_extracted_1300.afa")
+
+if runcommand == 'y':
+	os.system("../bin/Gblocks dataflow/03-alignments/dataflow/03-alignments/lacto_signal_differential_seqs_genomes_16s_extracted_1300.afa -t=d -b6=n")
 
 runcommand = input("\n" + "Run FastTree on full 16s seqs? (y or n):")
 
