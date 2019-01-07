@@ -10,8 +10,10 @@ genomes <- df_genomes$Genome
 files <- c()
 
 for (genome1 in genomes){
+  geneome1r <- paste(genome1, "rename", sep = "_")
   for (genome2 in genomes){
-    file <- paste(genome1, genome2, "txt", sep = ".")
+    geneome2r <- paste(genome2, "rename", sep = "_")
+    file <- paste(genome1r, genome2r, "txt", sep = ".")
     files <- c(files, file)
   }
 }
