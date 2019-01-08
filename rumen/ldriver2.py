@@ -12,7 +12,7 @@ from modules import seq_gen_lin as sg
 runqiime = input("\n" + "Run Qiime on data from Henderson et al. 2015? (y or n):")
 
 if runqiime == 'y':
-	sg.runqiime(inputfolderloc='dataflow/01-fastq/henderson2015', paired=False, numcores=40)
+	sg.runqiime(inputfolderloc='dataflow/01-fastq/henderson2015', paired=False, numcores=60)
 
 
 ### THEN ANALYSIS WITH DESeq_henderson2015_97 Rmardown
