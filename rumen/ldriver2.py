@@ -208,7 +208,7 @@ if makeheadermap == 'y':
 
 		df['file'] = file
 		
-		df.to_csv(headerfile + file.splslit('.fa')[0] + '.csv')
+		df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
 
 runcommand = input("\n" + "Run 16s search? (y or n):")
 
