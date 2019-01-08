@@ -244,12 +244,12 @@ if runcommand == 'y':
 	file_obj = sc.Fasta('lacto_signal_differential_seqs_genomes_16s_extracted.fasta', 'dataflow/02-16s/')
 	file_obj.setOutputLocation('dataflow/02-16s/')
 	file_obj.setOutputName('lacto_signal_differential_seqs_genomes_16s_extracted_1300.fasta')
-	file_obj.lengthcutoff(replaceheaders = False, length = 1100, direction = 'above')
+	file_obj.lengthcutoff(replaceheaders = False, length = 1000, direction = 'above')
 
 	file_obj = sc.Fasta('lacto_signal_differential_seqs_genomes_16s_extracted_1300.fasta', 'dataflow/02-16s/')
 	file_obj.setOutputLocation('dataflow/02-16s/')
 	file_obj.setOutputName('lacto_signal_differential_seqs_genomes_16s_extracted_1300_1700.fasta')
-	file_obj.lengthcutoff(replaceheaders = False, length = 1900, direction = 'below')
+	file_obj.lengthcutoff(replaceheaders = False, length = 2000, direction = 'below')
 
 
 runcommand = input("\n" + "Run muscle on full 16s seqs? (y or n):")
