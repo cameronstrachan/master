@@ -34,6 +34,7 @@ df_compiled <- bind_rows(dflist)
 colnames(df_compiled)[1:13] <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
 
 df_compiled$file <- gsub("submission.assembly", "", df_compiled$file)
+df_compiled$file <- gsub("final.assembly", "", df_compiled$file)
 df_compiled$file <- gsub("\\.1", "1", df_compiled$file)
 df_compiled$file <- gsub("\\.2", "2", df_compiled$file)
 df_compiled$file <- gsub("\\.0", "0", df_compiled$file)
