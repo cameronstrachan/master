@@ -21,7 +21,7 @@ df_meta <- df_meta %>%
 ### CLASSIFICATION
 ### ONLY SEQUENCES CLASSIFIED AT PHYLUM LEVEL
 
-df_classification  <- read.csv("~/master/rumen/dataflow/03-asv-taxonomy/henderson2015-20_320-97_det-rdp.csv")
+df_classification  <- read.csv("~/master/rumen/dataflow/03-asv-taxonomy/henderson2015-20_320-97-rdp.csv")
 df_classification[,1] <- NULL
 
 df_classification <- df_classification %>%
