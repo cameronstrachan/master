@@ -2,6 +2,44 @@ library(tidyverse)
 
 df_metrics <- read.csv("~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-99_df_metrics_lacto.csv")
 
+df_phlycounts_counts <- df_metrics %>%
+  select(asv_id, GRCid, count) %>%
+  spread(GRCid, count)
+
+df_phlycounts_counts[is.na(df_phlycounts_counts)] <- 0
+
+df_phlycounts_counts <- df_phlycounts_counts[order(df_phlycounts_counts$asv_id),] 
+
+numsamples <- length(df_phlycounts_counts)
+
+otumat <- as.matrix(df_phlycounts_counts[,2:numsamples])
+rownames(otumat) <- as.data.frame(df_phlycounts_counts)[,1]
+
+df_phlycounts_tax <- df_metrics %>%
+  select(asv_id, phylum, family, genus) %>%
+  unique()
+
+df_phlycounts_tax$phylum <- as.character(df_phlycounts_tax$phylum)
+df_phlycounts_tax$family <- as.character(df_phlycounts_tax$family)
+df_phlycounts_tax$genus <- as.character(df_phlycounts_tax$genus)
+
+df_phlycounts_tax[is.na(df_phlycounts_tax)] <- "NotAssigned"
+
+df_phlycounts_tax <- df_phlycounts_tax[order(df_phlycounts_tax$asv_id),] 
+
+taxmat <- as.matrix(df_phlycounts_tax[,2:4])
+rownames(taxmat) <- as.data.frame(df_phlycounts_tax)[,1]
+
+df_phylocounts_meta <- df_metrics %>% 
+  select(GRCid, lacto_signal) %>%
+  unique() 
+
+df_phylocounts_meta$lacto_signal <- as.factor(df_phylocounts_meta$lacto_signal)
+
+df_phylocounts_meta <- as.data.frame(df_phylocounts_meta)
+
+row.names(df_phylocounts_meta) <- df_phylocounts_meta[,1]
+
 library("phyloseq")
 library("ape")
 library("DESeq2")
