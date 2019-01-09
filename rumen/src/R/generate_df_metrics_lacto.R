@@ -1,11 +1,5 @@
 library(tidyverse)
-library(ggthemes)
-library(printr)
-library(ggplot2)
-library(cowplot)
 library(reshape2)
-library(knitr)
-library(gmodels)
 
 ### METADATA
 ### ONLY LOOK AT BACTERIA PRIMER
@@ -27,7 +21,7 @@ df_meta <- df_meta %>%
 ### CLASSIFICATION
 ### ONLY SEQUENCES CLASSIFIED AT PHYLUM LEVEL
 
-df_classification  <- read.csv("~/master/rumen/dataflow/03-asv-taxonomy/henderson2015-20_320-99-rdp.csv")
+df_classification  <- read.csv("~/master/rumen/dataflow/03-asv-taxonomy/henderson2015-20_320-97-rdp.csv")
 df_classification[,1] <- NULL
 
 df_classification <- df_classification %>%
@@ -36,7 +30,7 @@ df_classification <- df_classification %>%
 
 ### OTU TABLE
 
-df <- read.delim("~/master/rumen/dataflow/03-asv-table/henderson2015-20_320-99.txt", skip = 1, header = TRUE)
+df <- read.delim("~/master/rumen/dataflow/03-asv-table/henderson2015-20_320-97.txt", skip = 1, header = TRUE)
 df$clustering <- 99
 colnames(df)[1] <- 'asv_id'
 
@@ -67,7 +61,8 @@ rm(list=setdiff(ls(), "df_complete"))
 
 df_lacto_positive <- df_complete %>%
   filter(genus == "Lactobacillus") %>%
-  filter(count != 0)
+  mutate(count_norm = (count / total_reads)*100)  %>%
+  filter(count_norm > 0.01)
 
 
 lacto_positive_samples <- unique(df_lacto_positive$GRCid)
@@ -89,4 +84,4 @@ df_metrics <- df_complete_starch %>%
   
   distinct() 
 
-write.csv(df_metrics, "~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-99_df_metrics_lacto.csv")
+write.csv(df_metrics, "~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-97_df_metrics_lacto.csv")
