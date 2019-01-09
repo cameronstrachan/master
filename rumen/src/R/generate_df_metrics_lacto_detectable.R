@@ -30,7 +30,7 @@ df_classification <- df_classification %>%
 
 ### OTU TABLE
 
-df <- read.delim("~/master/rumen/dataflow/03-asv-table/henderson2015-20_320-97_det.txt", skip = 1, header = TRUE)
+df <- read.delim("~/master/rumen/dataflow/03-asv-table/henderson2015-20_320-97.txt", skip = 1, header = TRUE)
 df$clustering <- 97
 colnames(df)[1] <- 'asv_id'
 
