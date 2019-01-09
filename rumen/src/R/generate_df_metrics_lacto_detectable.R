@@ -50,7 +50,7 @@ df_normalization <- df %>%
   select(sra_accession, total_reads) %>%
   ungroup() %>%
   distinct() %>%
-  filter(total_reads > 1000)
+  filter(total_reads > 500)
 
 
 df_complete <- inner_join(df, df_meta) %>%
@@ -84,4 +84,4 @@ df_metrics <- df_complete_starch %>%
   
   distinct() 
 
-write.csv(df_metrics, "~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-97_df_metrics_lacto_det.csv")
+write.csv(df_metrics, "~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-97_df_metrics_lacto_det_500.csv")
