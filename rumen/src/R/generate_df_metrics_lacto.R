@@ -31,7 +31,7 @@ df_classification <- df_classification %>%
 ### OTU TABLE
 
 df <- read.delim("~/master/rumen/dataflow/03-asv-table/henderson2015-20_320-97.txt", skip = 1, header = TRUE)
-df$clustering <- 99
+df$clustering <- 97
 colnames(df)[1] <- 'asv_id'
 
 col_to_gather <- names(df)[!(startsWith(names(df), "SRX"))]
@@ -43,14 +43,14 @@ df$asv_id <- as.character(df$asv_id)
 ### SAMPLES ONLY WITH MORE THAN 1000 READS
 
 df_normalization <- df %>%
-  filter(clustering == 99) %>%
+  filter(clustering == 97) %>%
   group_by(sra_accession) %>%
   mutate(total_reads = sum(count)) %>%
   ungroup() %>%
   select(sra_accession, total_reads) %>%
   ungroup() %>%
   distinct() %>%
-  filter(total_reads > 500)
+  filter(total_reads > 1000)
 
 
 df_complete <- inner_join(df, df_meta) %>%
@@ -62,7 +62,7 @@ rm(list=setdiff(ls(), "df_complete"))
 df_lacto_positive <- df_complete %>%
   filter(genus == "Lactobacillus") %>%
   mutate(count_norm = (count / total_reads)*100)  %>%
-  filter(count_norm > 0.01)
+  filter(count_norm > 0.001)
 
 
 lacto_positive_samples <- unique(df_lacto_positive$GRCid)
