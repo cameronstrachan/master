@@ -89,4 +89,4 @@ df_metrics <- df_complete_starch %>%
   
   distinct() 
 
-write.csv(df_metrics, "~/master/rumen/dataflow/03-asv-taxonomy/henderson2015-20_320-99_df_metrics_lacto.csv")
+write.csv(df_metrics, "~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-99_df_metrics_lacto.csv")
