@@ -62,7 +62,7 @@ gm_mean = function(x, na.rm=TRUE){
 geoMeans = apply(counts(diagdds), 1, gm_mean)
 diagdds = estimateSizeFactors(diagdds, geoMeans = geoMeans)
 
-rm(list=setdiff(ls(), c("diagdds", "physeq", "df_metrics")))
+rm(list=setdiff(ls(), c("diagdds", "physeq")))
 
 diagdds = DESeq(diagdds, fitType = "parametric", test = "Wald", parallel=TRUE)
 
