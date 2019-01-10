@@ -88,6 +88,8 @@ df_phlycounts_counts <- df_metrics %>%
   select(asv_id, GRCid, count) %>%
   spread(GRCid, count)
 
+numsamples <- length(df_phlycounts_counts)
+
 df_phlycounts_counts <- df_phlycounts_counts[rowSums(df_phlycounts_counts[,2:numsamples] > 10),]
 
 trimmed_asv_ids <- unique(df_phlycounts_counts$asv_id)

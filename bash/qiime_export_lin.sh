@@ -27,6 +27,13 @@ biom convert -i dataflow/03-asv-table/feature-table.biom -o dataflow/03-asv-tabl
 rm dataflow/03-asv-table/feature-table.biom
 
 qiime tools export \
+  --input-path dataflow/02-qiime/table-dn-98.qza \
+  --output-path dataflow/03-asv-table
+
+biom convert -i dataflow/03-asv-table/feature-table.biom -o dataflow/03-asv-table/feature-table-98.txt --to-tsv
+rm dataflow/03-asv-table/feature-table.biom
+
+qiime tools export \
   --input-path dataflow/02-qiime/table-dn-97.qza \
   --output-path dataflow/03-asv-table
 
@@ -45,6 +52,12 @@ qiime tools export \
   --output-path dataflow/03-asv-seqs
 
 mv dataflow/03-asv-seqs/dna-sequences.fasta dataflow/03-asv-seqs/dna-sequences-99.fasta
+
+qiime tools export \
+  --input-path dataflow/02-qiime/rep-seqs-dn-98.qza \
+  --output-path dataflow/03-asv-seqs
+
+mv dataflow/03-asv-seqs/dna-sequences.fasta dataflow/03-asv-seqs/dna-sequences-98.fasta
 
 qiime tools export \
   --input-path dataflow/02-qiime/rep-seqs-dn-97.qza \
