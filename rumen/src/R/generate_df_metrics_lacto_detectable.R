@@ -50,7 +50,7 @@ df_normalization <- df %>%
   select(sra_accession, total_reads) %>%
   ungroup() %>%
   distinct() %>%
-  filter(total_reads > 500)
+  filter(total_reads > 1000)
 
 
 df_complete <- inner_join(df, df_meta) %>%
@@ -62,7 +62,7 @@ rm(list=setdiff(ls(), "df_complete"))
 df_lacto_positive <- df_complete %>%
   filter(genus == "Lactobacillus") %>%
   mutate(count_norm = (count / total_reads)*100)  %>%
-  filter(count_norm > 0)
+  filter(count_norm > 0.001)
 
 
 lacto_positive_samples <- unique(df_lacto_positive$GRCid)
@@ -84,4 +84,17 @@ df_metrics <- df_complete_starch %>%
   
   distinct() 
 
-write.csv(df_metrics, "~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-97_df_metrics_lacto_det_500.csv")
+df_phlycounts_counts <- df_metrics %>%
+  select(asv_id, GRCid, count) %>%
+  spread(GRCid, count)
+
+df_phlycounts_counts <- df_phlycounts_counts[rowSums(df_phlycounts_counts[,2:numsamples] > 10),]
+
+trimmed_asv_ids <- unique(df_phlycounts_counts$asv_id)
+
+df_metrics <- df_metrics %>%
+  rowwise() %>%
+  mutate(remove = ifelse(asv_id %in% trimmed_asv_ids, "no", "yes")) %>%
+  filter(remove != "yes")
+
+write.csv(df_metrics, "~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-97_df_metrics_lacto_1000.csv")
