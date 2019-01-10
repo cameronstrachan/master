@@ -84,21 +84,4 @@ df_metrics <- df_complete_starch %>%
   
   distinct() 
 
-df_phlycounts_counts <- df_metrics %>%
-  select(asv_id, GRCid, count) %>%
-  spread(GRCid, count)
-
-df_phlycounts_counts[is.na(df_phlycounts_counts)] <- 0
-
-numsamples <- length(df_phlycounts_counts)
-
-df_phlycounts_counts <- df_phlycounts_counts[rowSums(df_phlycounts_counts[,2:numsamples] > 10),]
-
-df_phlycounts_counts %>%
-  select(asv_id) %>%
-  distinct()
-
-df_metrics <- df_metrics %>%
-  inner_join(df_phlycounts_counts)
-
 write.csv(df_metrics, "~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-97_df_metrics_lacto_1000.csv")
