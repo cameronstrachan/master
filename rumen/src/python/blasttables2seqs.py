@@ -7,7 +7,7 @@ df2['Database'] = 'Rumen'
 
 df = df.append(df2)
 
-df = df[(df['length'] == 290)]
+df = df[(df['length'] >= 290)]
 df = df[(df['pident'] >= 90)]
 
 unique_seqs = list()
