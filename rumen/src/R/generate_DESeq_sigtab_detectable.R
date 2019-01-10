@@ -67,7 +67,7 @@ rm(list=setdiff(ls(), c("diagdds", "physeq")))
 diagdds = DESeq(diagdds, fitType = "parametric", test = "Wald", parallel=TRUE)
 
 res = results(diagdds, cooksCutoff = FALSE)
-alpha = 0.1
+alpha = 0.15
 #sigtab = res[which(res$padj < alpha), ]
 sigtab = res[which(res$pvalue < alpha), ]
 
