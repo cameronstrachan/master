@@ -96,6 +96,22 @@ runblast = input("\n" + "Concatenate sequences from genomes and Prevotella? (y o
 if runblast == 'y':
 	sg.concat(inputfolder='dataflow/01-nucl/', outputpath='dataflow/01-nucl/lacto_signal_differential_all_seqs_tags_genomes.fasta', filenames=["lacto_signal_differential_all_seqs_genomes.fasta", "lacto_signal_differential_all_seqs_tags.fasta"])
 
+	file_obj = sc.Fasta('lacto_signal_differential_all_seqs_tags_genomes.fasta', 'dataflow/01-nucl/')
+	file_obj.setOutputName('lacto_signal_differential_all_seqs_tags_genomes.fasta')
+	file_obj.setOutputLocation('dataflow/01-nucl/')
+
+
+	headers = file_obj.fasta2headermap()
+	l = []
+
+	for key, value in headers.items():
+		l.append(key)
+
+	file_obj.subsetfasta(seqlist = l , headertag='number', replace=':', length=30)
+
+
+
+
 runcommand = input("\n" + "Run muscle? (y or n):")
 
 if runcommand == 'y':
