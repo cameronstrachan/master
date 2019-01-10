@@ -92,11 +92,11 @@ numsamples <- length(df_phlycounts_counts)
 
 df_phlycounts_counts <- df_phlycounts_counts[rowSums(df_phlycounts_counts[,2:numsamples] > 10),]
 
-trimmed_asv_ids <- unique(df_phlycounts_counts$asv_id)
+df_phlycounts_counts %>%
+  select(asv_id) %>%
+  distinct()
 
 df_metrics <- df_metrics %>%
-  rowwise() %>%
-  mutate(remove = ifelse(asv_id %in% trimmed_asv_ids, "no", "yes")) %>%
-  filter(remove != "yes")
+  inner_join(df_phlycounts_counts)
 
 write.csv(df_metrics, "~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-97_df_metrics_lacto_1000.csv")
