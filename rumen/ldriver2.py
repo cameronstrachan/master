@@ -97,7 +97,7 @@ if runblast == 'y':
 	sg.concat(inputfolder='dataflow/01-nucl/', outputpath='dataflow/01-nucl/lacto_signal_differential_all_seqs_tags_genomes.fasta', filenames=["lacto_signal_differential_all_seqs_genomes.fasta", "lacto_signal_differential_all_seqs_tags.fasta"])
 
 	file_obj = sc.Fasta('lacto_signal_differential_all_seqs_tags_genomes.fasta', 'dataflow/01-nucl/')
-	file_obj.setOutputName('lacto_signal_differential_all_seqs_tags_genomes.fasta')
+	file_obj.setOutputName('lacto_signal_differential_all_seqs_tags_genomes_short.fasta')
 	file_obj.setOutputLocation('dataflow/01-nucl/')
 
 
@@ -115,7 +115,7 @@ if runblast == 'y':
 runcommand = input("\n" + "Run muscle? (y or n):")
 
 if runcommand == 'y':
-	os.system("../bin/muscle -in dataflow/01-nucl/lacto_signal_differential_all_seqs_tags_genomes.fasta -out dataflow/03-alignments/lacto_signal_differential_all_seqs_tags_genomes_alignment.afa")
+	os.system("../bin/muscle -in dataflow/01-nucl/lacto_signal_differential_all_seqs_tags_genomes_short.fasta -out dataflow/03-alignments/lacto_signal_differential_all_seqs_tags_genomes_alignment.afa")
 
 runcommand = input("\n" + "Run Gblocks? (y or n):")
 
