@@ -88,6 +88,8 @@ df_phlycounts_counts <- df_metrics %>%
   select(asv_id, GRCid, count) %>%
   spread(GRCid, count)
 
+df_phlycounts_counts[is.na(df_phlycounts_counts)] <- 0
+
 numsamples <- length(df_phlycounts_counts)
 
 df_phlycounts_counts <- df_phlycounts_counts[rowSums(df_phlycounts_counts[,2:numsamples] > 10),]
