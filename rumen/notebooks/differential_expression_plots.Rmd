@@ -1,0 +1,103 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(stringi)
+library(ggplot2)
+library(ggdendro)
+library(reshape2)
+library(grid)
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+### CODE FOR SELECTING INCREASES AND DECREASES
+
+# sigtab <- read.csv("~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-99_df_metrics_lacto_DESeq_sigtab_1000.csv")
+# 
+# sigtab <- sigtab %>%
+#   rename(asv_id = X) %>%
+#   filter(pvalue < 0.1) %>%
+#   filter(log2FoldChange > 3 | log2FoldChange < -3) %>%
+#   rowwise() %>%
+#   mutate(direction = ifelse(log2FoldChange > 0, "increase", "decrease")) %>%
+#   select(asv_id, direction, log2FoldChange) %>%
+#   mutate(FoldChange = 2 * log2FoldChange) %>%
+#   distinct()
+# 
+# 
+# 
+# write.csv(sigtab, "~/master/rumen/dataflow/00-meta/lacto_signal_differential.csv")
+# 
+# selected_seq_ids <- unique(sigtab$asv_id)
+# 
+# df_metrics <- read.csv("~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-99_df_metrics_lacto_1000.csv")
+# df_plot <- df_metrics[df_metrics$asv_id %in% selected_seq_ids,]
+# write.csv(df_plot, "~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-99_df_metrics_lacto_1000_df_plot.csv")
+# 
+
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=25, fig.width=20}
+# df_plot <- read.csv("~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-97_df_metrics_lacto_1000_df_plot.csv")
+# 
+# 
+# ggplot(df_plot, aes(x=lacto_signal, y=count_norm)) + 
+#             geom_jitter(aes(colour = lacto_signal), size = 5) + 
+#   facet_wrap(family ~ asv_id, scales="free") +
+#   theme() +
+#           theme(strip.text = element_text(size = 20),
+#           plot.title = element_text(size = 30),
+#           axis.text.x = element_text(angle = 90, hjust = 1, size = 20),
+#           axis.text.y = element_text(size = 20),
+#           axis.title.x = element_text(size = 20),
+#           axis.title.y = element_text(size = 20))
+```
+
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=25, fig.width=20}
+# df_plot <- read.csv("~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-98_df_metrics_lacto_1000_df_plot.csv")
+# 
+# 
+# ggplot(df_plot, aes(x=lacto_signal, y=count_norm)) + 
+#             geom_jitter(aes(colour = lacto_signal), size = 5) + 
+#   facet_wrap(family ~ asv_id, scales="free") +
+#   theme() +
+#           theme(strip.text = element_text(size = 20),
+#           plot.title = element_text(size = 30),
+#           axis.text.x = element_text(angle = 90, hjust = 1, size = 20),
+#           axis.text.y = element_text(size = 20),
+#           axis.title.x = element_text(size = 20),
+#           axis.title.y = element_text(size = 20))
+```
+
+### 99 percent
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=25, fig.width=20}
+df_plot <- read.csv("~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-99_df_metrics_lacto_1000_df_plot.csv")
+df_plot$genus <- as.character(df_plot$genus)
+df_plot$family <- as.character(df_plot$family)
+df_plot$genus[is.na(df_plot$genus)] <- "None"
+df_plot$family[is.na(df_plot$family)] <- "None"
+
+df_plot <- df_plot %>% 
+  mutate(genus, replace_na(genus, 'None')) %>%
+  filter(genus != "Lactobacillus")
+
+ggplot(df_plot, aes(x=lacto_signal, y=count_norm)) + 
+            geom_jitter(aes(colour = lacto_signal), size = 5) + 
+  facet_wrap(family ~ asv_id, scales="free") +
+  theme() +
+          theme(strip.text = element_text(size = 10),
+          plot.title = element_text(size = 30),
+          axis.text.x = element_text(angle = 90, hjust = 1, size = 20),
+          axis.text.y = element_text(size = 20),
+          axis.title.x = element_text(size = 20),
+          axis.title.y = element_text(size = 20))
+```

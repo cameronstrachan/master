@@ -1,14 +1,17 @@
 import pandas as pd
 
-df = pd.read_csv('dataflow/03-blast-tables/lacto_signal_differential_all_seqs_tags_prevotella_genomes_mapped', sep='\t', low_memory=False, names=["qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq"])
-df['Database'] = 'Prevotella'
-df2 = pd.read_csv('dataflow/03-blast-tables/lacto_signal_differential_all_seqs_tags_rumen_genomes_mapped', sep='\t', low_memory=False, names=["qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq"])
-df2['Database'] = 'Rumen'
+#df = pd.read_csv('dataflow/03-blast-tables/lacto_signal_differential_all_seqs_tags_prevotella_genomes_mapped', sep='\t', low_memory=False, names=["qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq"])
+#df['Database'] = 'Prevotella'
+#df2 = pd.read_csv('dataflow/03-blast-tables/lacto_signal_differential_all_seqs_tags_rumen_genomes_mapped', sep='\t', low_memory=False, names=["qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq"])
+#df2['Database'] = 'Rumen'
 
-df = df.append(df2)
+#df = df.append(df2)
+
+df = pd.read_csv('dataflow/03-blast-tables/lacto_signal_differential_all_seqs_tags_rumen_genomes_mapped', sep='\t', low_memory=False, names=["qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq"])
+df['Database'] = 'Rumen'
 
 df = df[(df['length'] >= 280)]
-df = df[(df['pident'] >= 80)]
+df = df[(df['pident'] >= 90)]
 
 unique_seqs = list()
 
