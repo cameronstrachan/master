@@ -10,8 +10,8 @@ import pandas as pd
 df = pd.read_csv('dataflow/03-blast-tables/lacto_signal_differential_all_seqs_tags_rumen_genomes_mapped', sep='\t', low_memory=False, names=["qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq"])
 df['Database'] = 'Rumen'
 
-df = df[(df['length'] >= 280)]
-df = df[(df['pident'] >= 95)]
+df = df[(df['length'] >= 260)]
+df = df[(df['pident'] >= 92)]
 
 unique_seqs = list()
 
