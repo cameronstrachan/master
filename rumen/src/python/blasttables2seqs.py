@@ -11,7 +11,7 @@ df = pd.read_csv('dataflow/03-blast-tables/lacto_signal_differential_all_seqs_ta
 df['Database'] = 'Rumen'
 
 df = df[(df['length'] >= 280)]
-df = df[(df['pident'] >= 90)]
+df = df[(df['pident'] >= 95)]
 
 unique_seqs = list()
 
