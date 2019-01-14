@@ -4,7 +4,7 @@ import pandas as pd
 df = pd.read_csv('dataflow/03-blast-tables/lacto_signal_differential_seqs_mapped', sep='\t', low_memory=False, names=["qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq"])
 
 df = df[(df['length'] == 300)]
-df = df[(df['pident'] >= 98)]
+df = df[(df['pident'] >= 99)]
 
 with open('dataflow/01-nucl/lacto_signal_differential_all_seqs_tags.fasta', 'w') as file:
     for index, row in df.iterrows():
