@@ -134,8 +134,10 @@ runrename = input("\n" + "Run renaming of selected genomes? (y or n):")
 
 if runrename == 'y':
 
-	genomes_df = pd.read_csv('dataflow/00-meta/selected_genomes.csv', low_memory=False)
-	genomes = genomes_df['Genome'].tolist()
+	#genomes_df = pd.read_csv('dataflow/00-meta/selected_genomes.csv', low_memory=False)
+	#genomes = genomes_df['Genome'].tolist()
+
+	genomes = ["4309559-submission.assembly", "4300142-submission.assembly", "4304392-submission.assembly", "GCF_900110745.1_IMG-taxon_2693429877_annotated_assembly_genomic", "3353505-final.assembly"]
 
 	files = [item + ".fasta" for item in genomes]
 
@@ -155,8 +157,11 @@ runprodigal = input("\n" + "Run prodigal on selected Prevotella genomes? (y or n
 
 if runprodigal == 'y':
 
-	genomes_df = pd.read_csv('dataflow/00-meta/selected_genomes.csv', low_memory=False)
-	genomes = genomes_df['Genome'].tolist()
+	#genomes_df = pd.read_csv('dataflow/00-meta/selected_genomes.csv', low_memory=False)
+	#genomes = genomes_df['Genome'].tolist()
+
+	genomes = ["4309559-submission.assembly", "4300142-submission.assembly", "4304392-submission.assembly", "GCF_900110745.1_IMG-taxon_2693429877_annotated_assembly_genomic", "3353505-final.assembly"]
+
 	files = [item + "_rename.fasta" for item in genomes]
 
 	for file in files:
@@ -176,8 +181,11 @@ runallvallblast = input("\n" + "Run all against all blast with Prevoltella genom
 
 if runallvallblast == 'y':
 
-	genomes_df = pd.read_csv('dataflow/00-meta/selected_genomes.csv', low_memory=False)
-	genomes = genomes_df['Genome'].tolist()
+	#genomes_df = pd.read_csv('dataflow/00-meta/selected_genomes.csv', low_memory=False)
+	#genomes = genomes_df['Genome'].tolist()
+
+	genomes = ["4309559-submission.assembly", "4300142-submission.assembly", "4304392-submission.assembly", "GCF_900110745.1_IMG-taxon_2693429877_annotated_assembly_genomic", "3353505-final.assembly"]
+
 	files = [item + "_rename.fasta" for item in genomes]
 
 	# these are the directories we are working with
