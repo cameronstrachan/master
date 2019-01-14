@@ -1,12 +1,11 @@
 library(tidyverse)
 library(stringi)
 library(reshape2)
-library(grid)
+
 
 blastdir <- 'dataflow/02-blast/'
 
-df_genomes <- read.csv("dataflow/00-meta/selected_genomes.csv")
-genomes <- df_genomes$Genome
+genomes <- c("4309559-submission.assembly", "4300142-submission.assembly", "4304392-submission.assembly", "GCF_900110745.1_IMG-taxon_2693429877_annotated_assembly_genomic", "3353505-final.assembly")
 files <- c()
 
 for (genome1 in genomes){
