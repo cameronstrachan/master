@@ -49,7 +49,7 @@ df_classification <- df_classification %>%
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 ### OTU TABLE
 
-df <- read.delim("~/master/rumen/dataflow/03-asv-table/henderson2015-4_194-99.txt", skip = 1, header = TRUE)
+df <- read.delim("~/master/rumen/dataflow/03-asv-table/henderson2015-20_320-99.txt", skip = 1, header = TRUE)
 df$clustering <- 99
 colnames(df)[1] <- 'asv_id'
 
@@ -71,7 +71,7 @@ df_normalization <- df %>%
   select(sra_accession, total_reads) %>%
   ungroup() %>%
   distinct() %>%
-  filter(total_reads > 1000)
+  filter(total_reads > 500)
   
 
 df_complete <- inner_join(df, df_meta) %>%

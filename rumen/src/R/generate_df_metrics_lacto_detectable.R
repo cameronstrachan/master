@@ -21,7 +21,7 @@ df_meta <- df_meta %>%
 ### CLASSIFICATION
 ### ONLY SEQUENCES CLASSIFIED AT PHYLUM LEVEL
 
-df_classification  <- read.csv("~/master/rumen/dataflow/03-asv-taxonomy/henderson2015-20_320-97-rdp.csv")
+df_classification  <- read.csv("~/master/rumen/dataflow/03-asv-taxonomy/henderson2015-20_320-99-rdp.csv")
 df_classification[,1] <- NULL
 
 df_classification <- df_classification %>%
@@ -30,8 +30,8 @@ df_classification <- df_classification %>%
 
 ### OTU TABLE
 
-df <- read.delim("~/master/rumen/dataflow/03-asv-table/henderson2015-20_320-97.txt", skip = 1, header = TRUE)
-df$clustering <- 97
+df <- read.delim("~/master/rumen/dataflow/03-asv-table/henderson2015-20_320-99.txt", skip = 1, header = TRUE)
+df$clustering <- 99
 colnames(df)[1] <- 'asv_id'
 
 col_to_gather <- names(df)[!(startsWith(names(df), "SRX"))]
@@ -43,7 +43,7 @@ df$asv_id <- as.character(df$asv_id)
 ### SAMPLES ONLY WITH MORE THAN 1000 READS
 
 df_normalization <- df %>%
-  filter(clustering == 97) %>%
+  filter(clustering == 99) %>%
   group_by(sra_accession) %>%
   mutate(total_reads = sum(count)) %>%
   ungroup() %>%
@@ -84,4 +84,4 @@ df_metrics <- df_complete_starch %>%
   
   distinct() 
 
-write.csv(df_metrics, "~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-97_df_metrics_lacto_1000.csv")
+write.csv(df_metrics, "~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-99_df_metrics_lacto_1000.csv")

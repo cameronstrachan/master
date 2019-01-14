@@ -1,6 +1,6 @@
 library(tidyverse) 
 
-df_metrics <- read.csv("~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-98_df_metrics_lacto_1000.csv")
+df_metrics <- read.csv("~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-99_df_metrics_lacto_1000.csv")
 
 df_phlycounts_counts <- df_metrics %>%
   select(asv_id, GRCid, count) %>%
@@ -67,10 +67,10 @@ rm(list=setdiff(ls(), c("diagdds", "physeq")))
 diagdds = DESeq(diagdds, fitType = "parametric", test = "Wald", parallel=TRUE)
 
 res = results(diagdds, cooksCutoff = FALSE)
-alpha = 0.15
+alpha = 0.1
 #sigtab = res[which(res$padj < alpha), ]
 sigtab = res[which(res$pvalue < alpha), ]
 
 sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(physeq)[rownames(sigtab), ], "matrix")) 
 
-write.csv(sigtab, "~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-98_df_metrics_lacto_DESeq_sigtab_1000.csv")
+write.csv(sigtab, "~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-99_df_metrics_lacto_DESeq_sigtab_1000.csv")
