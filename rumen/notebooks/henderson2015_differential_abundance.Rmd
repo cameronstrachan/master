@@ -16,7 +16,7 @@ library(grid)
 
 ### 99 percent
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=25, fig.width=20}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=30, fig.width=25}
 df_plot <- read.csv("~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-99_df_metrics_lacto_1000_df_plot.csv")
 df_plot$genus <- as.character(df_plot$genus)
 df_plot$family <- as.character(df_plot$family)
@@ -30,7 +30,7 @@ ggplot(df_plot, aes(x=lacto_signal, y=count_norm)) +
             geom_jitter(aes(colour = lacto_signal), size = 5) + 
   facet_wrap(family ~ asv_id, scales="free") +
   theme() +
-          theme(strip.text = element_text(size = 10),
+          theme(strip.text = element_text(size = 15),
           plot.title = element_text(size = 30),
           axis.text.x = element_text(angle = 90, hjust = 1, size = 20),
           axis.text.y = element_text(size = 20),
