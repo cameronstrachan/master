@@ -60,7 +60,7 @@ df_complete <- inner_join(df, df_meta) %>%
 rm(list=setdiff(ls(), "df_complete"))
 
 df_lacto_positive <- df_complete %>%
-  filter(genus == "Lactobacillus" | genus == "Streptoccocus") %>%
+  filter(family == "Lactobacillaceae" | family == "Streptococcaceae") %>%
   mutate(count_norm = (count / total_reads)*100)  %>%
   filter(count_norm > 0.001)
 
