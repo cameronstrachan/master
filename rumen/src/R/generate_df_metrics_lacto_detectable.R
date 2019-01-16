@@ -62,7 +62,7 @@ rm(list=setdiff(ls(), "df_complete"))
 df_lacto_positive <- df_complete %>%
   filter(genus == "Lactobacillus") %>%
   mutate(count_norm = (count / total_reads)*100)  %>%
-  filter(count_norm > 0)
+  filter(count_norm > 0.001)
 
 
 lacto_positive_samples <- unique(as.character(df_lacto_positive$GRCid))
@@ -74,9 +74,9 @@ df_complete_starch <- df_complete %>%
 all_samples <- unique(as.character(df_complete_starch$GRCid))
 
 print("Lacto Samples")
-lacto_positive_samples
+length(lacto_positive_samples)
 print("All Samples")
-all_samples 
+length(all_samples)
 print("Ratio")
 (length(lacto_positive_samples) / length(all_samples))*100
 
