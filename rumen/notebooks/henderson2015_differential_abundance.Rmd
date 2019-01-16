@@ -24,7 +24,7 @@ df_plot$genus[is.na(df_plot$genus)] <- "None"
 df_plot$family[is.na(df_plot$family)] <- "None"
 
 df_plot <- df_plot %>% 
-  filter(genus != "Lactobacillus") %>%
+  filter(genus != "Lactobacillus" | genus != "Streptococcus") %>%
   filter(family != "None")
 
 #df_plot1 <- df_plot %>% 
