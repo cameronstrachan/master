@@ -36,15 +36,12 @@
 * Which metabolites can we monitor at BIOMIN? DON and it's derivatives? ZEN and it's derivatives? SCFA?
 * In Dr. Zabeli's paper, it took 3 days for the ph to normalize to below 5.8. Does BIOMIN have a good idea of how to get the ph to 5.8 and to hold it there?
 * Should we be sampling the solid fraction? Some recent evidence suggestions that ...
-<<<<<<< HEAD
-=======
 
 |Sequence data anlysis thoughts|30-11-2018|
 |---|---|
 
-### Thoughts from anlysis
+### Thoughts from analysis
 
 - Are lactobacillus (or lactic acid bacteria, so including other genera streptococcus) predictors of unhealthy communities. Then, in the global microbiome data set, for example, you can look at what communities which had extreme diets, did not show lactobacillus. What is the community that is resistant to the LAB?
 - The lactos (and megas), definitely go up with high starch diets, but are not indicators of acidosis, but maybe the overall level of lactors is an indicator?
-- 
->>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
+-
