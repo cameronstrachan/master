@@ -10,7 +10,7 @@ sigtab$family[is.na(sigtab$family)] <- "None"
 sigtab <- sigtab %>%
   rename(asv_id = X) %>%
   filter(pvalue < 0.1) %>%
-  filter(genus != "Lactobacillus") %>%
+  filter(genus != "Lactobacillus" | genus != "Streptoccocus" | genus != "Selenomonas") %>%
   filter(log2FoldChange > 3 | log2FoldChange < -3) %>%
   rowwise() %>%
   mutate(direction = ifelse(log2FoldChange > 0, "increase", "decrease")) %>%
