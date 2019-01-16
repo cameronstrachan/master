@@ -16,15 +16,7 @@ sigtab <- sigtab %>%
   mutate(direction = ifelse(log2FoldChange > 0, "increase", "decrease")) %>%
   select(asv_id, direction, log2FoldChange) %>%
   mutate(FoldChange = 2 * log2FoldChange) %>%
-  distinct() %>%
-  filter(asv_id != "8accdfa41f6c21037bec2dd15596a0da") %>%
-  
-  filter(asv_id != "35a80099ec8e35626e6292bb8df08227") %>%
-  filter(asv_id != "46ffa0bf325adaec7652afc11bcdddfe") %>%
-  filter(asv_id != "dfd29bc8e5b3446c70d0f12def862834") %>%
-  filter(asv_id != "584d5155a7ad9445db726adfcc1a0c2e") %>%
-  filter(asv_id != "5f22ca53ac9778028d8a191e7028e5e4") %>%
-  filter(asv_id != "231d9c8e51b5949e2bb72b2975badf5b") 
+  distinct()
   
 
 write.csv(sigtab, "~/master/rumen/dataflow/00-meta/lacto_signal_differential.csv")

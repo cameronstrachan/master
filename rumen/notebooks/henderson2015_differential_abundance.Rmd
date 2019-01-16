@@ -24,16 +24,49 @@ df_plot$genus[is.na(df_plot$genus)] <- "None"
 df_plot$family[is.na(df_plot$family)] <- "None"
 
 df_plot <- df_plot %>% 
-  filter(genus != "Lactobacillus")
+  filter(genus != "Lactobacillus") %>%
+  filter(family != "None")
 
-ggplot(df_plot, aes(x=lacto_signal, y=count_norm)) + 
-            geom_jitter(aes(colour = lacto_signal), size = 5) + 
-  facet_wrap(family ~ asv_id, scales="free") +
-  theme() +
-          theme(strip.text = element_text(size = 15),
-          plot.title = element_text(size = 30),
-          axis.text.x = element_text(angle = 90, hjust = 1, size = 20),
-          axis.text.y = element_text(size = 20),
-          axis.title.x = element_text(size = 20),
-          axis.title.y = element_text(size = 20))
+#df_plot1 <- df_plot %>% 
+#  filter(family == "Lachnospiraceae" | family == "Lachnospiraceae" | family == "Fibrobacteraceae" | family == #"Ruminococcaceae")
+
+
+# ggplot(df_plot, aes(x=lacto_signal, y=count_norm)) + 
+#             geom_jitter(aes(colour = lacto_signal), size = 5) + 
+#   facet_grid(asv_id ~ family, scales="free") +
+#   theme() +
+#           theme(strip.text = element_text(size = 16),
+#           plot.title = element_text(size = 30),
+#           axis.text.x = element_text(angle = 90, hjust = 1, size = 20),
+#           axis.text.y = element_text(size = 20),
+#           axis.title.x = element_text(size = 20),
+#           axis.title.y = element_text(size = 20)) + 
+#   ylab("Normalized Abundance") + 
+#   xlab("Lactobacillus Containing")
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=3.5, fig.width=3.5}
+for (seq in unique(df_plot$asv_id)){
+  
+  df_plot_sub <- df_plot %>%
+    filter(asv_id == seq)
+  
+  
+plot(ggplot(df_plot_sub, aes(x=lacto_signal, y=count_norm)) +
+            geom_jitter(aes(colour = lacto_signal), size = 5) +
+       theme() +
+          theme(plot.title = element_text(size = 16),
+          axis.text.x = element_text(angle = 90, hjust = 1, size = 10),
+          axis.text.y = element_text(size = 10),
+          axis.title.x = element_text(size = 12),
+          axis.title.y = element_text(size = 12)) +
+       ggtitle(unique(df_plot_sub$family)) + 
+  theme(legend.position="none") +
+  ylab("Normalized Abundance") +
+  xlab("Lactobacillus Containing"))
+  
+  
+}
+
 ```
