@@ -50,7 +50,7 @@ df_normalization <- df %>%
   select(sra_accession, total_reads) %>%
   ungroup() %>%
   distinct() %>%
-  filter(total_reads > 1000)
+  filter(total_reads > 500)
 
 
 df_complete <- inner_join(df, df_meta) %>%
