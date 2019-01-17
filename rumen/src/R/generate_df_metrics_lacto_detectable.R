@@ -62,7 +62,9 @@ rm(list=setdiff(ls(), "df_complete"))
 df_lacto_positive <- df_complete %>%
   filter(family == "Lactobacillaceae" | family == "Streptococcaceae") %>%
   mutate(count_norm = (count / total_reads)*100)  %>%
-  filter(count_norm > 0.1)
+  filter(count_norm > 0.1) %>%
+  filter(animal_class == "Cattle") %>%
+  filter(animal_age == "mature")
 
 
 lacto_positive_samples <- unique(as.character(df_lacto_positive$GRCid))
