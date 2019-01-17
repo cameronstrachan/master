@@ -50,7 +50,7 @@ df_normalization <- df %>%
   select(sra_accession, total_reads) %>%
   ungroup() %>%
   distinct() %>%
-  filter(total_reads > 500)
+  filter(total_reads > 1000)
 
 
 df_complete <- inner_join(df, df_meta) %>%
@@ -62,7 +62,7 @@ rm(list=setdiff(ls(), "df_complete"))
 df_lacto_positive <- df_complete %>%
   filter(family == "Lactobacillaceae" | family == "Streptococcaceae") %>%
   mutate(count_norm = (count / total_reads)*100)  %>%
-  filter(count_norm > 0) %>%
+  filter(count_norm > 0.01) %>%
   filter(animal_class == "Cattle") %>%
   filter(animal_age == "mature")
 
