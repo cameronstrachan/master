@@ -63,7 +63,6 @@ df_lacto_positive <- df_complete %>%
   filter(family == "Lactobacillaceae") %>%
   mutate(count_norm = (count / total_reads)*100)  %>%
   filter(count_norm > 0.001) %>%
-  filter(animal_age == "mature") %>%
   filter(animal_class == "Cattle") 
 
 
@@ -76,7 +75,6 @@ lacto_positive_samples <- unique(as.character(df_lacto_positive$GRCid))
 
 
 df_complete_starch <- df_complete %>%
-  filter(animal_age == "mature") %>%
   filter(starch_rich == "y") %>%
   filter(animal_class == "Cattle") 
 
