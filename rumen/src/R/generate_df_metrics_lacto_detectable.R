@@ -67,7 +67,8 @@ df_lacto_positive <- df_complete %>%
 
 
 df_lacto_positive_starch <- df_lacto_positive %>%
-  filter(starch_rich == "y") 
+  filter(starch_rich == "y") %>%
+  filter(diet_category != "F")
   
 
 lacto_positive_samples_starch <- unique(as.character(df_lacto_positive_starch$GRCid))
@@ -76,7 +77,8 @@ lacto_positive_samples <- unique(as.character(df_lacto_positive$GRCid))
 
 df_complete_starch <- df_complete %>%
   filter(starch_rich == "y") %>%
-  filter(animal_class == "Cattle") 
+  filter(animal_class == "Cattle") %>%
+  filter(diet_category != "F")
 
 all_samples <- unique(as.character(df_complete_starch$GRCid))
 
@@ -87,7 +89,7 @@ length(lacto_positive_samples_starch)
 print("All Samples")
 length(all_samples)
 print("Ratio")
-(length(lacto_positive_samples) / length(all_samples))*100
+(length(lacto_positive_samples_starch) / length(all_samples))*100
 
 df_complete_starch <- df_complete_starch%>%
   rowwise() %>%
