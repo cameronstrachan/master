@@ -70,7 +70,9 @@ df_lacto_positive <- df_complete %>%
 lacto_positive_samples <- unique(as.character(df_lacto_positive$GRCid))
 
 
-df_complete_starch <- df_complete #%>%
+df_complete_starch <- df_complete %>%
+  filter(animal_class == "Cattle") %>%
+  filter(animal_age == "mature")#%>%
   #filter(starch_rich == "y") 
 
 all_samples <- unique(as.character(df_complete_starch$GRCid))
