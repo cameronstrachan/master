@@ -62,11 +62,16 @@ rm(list=setdiff(ls(), "df_complete"))
 df_lacto_positive <- df_complete %>%
   filter(family == "Lactobacillaceae" | family == "Streptococcaceae") %>%
   mutate(count_norm = (count / total_reads)*100)  %>%
-  filter(count_norm > 0.01) %>%
+  filter(count_norm > 0.001) %>%
   filter(animal_class == "Cattle") %>%
   filter(animal_age == "mature")
 
 
+df_lacto_positive_starch <- df_lacto_positive %>%
+  filter(starch_rich == "y") 
+  
+
+lacto_positive_samples_starch <- unique(as.character(df_lacto_positive_starch$GRCid))
 lacto_positive_samples <- unique(as.character(df_lacto_positive$GRCid))
 
 
@@ -79,6 +84,8 @@ all_samples <- unique(as.character(df_complete_starch$GRCid))
 
 print("Lacto Samples")
 length(lacto_positive_samples)
+print("Lacto Sample Starch")
+lacto_positive_samples_starch
 print("All Samples")
 length(all_samples)
 print("Ratio")
