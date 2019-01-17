@@ -60,9 +60,9 @@ df_complete <- inner_join(df, df_meta) %>%
 rm(list=setdiff(ls(), "df_complete"))
 
 df_lacto_positive <- df_complete %>%
-  filter(family == "Lactobacillaceae" | family == "Streptococcaceae") %>%
+  filter(family == "Lactobacillaceae") %>%
   mutate(count_norm = (count / total_reads)*100)  %>%
-  filter(count_norm > 0.01) %>%
+  filter(count_norm > 0.001) %>%
   filter(animal_class == "Cattle") %>%
   filter(animal_age == "mature")
 
