@@ -57,7 +57,7 @@ df_complete <- inner_join(df, df_meta) %>%
   inner_join(df_normalization) %>%
   inner_join(df_classification)
 
-rm(list=setdiff(ls(), "df_complete"))
+#rm(list=setdiff(ls(), "df_complete"))
 
 df_lacto_positive <- df_complete %>%
   filter(family == "Lactobacillaceae") %>%
@@ -68,7 +68,7 @@ df_lacto_positive <- df_complete %>%
 
 df_lacto_positive_starch <- df_lacto_positive %>%
   filter(starch_rich == "y") %>%
-  filter(diet_category != "F")
+  filter(forage_proportion != 100)
   
 
 lacto_positive_samples_starch <- unique(as.character(df_lacto_positive_starch$GRCid))
@@ -78,7 +78,7 @@ lacto_positive_samples <- unique(as.character(df_lacto_positive$GRCid))
 df_complete_starch <- df_complete %>%
   filter(starch_rich == "y") %>%
   filter(animal_class == "Cattle") %>%
-  filter(diet_category != "F")
+  filter(forage_proportion != 100)
 
 all_samples <- unique(as.character(df_complete_starch$GRCid))
 
