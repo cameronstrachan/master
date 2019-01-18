@@ -17,12 +17,6 @@ library("ggpubr")
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-<<<<<<< HEAD
-df_meta <- read.csv("~/master/wolf/dataflow/00-meta/wetzels2018_wu201fastq.csv")
-colnames(df_meta)[1] <- "sra_accession"
-df_meta <- df_meta[,1:7]
-df_meta$sra_accession <- as.character(df_meta$sra_accession)
-=======
 df_meta <- read.csv("~/master/wolf/dataflow/00-meta/wetzels2018_wu2018_fastq.csv")
 colnames(df_meta)[1] <- "sra_accession"
 df_meta$sra_accession <- as.character(df_meta$sra_accession)
@@ -34,20 +28,13 @@ df_meta$pack <- as.character(df_meta$pack)
 df_meta$sibling <- as.character(df_meta$sibling)
 df_meta$replicate <- as.character(df_meta$replicate)
 df_meta$sample_id <- as.character(df_meta$sample_id)
->>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
 
 df_classification  <- read.csv("~/master/wolf/dataflow/03-asv-taxonomy/wetzels2018_wu2018-97-rdp.csv")
 df_classification[,1] <- NULL
 
-<<<<<<< HEAD
-df_97 <- read.delim("~/master/wolf/dataflow/03-asv-table-merge/wetzels2018_wu2018-97.txt", skip = 1, header = TRUE)
-df_97$clustering <- 97
 
-df <- df_97
-=======
 df <- read.delim("~/master/wolf/dataflow/03-asv-table-merge/wetzels2018_wu2018-97.txt", skip = 1, header = TRUE)
 df$clustering <- 97
->>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
 
 colnames(df)[1] <- 'asv_id'
 
@@ -56,14 +43,7 @@ df <- melt(df, id = col_to_gather)
 colnames(df)[3:4] <- c('sra_accession', 'count')
 
 df$asv_id <- as.character(df$asv_id)
-<<<<<<< HEAD
-df_meta$type <- as.character(df_meta$type)
-df_meta$study <- as.character(df_meta$study)
-df_meta$region <- as.character(df_meta$region)
-df_meta$sample <- as.character(df_meta$sample)
-=======
 
->>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
 
 df_normalization <- df %>%
   filter(clustering == 97) %>%
@@ -115,18 +95,6 @@ plot
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 df_metrics <- df_complete %>% 
-<<<<<<< HEAD
-  filter(type == "Wolf") %>%
-  filter(sample == "fecal") %>%
-  
-  #filter(count > 0) %>%
-  
-  mutate(count_norm = (count / total_16s_reads)*100) %>%
-  
-  unite(classification, c("phylum", "family", "genus"), sep = ";", remove = FALSE)
-
-#df_metrics$classification <- gsub(";NA", "", df_metrics$classification)
-=======
 
   filter(region != "Henan") %>%
   
@@ -158,30 +126,13 @@ df_metrics <- df_metrics %>%
   filter(sample == "fecal")
 
   #df_metrics$classification <- gsub(";NA", "", df_metrics$classification)
->>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
 ```
 
 \newpage
 
 ### phylum level grouping
 
-<<<<<<< HEAD
-- Looking at the percentage of the sample at a phylum level makes is very clear that the wolf communities from China and here are very distinct. This is especially true with the ratio of Bacteroidetes to Fermicutes (why is the Wolf feces here so Firmicute dominated?)
 
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.height=3}
-df_metrics_phylum <- df_metrics %>%
-  filter(count_norm > 0.1) %>%
-  group_by(sra_accession, phylum) %>%
-  mutate(phylum_percent = sum(count_norm)) %>%
-  ungroup() %>%
-  select(sra_accession, phylum, phylum_percent, study) %>%
-  distinct() 
-
-
-ggplot() + geom_bar(
-  aes(y = phylum_percent, x = sra_accession, fill = phylum),
-=======
 - Looking at the percentage of the sample at a phylum level makes is very clear that the wolf communities from China and here are very distinct.  
 - There is one sample from the WSC (W4f) that looks a bit more like the Wu data, based on the amount of bacteroidetes, fusobacteria and actinobacteria predominatly.
 - Further, dogs and wolfs from china seems to be more similar as wolfs from the WSC. 
@@ -199,17 +150,12 @@ df_metrics_phylum <- df_metrics %>%
 
 ggplot() + geom_bar(
   aes(y = phylum_percent, x = sample_id, fill = phylum),
->>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
   data = df_metrics_phylum,
   stat = "identity" ,
   position = "fill"
 )  +labs(x="Category" , y= "Percentage (%)")+
   theme_minimal() +
-<<<<<<< HEAD
-  theme(axis.text.x = element_blank()) + 
-=======
   theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8)) + 
->>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
      facet_wrap(.~study, scales="free")+
   ylab("Percentage of Sample") +
   xlab("Individual Sample")
@@ -217,15 +163,7 @@ ggplot() + geom_bar(
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 df_phlycounts_counts <- df_metrics %>%
-<<<<<<< HEAD
-  select(asv_id, sra_accession, count_norm) %>%
-  spread(sra_accession, count_norm)
 
-df_phlycounts_counts <- df_phlycounts_counts[order(df_phlycounts_counts$asv_id),] 
-
-otumat <- as.matrix(df_phlycounts_counts[,2:59])
-rownames(otumat) <- df_phlycounts_counts[,1]
-=======
   select(asv_id, sample_id, count_norm) %>%
   spread(sample_id, count_norm)
 
@@ -233,7 +171,6 @@ df_phlycounts_counts <- df_phlycounts_counts[order(df_phlycounts_counts$asv_id),
 
 otumat <- as.matrix(df_phlycounts_counts[,2:29])
 rownames(otumat) <- as.data.frame(df_phlycounts_counts)[,1]
->>>>>>> bc63259588b9b18c1f659eccbc5b966d470663f4
 
 df_phlycounts_tax <- df_metrics %>%
   select(asv_id, phylum, family, genus) %>%
@@ -248,32 +185,6 @@ df_phlycounts_tax[is.na(df_phlycounts_tax)] <- "NotAssigned"
 df_phlycounts_tax <- df_phlycounts_tax[order(df_phlycounts_tax$asv_id),] 
 
 taxmat <- as.matrix(df_phlycounts_tax[,2:4])
-<<<<<<< HEAD
-rownames(taxmat) <- df_phlycounts_tax[,1]
-```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=20, fig.height=10}
-library("phyloseq")
-OTU = otu_table(otumat, taxa_are_rows = TRUE)
-TAX = tax_table(taxmat)
-physeq = phyloseq(OTU, TAX)
-plot_bar(physeq, fill = "phylum")
-```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=10}
-phylum.sum = tapply(taxa_sums(physeq), tax_table(physeq)[, "phylum"], sum, na.rm=TRUE)
-top5phyla = names(sort(phylum.sum, TRUE))[1:5]
-physeq1 = prune_taxa((tax_table(physeq)[, "phylum"] %in% top5phyla), physeq)
-
-
-physeq.ord <- ordinate(physeq1, "NMDS", "bray")
-p1 = plot_ordination(physeq, physeq.ord, type="taxa", color="phylum", title="taxa")
-p1 + facet_wrap(~phylum, 3)
-
-p2 = plot_ordination(physeq1, physeq.ord, type="samples") 
-p2 + geom_polygon(aes()) + geom_point(size=5) + ggtitle("samples")
-```
-=======
 rownames(taxmat) <- as.data.frame(df_phlycounts_tax)[,1]
 
 df_phylocounts_meta <- df_metrics %>% 

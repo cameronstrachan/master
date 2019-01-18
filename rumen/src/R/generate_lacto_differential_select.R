@@ -17,12 +17,67 @@ sigtab <- sigtab %>%
   select(asv_id, direction, log2FoldChange) %>%
   mutate(FoldChange = 2 * log2FoldChange) %>%
   distinct()
-  
-
-write.csv(sigtab, "~/master/rumen/dataflow/00-meta/lacto_signal_differential.csv")
 
 selected_seq_ids <- unique(sigtab$asv_id)
 
 df_metrics <- read.csv("~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-99_df_metrics_lacto_1000.csv")
 df_plot <- df_metrics[df_metrics$asv_id %in% selected_seq_ids,]
+
+
+df_plot$genus <- as.character(df_plot$genus)
+df_plot$family <- as.character(df_plot$family)
+df_plot$genus[is.na(df_plot$genus)] <- "None"
+df_plot$family[is.na(df_plot$family)] <- "None"
+
+df_plot <- df_plot %>% 
+  filter(family != "Lactobacillaceae") 
+
+df_plot_select <- df_plot %>% 
+  group_by(asv_id, lacto_signal) %>%
+  top_n(10, count_norm) %>%
+  ungroup() 
+
+df_plot_select_rank <- df_plot_select %>%
+  
+  select(asv_id, lacto_signal, count_norm) %>%
+  
+  group_by(asv_id, lacto_signal) %>%
+  
+  summarise(value = list(count_norm)) %>%
+  
+  spread(lacto_signal, value) %>%
+  
+  group_by(asv_id) %>%
+  
+  mutate(mean_pos = mean(unlist(pos))) %>%
+  mutate(mean_neg = mean(unlist(neg))) %>%
+  
+  ungroup() %>%
+  rowwise() %>%
+  
+  mutate(ratio_pos = mean_pos / mean_neg) %>%
+  
+  mutate(ratio_neg = mean_neg / mean_pos) %>%
+  
+  ungroup() %>%
+  
+  select(asv_id, ratio_pos, ratio_neg) %>%
+  
+  distinct() %>%
+  
+  gather(direction, ratio, -asv_id)  %>%
+  
+  filter(ratio > 100) %>%
+  
+  select(-direction)
+
+df_plot <- df_plot %>%
+  inner_join(df_plot_select_rank) 
+
+selected_seq_ids <- unique(df_plot$asv_id)
+
+sigtab <- sigtab[sigtab$asv_id %in% selected_seq_ids,]
+
+
 write.csv(df_plot, "~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-99_df_metrics_lacto_1000_df_plot.csv")
+write.csv(sigtab, "~/master/rumen/dataflow/00-meta/lacto_signal_differential.csv")

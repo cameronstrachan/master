@@ -24,18 +24,56 @@ df_plot$genus[is.na(df_plot$genus)] <- "None"
 df_plot$family[is.na(df_plot$family)] <- "None"
 
 df_plot <- df_plot %>% 
-  filter(family != "Lactobacillaceae" | family != "Streptococcaceae") %>%
-  filter(family != "None")
+  filter(family != "Lactobacillaceae") %>%
+  select(-X, -X.1)
 
-#df_plot1 <- df_plot %>% 
-#  filter(family == "Lachnospiraceae" | family == "Lachnospiraceae" | family == "Fibrobacteraceae" | family == #"Ruminococcaceae")
+df_plot_select <- df_plot %>% 
+  group_by(asv_id, lacto_signal) %>%
+  top_n(10, count_norm) %>%
+  ungroup() 
+  
+df_plot_select_rank <- df_plot_select %>%
+  
+  select(asv_id, lacto_signal, count_norm) %>%
+  
+  group_by(asv_id, lacto_signal) %>%
 
+  summarise(value = list(count_norm)) %>%
+
+  spread(lacto_signal, value) %>%
+
+  group_by(asv_id) %>%
+
+  mutate(mean_pos = mean(unlist(pos))) %>%
+  mutate(mean_neg = mean(unlist(neg))) %>%
+  
+  ungroup() %>%
+  rowwise() %>%
+    
+  mutate(ratio_pos = mean_pos / mean_neg) %>%
+
+  mutate(ratio_neg = mean_neg / mean_pos) %>%
+  
+  ungroup() %>%
+  
+  select(asv_id, ratio_pos, ratio_neg) %>%
+  
+  distinct() %>%
+
+  gather(direction, ratio, -asv_id)  %>%
+  
+  filter(ratio > 100) %>%
+  
+  select(-direction)
+
+df_plot <- df_plot %>%
+  inner_join(df_plot_select_rank) 
 
 ggplot(df_plot, aes(x=lacto_signal, y=count_norm)) +
             geom_jitter(aes(colour = lacto_signal), size = 5) +
   facet_wrap(asv_id ~ family, scales="free") +
   theme() +
-          theme(strip.text = element_text(size = 12),
+          theme(strip.text = element_text(size = 25),
           plot.title = element_text(size = 30),
           axis.text.x = element_text(angle = 90, hjust = 1, size = 20),
           axis.text.y = element_text(size = 20),
