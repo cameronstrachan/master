@@ -34,7 +34,7 @@ df_plot <- df_plot %>%
 
 df_plot_select <- df_plot %>% 
   group_by(asv_id, lacto_signal) %>%
-  top_n(10, count_norm) %>%
+  top_n(3, count_norm) %>%
   ungroup() 
 
 df_plot_select_rank <- df_plot_select %>%
