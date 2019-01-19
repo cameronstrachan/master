@@ -49,8 +49,8 @@ df_plot_select_rank <- df_plot_select %>%
   
   group_by(asv_id) %>%
   
-  mutate(mean_pos = mean(unlist(pos))) %>%
-  mutate(mean_neg = mean(unlist(neg))) %>%
+  mutate(mean_pos = median(unlist(pos))) %>%
+  mutate(mean_neg = median(unlist(neg))) %>%
   
   ungroup() %>%
   rowwise() %>%
@@ -67,7 +67,7 @@ df_plot_select_rank <- df_plot_select %>%
   
   gather(direction, ratio, -asv_id)  %>%
   
-  filter(ratio > 100) %>%
+  filter(ratio > 10) %>%
   
   select(-direction)
 
