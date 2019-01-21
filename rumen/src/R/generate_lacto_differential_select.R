@@ -67,7 +67,7 @@ df_plot_select_rank <- df_plot_select %>%
   
   gather(direction, ratio, -asv_id)  %>%
   
-  filter(ratio > 100) %>%
+  filter(ratio > 10) %>%
   
   select(-direction)
 
