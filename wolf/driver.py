@@ -16,13 +16,13 @@ print("On linux, before running, type:  conda activate qiime2-2018.11")
 runqiime = input("\n" + "Run Qiime on data from Wetzels et al. 2018? (y or n):")
 
 if runqiime == 'y':
-	sg.runqiime(inputfolderloc='dataflow/01-fastq/wetzels2018', paired=True, numcores=40)
+	sg.runqiime(inputfolderloc='dataflow/01-fastq/wetzels2018', paired=True, numcores=60)
 
 ### RUN QIIME
 runqiime = input("\n" + "Run Qiime on data from Wu et al. 2017? (y or n):")
 
 if runqiime == 'y':
-	sg.runqiime(inputfolderloc='dataflow/01-fastq/wu2018', paired=False, numcores=40)
+	sg.runqiime(inputfolderloc='dataflow/01-fastq/wu2018', paired=False, numcores=60)
 
 ### RUN QIIME
 runmerge = input("\n" + "Run merge on wetzels and wu? (y or n):")

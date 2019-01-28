@@ -1,6 +1,7 @@
 ---
 output:
   pdf_document: default
+  word_document: default
   html_document: default
 ---
 
@@ -12,99 +13,143 @@ library(ggplot2)
 library(ggdendro)
 library(reshape2)
 library(grid)
+library(ape)
+library(adephylo)
+library(stringr)
+library(distory)
 ```
 
-### 99 percent
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=30, fig.width=25}
 df_plot <- read.csv("~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-99_df_metrics_lacto_1000_df_plot.csv")
-df_plot$genus <- as.character(df_plot$genus)
-df_plot$family <- as.character(df_plot$family)
-df_plot$genus[is.na(df_plot$genus)] <- "None"
-df_plot$family[is.na(df_plot$family)] <- "None"
-
-df_plot <- df_plot %>% 
-  filter(family != "Lactobacillaceae") %>%
-  select(-X, -X.1)
-
-df_plot_select <- df_plot %>% 
-  group_by(asv_id, lacto_signal) %>%
-  top_n(10, count_norm) %>%
-  ungroup() 
-  
-df_plot_select_rank <- df_plot_select %>%
-  
-  select(asv_id, lacto_signal, count_norm) %>%
-  
-  group_by(asv_id, lacto_signal) %>%
-
-  summarise(value = list(count_norm)) %>%
-
-  spread(lacto_signal, value) %>%
-
-  group_by(asv_id) %>%
-
-  mutate(mean_pos = mean(unlist(pos))) %>%
-  mutate(mean_neg = mean(unlist(neg))) %>%
-  
-  ungroup() %>%
-  rowwise() %>%
-    
-  mutate(ratio_pos = mean_pos / mean_neg) %>%
-
-  mutate(ratio_neg = mean_neg / mean_pos) %>%
-  
-  ungroup() %>%
-  
-  select(asv_id, ratio_pos, ratio_neg) %>%
-  
-  distinct() %>%
-
-  gather(direction, ratio, -asv_id)  %>%
-  
-  filter(ratio > 100) %>%
-  
-  select(-direction)
 
 df_plot <- df_plot %>%
-  inner_join(df_plot_select_rank) 
+  select(asv_id, phylum, family, genus) %>%
+  distinct() %>%
+  mutate(tag = str_sub(asv_id, 1, 5))
 
-ggplot(df_plot, aes(x=lacto_signal, y=count_norm)) +
+tree <- read.tree("~/master/rumen/dataflow/03-trees/muscle_trimmed_realigned_nobootstrap.newick")
+
+
+df_dist <- as.matrix(distTips(tree))
+df_dist <- as.data.frame(df_dist[!(startsWith(row.names(df_dist), "Rumen")), startsWith(colnames(df_dist), "Rumen")])
+
+
+df_dist$tags <- row.names(df_dist)
+row.names(df_dist) <- NULL
+
+df_dist <- df_dist %>%
+  separate(tags, into = c("tag", "direction"), remove = FALSE) %>%
+  group_by(tag) %>%
+  mutate(nseqs = length(unique(tags))) %>%
+  ungroup() %>%
+  select(-tags) %>%
+  gather(genome, dist, -tag, -direction, -nseqs) %>%
+  group_by(tag, genome) %>%
+  mutate(mean_dist = median(dist)) %>%
+  ungroup() %>%
+  select(-dist) %>%
+  distinct() %>%
+  group_by(tag) %>%
+  top_n(-1, mean_dist) %>%
+  ungroup() %>%
+  inner_join(df_plot) 
+
+df_dist_genomes <- df_dist %>%
+  select(tag, direction, genome, mean_dist) %>%
+  mutate(genome_trim = str_sub(genome, 1, 25)) %>%
+  select(-genome) %>%
+  distinct() %>%
+  filter(genome_trim != "Rumen_GCF_900110745.1_IMG")
+  
+
+df_plot <- read.csv("~/master/rumen/dataflow/04-analysis-tables/henderson2015-20_320-99_df_metrics_lacto_1000_df_plot.csv")
+
+df_plot <- df_plot %>%
+  mutate(tag = str_sub(asv_id, 1, 5)) %>%
+  inner_join(df_dist_genomes)
+
+
+
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=30, fig.width=25}
+df_plot$genome_trim <- gsub("Rumen_", "", df_plot$genome_trim)  
+df_plot$genome_trim <- gsub("-submission.", "", df_plot$genome_trim)  
+df_plot$genome_trim <- gsub("-finalcontig", "", df_plot$genome_trim)  
+df_plot$genome_trim <- gsub("_IMG", "", df_plot$genome_trim)  
+
+df_plot$genome_trim <- gsub("_4_168extract", "", df_plot$genome_trim)  
+df_plot$genome_trim <- gsub("_ASM", "", df_plot$genome_trim)  
+df_plot$genome_trim <- gsub("-final.assem", "", df_plot$genome_trim)  
+df_plot$genome_trim <- gsub("-assembly_87", "", df_plot$genome_trim)
+df_plot$genome_trim <- gsub("-assembly_29", "", df_plot$genome_trim)  
+
+df_plot <- df_plot %>%
+  unite(genome_dist, c("genome_trim", "mean_dist"), remove = FALSE, sep = " : ")
+
+# for(fam in unique(df_plot$family)){
+#   
+#   df_plot_fam <- df_plot %>%
+#     filter(family == fam)
+#   
+#   
+#   
+# plot(ggplot(df_plot_fam, aes(x=lacto_signal, y=count_norm)) +
+#             geom_jitter(aes(colour = lacto_signal), size = 5) +
+#   facet_wrap(family ~ asv_id + genome_dist, scales="free") +
+#   theme() +
+#           theme(strip.text = element_text(size = 20),
+#           plot.title = element_text(size = 25),
+#           axis.text.x = element_text(angle = 90, hjust = 1, size = 20),
+#           axis.text.y = element_text(size = 20),
+#           axis.title.x = element_text(size = 20),
+#           axis.title.y = element_text(size = 20)) +
+#   theme(legend.position="none") +
+#   ylab("Normalized Abundance") +
+#   xlab("LAB Containing"))
+#   
+# }
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.width=5}
+i <-1
+
+for(seq in unique(df_plot$asv_id)){
+  
+  df_plot_fam <- df_plot %>%
+    filter(asv_id == seq)
+  
+  pdf(paste("~/Desktop/biomin_jan24/plots/", i, ".pdf", sep=""))   
+
+  
+plot(ggplot(df_plot_fam, aes(x=lacto_signal, y=count_norm)) +
             geom_jitter(aes(colour = lacto_signal), size = 5) +
-  facet_wrap(asv_id ~ family, scales="free") +
+  facet_wrap(family ~ ., scales="free") +
   theme() +
-          theme(strip.text = element_text(size = 25),
-          plot.title = element_text(size = 30),
-          axis.text.x = element_text(angle = 90, hjust = 1, size = 20),
+          theme(strip.text = element_text(size = 20),
+          plot.title = element_text(size = 25),
+          axis.text.x = element_text(size = 20),
           axis.text.y = element_text(size = 20),
           axis.title.x = element_text(size = 20),
           axis.title.y = element_text(size = 20)) +
+  theme(legend.position="none") +
   ylab("Normalized Abundance") +
-  xlab("LAB Containing")
+  xlab("LAB Containing"))
+
+
+
+
+
+dev.off() 
+i <- i + 1
+
+}
 ```
 
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=3.5, fig.width=3.5}
-# for (seq in unique(df_plot$asv_id)){
-#   
-#   df_plot_sub <- df_plot %>%
-#     filter(asv_id == seq)
-#   
-#   
-# plot(ggplot(df_plot_sub, aes(x=lacto_signal, y=count_norm)) +
-#             geom_jitter(aes(colour = lacto_signal), size = 5) +
-#        theme() +
-#           theme(plot.title = element_text(size = 16),
-#           axis.text.x = element_text(angle = 90, hjust = 1, size = 10),
-#           axis.text.y = element_text(size = 10),
-#           axis.title.x = element_text(size = 12),
-#           axis.title.y = element_text(size = 12)) +
-#        ggtitle(unique(df_plot_sub$family)) + 
-#   theme(legend.position="none") +
-#   ylab("Normalized Abundance") +
-#   xlab("Lactobacillus Containing"))
-#   
-#   
-# }
 
-```
+
+
