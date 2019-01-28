@@ -140,11 +140,11 @@ def runqiime(inputfolderloc='path/to/input', paired=True, numcores=7):
 
 	os.rename('dataflow/03-asv-seqs/dna-sequences-100.fasta', outputprefixseqs + '-100.fasta')
 	os.rename('dataflow/03-asv-seqs/dna-sequences-99.fasta', outputprefixseqs + '-99.fasta')
-	os.rename('dataflow/03-asv-seqs/dna-sequences-97.fasta', outputprefixseqs + '-98.fasta')
+	os.rename('dataflow/03-asv-seqs/dna-sequences-98.fasta', outputprefixseqs + '-98.fasta')
 	os.rename('dataflow/03-asv-seqs/dna-sequences-97.fasta', outputprefixseqs + '-97.fasta')
 	os.rename('dataflow/03-asv-table/feature-table-100.txt', outputprefixstabs + '-100.txt')
 	os.rename('dataflow/03-asv-table/feature-table-99.txt', outputprefixstabs + '-99.txt')
-	os.rename('dataflow/03-asv-table/feature-table-97.txt', outputprefixstabs + '-98.txt')
+	os.rename('dataflow/03-asv-table/feature-table-98.txt', outputprefixstabs + '-98.txt')
 	os.rename('dataflow/03-asv-table/feature-table-97.txt', outputprefixstabs + '-97.txt')
 
 
