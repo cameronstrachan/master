@@ -26,16 +26,11 @@ runcommand = input("\n" + "Select seqs from DEseq results? (y or n):")
 if runcommand == 'y':
 	os.system("Rscript src/R/generate_lacto_differential_select.R ")
 
-extractseqs = input("\n" + "Extract seqs with differential abundance between sample defined on the presence of Lactobacillus? (y or n):")
-
-if extractseqs == 'y':
-
 ### delete the output files
 
 runcommand = input("\n" + "Delete the output files from the pipeline?")
 
 if runcommand == 'y':
-
 	outputfiles = ["dataflow/01-nucl/lacto_prevo_decrease.fasta", "dataflow/01-nucl/lacto_prevo_increase.fasta", "dataflow/01-nucl/lacto_signal_differential_seqs.fasta", "dataflow/03-blast-tables/lacto_signal_differential_seqs_mapped", "dataflow/03-blast-tables/lacto_signal_differential_all_seqs_tags_rumen_genomes_mapped", "dataflow/03-blast-tables/lacto_signal_differential_all_seqs_tags_prevotella_genomes_mapped", "dataflow/01-nucl/lacto_signal_differential_all_seqs_tags_genomes.fasta", "dataflow/01-nucl/lacto_signal_differential_all_seqs_tags_genomes_short.fasta"]
 
 	for ofile in outputfiles:
@@ -45,6 +40,10 @@ if runcommand == 'y':
 		else:
 		  print("The file " + ofile + " does not exist")
 
+
+extractseqs = input("\n" + "Extract seqs with differential abundance between sample defined on the presence of Lactobacillus? (y or n):")
+
+if extractseqs == 'y':
 ### select seq ids from metadata
 	meta_df = pd.read_csv('dataflow/00-meta/lacto_signal_differential.csv', low_memory=False)
 
