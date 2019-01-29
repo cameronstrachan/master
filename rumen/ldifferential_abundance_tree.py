@@ -28,7 +28,7 @@ if runcommand == 'y':
 
 ### delete the output files
 
-runcommand = input("\n" + "Delete the output files from the pipeline?")
+runcommand = input("\n" + "Delete the output files from the pipeline? (y or n):")
 
 if runcommand == 'y':
 	outputfiles = ["dataflow/01-nucl/lacto_prevo_decrease.fasta", "dataflow/01-nucl/lacto_prevo_increase.fasta", "dataflow/01-nucl/lacto_signal_differential_seqs.fasta", "dataflow/03-blast-tables/lacto_signal_differential_seqs_mapped", "dataflow/03-blast-tables/lacto_signal_differential_all_seqs_tags_rumen_genomes_mapped", "dataflow/03-blast-tables/lacto_signal_differential_all_seqs_tags_prevotella_genomes_mapped", "dataflow/01-nucl/lacto_signal_differential_all_seqs_tags_genomes.fasta", "dataflow/01-nucl/lacto_signal_differential_all_seqs_tags_genomes_short.fasta"]
