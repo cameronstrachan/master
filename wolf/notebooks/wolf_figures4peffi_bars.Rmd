@@ -1,0 +1,116 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(printr)
+library(ggplot2)
+library(cowplot)
+library(reshape2)
+library(knitr)
+library(pwr)
+library("ggpubr")
+library(gmodels)
+library(ggpubr)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_meta <- read.csv("~/master/wolf/dataflow/00-meta/wetzels2018_wu2018_fastq.csv")
+df_unifrac <- read.csv("~/master/wolf/dataflow/03-distance/unifrac_matrix_unweighted.csv")
+
+colnames(df_unifrac)[1] <- "id1"
+
+df_unifrac <- melt(df_unifrac, by = "id1")
+colnames(df_unifrac)[2:3] <- c("id2", "UniFrac")
+
+df_meta_trim1 <- df_meta %>%
+  filter(study == "wetzels2018") %>%
+  select(sample_id, sample, pack, type)
+
+colnames(df_meta_trim1) <- c("id1", "sample1", "pack1", "type1") 
+
+df_meta_trim2 <- df_meta %>%
+  filter(study == "wetzels2018") %>%
+  select(sample_id, sample, pack, type)
+
+colnames(df_meta_trim2) <- c("id2", "sample2", "pack2", "type2") 
+
+df_unifrac <- df_unifrac %>%
+  filter(UniFrac != 0) %>%
+  inner_join(df_meta_trim1) %>%
+  inner_join(df_meta_trim2)
+
+df_unifrac_test <- df_unifrac %>%
+  
+  rowwise() %>%
+  mutate(same_pack = ifelse(pack1 == pack2, "SamePack", "DifferentPack")) %>%
+  ungroup() %>%
+  
+  rowwise() %>%
+  mutate(same_sample = ifelse(sample1 == sample2, "SameSample", "DifferentSample")) %>%
+  ungroup() %>%
+  
+  rowwise() %>%
+  mutate(same_animal = ifelse(type1 == type2, "SameAnimal", "DifferentAnimal")) %>%
+  ungroup() %>%
+  
+  group_by(same_sample) %>%
+  
+  mutate(mean_sample_unifrac = mean(UniFrac)) %>%
+  mutate(sd_sample_unifrac = sd(UniFrac)) %>%
+  mutate(ci_sample_unifrac_low = ci(UniFrac)[2]) %>%
+  mutate(ci_sample_unifrac_high = ci(UniFrac)[3]) %>%
+  
+  ungroup()
+
+
+df_unifrac_test_same_sample <- df_unifrac_test %>%
+  
+  filter(same_sample == "SameSample") %>%
+  
+  select(same_pack, same_animal, sample1, UniFrac) %>%
+  
+  group_by(same_pack, sample1) %>%
+  
+  mutate(mean_pack_unifrac = mean(UniFrac)) %>%
+  mutate(ci_pack_unifrac_low = ci(UniFrac)[2]) %>%
+  mutate(ci_pack_unifrac_high = ci(UniFrac)[3]) %>%
+  
+  ungroup() %>%
+  
+  group_by(same_animal, sample1) %>%
+  
+  mutate(mean_animal_unifrac = mean(UniFrac)) %>%
+  mutate(ci_animal_unifrac_low = ci(UniFrac)[2]) %>%
+  mutate(ci_animal_unifrac_high = ci(UniFrac)[3]) %>%
+  
+  ungroup() %>%
+  
+  rename(Category1 = same_pack) %>%
+  rename(Category2 = same_animal) %>%
+  rename(Sample = sample1) 
+
+df_unifrac_test_same_sample$Category1 <- gsub("Pack", " pack", df_unifrac_test_same_sample$Category1)
+df_unifrac_test_same_sample$Category2 <- gsub("Animal", " animal", df_unifrac_test_same_sample$Category2)
+```
+
+\vspace{12pt}
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=5, fig.height=2.5}
+ggbarplot(df_unifrac_test_same_sample, x = "Sample", y = "UniFrac", fill = "Category1", add = "mean_se", add.params = list(group = "Category1"), position = position_dodge(0.8)) + 
+  stat_compare_means( aes(label = ..p.signif.., group = Category1), 
+                        label.x = 1.5, label.y = 0.65) +
+  ylab("Unweighted UniFrac Distance") + theme(legend.title = element_blank())
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=5, fig.height=2.5}
+ggbarplot(df_unifrac_test_same_sample, x = "Sample", y = "UniFrac", fill = "Category2", add = "mean_se", add.params = list(group = "Category2"), position = position_dodge(0.8)) + 
+  stat_compare_means( aes(label = ..p.signif.., group = Category2), 
+                        label.x = 1.5, label.y = 0.65) +
+  ylab("Unweighted UniFrac Distance") + theme(legend.title = element_blank())
+```

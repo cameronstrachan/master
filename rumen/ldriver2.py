@@ -291,3 +291,7 @@ runcommand = input("\n" + "Run FastTree on full 16s seqs? (y or n):")
 if runcommand == 'y':
 	os.system("../bin/FastTree -gtr -nt dataflow/03-alignments/lacto_signal_differential_seqs_genomes_16s_extracted_1400_1600.afa-gb > dataflow/03-trees/lacto_signal_differential_seqs_genomes_16s_extracted_1400_1600.afa.newick")
 
+
+# perl vxtractor.pl -a -r .V1-V3. -h HMMs/SSU/bacteria/ -o ../../rumen/dataflow/03-asv-seqs/henderson2015-20_320-99_V1_V3.fasta  ../../rumen/dataflow/03-asv-seqs/henderson2015-20_320-99.fasta
+# perl vxtractor.pl -a -r .V1-V3. -h HMMs/SSU/bacteria/ -o ../../rumen/dataflow/01-nucl/prevotella_genomes_V1_V3.fasta  ../../rumen/dataflow/01-nucl/prevotella_genomes.fasta
+# perl vxtractor.pl -a -r .V1-V3. -h HMMs/SSU/bacteria/ -o ../../rumen/dataflow/01-nucl/rumen_genomes_V1_V3.fasta  ../../rumen/dataflow/01-nucl/rumen_genomes.fasta
