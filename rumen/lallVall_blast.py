@@ -31,7 +31,7 @@ if runrename == 'y':
 			file_obj.headerrename()
 	
 
-runprodigal = input("\n" + "Run prodigal on selected Prevotella genomes? (y or n):")
+runprodigal = input("\n" + "Run prodigal on all Prevotella genomes? (y or n):")
 
 if runprodigal == 'y':
 
@@ -52,12 +52,13 @@ if runprodigal == 'y':
 		file_obj.runprodigal()
 
 
-runallvallblast = input("\n" + "Run all against all blast with Prevoltella genomes? (y or n):")
+runallvallblast = input("\n" + "Run all against all blast with just rumen Prevoltella genomes? (y or n):")
 
 if runallvallblast == 'y':
 
 	genomes_df = pd.read_csv('dataflow/00-meta/checkM_summary_clean_prevotella.csv', low_memory=False)
-	genomes = genomes_df['BinID'].tolist()
+	genomes_df_rumen = genomes_df[genomes_df['source'] == 'rumen']
+	genomes = genomes_df_rumen['BinID'].tolist()
 	files = [item + "_rename.fasta" for item in genomes]
 
 	# these are the directories we are working with
