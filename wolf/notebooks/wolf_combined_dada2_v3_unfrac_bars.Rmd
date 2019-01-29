@@ -38,7 +38,7 @@ df$clustering <- 97
 
 colnames(df)[1] <- 'asv_id'
 
-col_to_gather <- names(df)[!(startsWith(names(df), "SRR") |  startsWith(names(df), "W"))]
+col_to_gather <- names(df)[!(startsWith(names(df), "D") |  startsWith(names(df), "W"))]
 df <- melt(df, id = col_to_gather)
 colnames(df)[3:4] <- c('sra_accession', 'count')
 
@@ -137,7 +137,7 @@ df_phlycounts_counts <- df_metrics %>%
 
 df_phlycounts_counts <- df_phlycounts_counts[order(df_phlycounts_counts$asv_id),] 
 
-otumat <- as.matrix(df_phlycounts_counts[,2:33])
+otumat <- as.matrix(df_phlycounts_counts[,2:63])
 rownames(otumat) <- as.data.frame(df_phlycounts_counts)[,1]
 
 df_phlycounts_tax <- df_metrics %>%
