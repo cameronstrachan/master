@@ -37,7 +37,7 @@ if runprodigal == 'y':
 
 	genomes_df = pd.read_csv('dataflow/00-meta/checkM_summary_clean_prevotella.csv', low_memory=False)
 	genomes = genomes_df['BinID'].tolist()
-	files = [item + ".fasta" for item in genomes]
+	files = [item + "_rename.fasta" for item in genomes]
 
 	for file in files:
 		# contruct object
@@ -58,7 +58,7 @@ if runallvallblast == 'y':
 
 	genomes_df = pd.read_csv('dataflow/00-meta/checkM_summary_clean_prevotella.csv', low_memory=False)
 	genomes = genomes_df['BinID'].tolist()
-	files = [item + ".fasta" for item in genomes]
+	files = [item + "_rename.fasta" for item in genomes]
 
 	# these are the directories we are working with
 	indir = 'dataflow/01-prot/'
