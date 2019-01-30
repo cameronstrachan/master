@@ -74,20 +74,11 @@ df_rbh <- inner_join(df_forward, df_reverse) %>%
   mutate(samefile = ifelse(file1 == file2, "yes", "no")) %>%
   filter(samefile != "yes") %>%
   select(-samefile) %>%
-  filter(mean_pi > 40)
+  filter(mean_pi > 95)
 
 df_rbh$sseqid[is.na(df_rbh$sseqid)] <- "None"
 df_rbh$file1[is.na(df_rbh$file1)] <- "None"
 df_rbh$file2[is.na(df_rbh$file2)] <- "None"
 df_rbh$mean_pi[is.na(df_rbh$mean_pi)] <- 0.0
 
-df_pi_shared <- df_rbh %>%
-  select(file1, file2, mean_pi) %>%
-  group_by(file1, file2) %>%
-  mutate(mean_mean_pi = mean(mean_pi)) %>%
-  ungroup() %>%
-  select(-mean_pi) %>%
-  distinct()
-
-write.csv(df_rbh, "dataflow/04-analysis-tables/selected_genomes_rbh.csv")
-write.csv(df_pi_shared, "dataflow/04-analysis-tables/selected_genomes_sharedPI.csv")
+write.csv(df_rbh, "dataflow/04-analysis-tables/selected_genomes_rbh_95pi.csv")
