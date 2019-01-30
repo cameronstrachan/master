@@ -20,7 +20,7 @@ library(ggpubr)
 
 ### methods
 
-All sequence data was demultiplexed before barcode and primer removal. The forward reads were then trimmed to between 8 and 270 bp and the reverse reads to between 8 and 220 bp resulting in a median Phred quality score of over 35 across all reads. The quality trimmed reads were subsequently denoised using DADA2 and clustered to 97% identify using VSEARCH. An alignment of the representative sequences for each cluster was generated using MUSCLE in order to calculate a maximum likelihood phylogenetic tree with phyML. Next, the weighted UniFrac distance was calculated pairwise between each sample. Only comparing samples of the same type (feces or skin), the mean UniFrac distance was compared for samples coming from the same pack to those from different packs. The same was then done for comparing samples from the same or different animal category (wolf or dog). For each comparison, a unpaired t-test was performed. In the bar plots below, a single star (\*) indicates a p-value lower than 0.05, while three stars (\*\*\*) indicates a p-value lower than 0.001. 
+All sequence data was demultiplexed before barcode and primer removal. The forward reads were then trimmed to between 8 and 270 bp and the reverse reads to between 8 and 220 bp resulting in a median Phred quality score of over 35 across all reads. The quality trimmed reads were subsequently denoised using DADA2 and clustered to 97% identify using VSEARCH. An alignment of the representative sequences for each cluster was generated using MUSCLE in order to calculate a maximum likelihood phylogenetic tree with phyML. Next, the weighted UniFrac distance was calculated pairwise between each sample. Only comparing samples of the same type (feces or skin), the mean UniFrac distance was compared for samples coming from the same pack to those from different packs. The same was then done for comparing samples from the same or different animal category (wolf or dog). For each comparison, a paired t-test was performed. In the bar plots below, a single star (\*) indicates a p-value lower than 0.05, while three stars (\*\*\*) indicates a p-value lower than 0.001. 
 
 ### plots
 
@@ -101,7 +101,7 @@ df_unifrac_test_same_sample <- df_unifrac_test %>%
   rename(Sample = sample1) 
 
 df_unifrac_test_same_sample$Category1 <- gsub("Pack", " pack", df_unifrac_test_same_sample$Category1)
-df_unifrac_test_same_sample$Category2 <- gsub("Animal", " animal", df_unifrac_test_same_sample$Category2)
+df_unifrac_test_same_sample$Category2 <- gsub("Animal", " group", df_unifrac_test_same_sample$Category2)
 ```
 
 \vspace{12pt}
