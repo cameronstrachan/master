@@ -17,7 +17,8 @@ runcommand = input("\n" + "Create a fasta with just the homologies? (y or n):")
 if runcommand == 'y':
 
 	genomes_df = pd.read_csv('dataflow/00-meta/checkM_summary_clean_prevotella.csv', low_memory=False)
-	genomes = genomes_df['BinID'].tolist()
+	genomes_df_rumen = genomes_df[genomes_df['source'] == 'rumen']
+	genomes = genomes_df_rumen['BinID'].tolist()
 	files = [item + "_rename.fasta" for item in genomes]
 
 	sg.concat(inputfolder='dataflow/01-prot/', outputpath='dataflow/01-prot/rumen_prevotella.fasta', filenames=files)
