@@ -1,11 +1,16 @@
 library(tidyverse)
 library(stringi)
 library(reshape2)
+library(readr)
 
+checkM_summary_clean_prevotella <- read_csv("master/rumen/dataflow/00-meta/checkM_summary_clean_prevotella.csv")
+
+checkM_summary_clean_prevotella_rumen <- checkM_summary_clean_prevotella %>%
+  filter(source == "rumen")
 
 blastdir <- 'dataflow/02-blast/'
 
-genomes <- c("4309559-submission.assembly", "4300142-submission.assembly", "4304392-submission.assembly", "GCF_900110745.1_IMG-taxon_2693429877_annotated_assembly_genomic", "3353505-final.assembly")
+genomes <- unique(checkM_summary_clean_prevotella_rumen$BinID)
 files <- c()
 
 for (genome1 in genomes){
