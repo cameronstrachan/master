@@ -24,9 +24,10 @@ if runcommand == 'y':
 	sg.concat(inputfolder='dataflow/01-prot/', outputpath='dataflow/01-prot/rumen_prevotella.fasta', filenames=files)
 
 	genes_df = pd.read_csv('dataflow/00-meta/df_conserved_homologues.csv', low_memory=False)
-	genes = genes_df['qseqid'].tolist()
+	genes = genes_df['sseqid'].tolist()
 
 	file_obj = sc.Fasta('rumen_prevotella.fasta', 'dataflow/01-prot/')
 	file_obj.setOutputName('rumen_prevotella_homologues.fasta')
 	file_obj.setOutputLocation('dataflow/01-prot/')
 	file_obj.subsetfasta(seqlist = genes, headertag='homologues')
+
