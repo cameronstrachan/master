@@ -13,7 +13,7 @@ from modules import seq_gen_lin as sg
 #checkm lineage_wf -t 60 -x fasta dataflow/01-checkmin dataflow/02-checkmout
 #checkm qa dataflow/02-checkmout/lineage.ms dataflow/02-checkmout > dataflow/02-checkmout/qa_out.log
 
-runcommand = input("\n" + "Run checkM pipeline? (y or n):")
+runcommand = input("\n" + "Run checkM pipeline on all rumen and prevotella genomes? (y or n):")
 
 if runcommand == 'y':
 	os.system("checkm lineage_wf -t 60 -x fasta dataflow/01-checkmin dataflow/02-checkmout")
