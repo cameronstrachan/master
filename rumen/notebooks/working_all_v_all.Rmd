@@ -25,7 +25,7 @@ df_pi$file1 <- gsub("_IMGtaxon_2693429877_annotated_assembly", "", df_pi$file1)
 df_pi$file2 <- gsub("_IMGtaxon_2693429877_annotated_assembly", "", df_pi$file2)
 ```
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5}
 df_pi_shared_spread <- df_pi %>%
   spread(file2, mean_mean_pi)
 
@@ -42,7 +42,7 @@ dendro.plot <- ggdendrogram(data = df_pi_shared_spread.matrix.dendro, rotate = T
 dendro.plot 
 ```
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=3.5, fig.width=6}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7.5, fig.width=6}
 df_pi <- melt(df_pi_shared_spread_scaled, by = c("mean_mean_pi"))
 colnames(df_pi) <- c("file1", "file2", "mean_mean_pi")
 
@@ -54,8 +54,8 @@ df_pi$file1 <- factor(df_pi$file1,
 
 heatmap.plot <- ggplot(data = df_pi, aes(x = file2, y = file1)) +
   geom_tile(aes(fill = mean_mean_pi)) +
-      theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 25),  
-        axis.text.y = element_text(size = 25),
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 20),  
+        axis.text.y = element_text(size = 20),
         axis.title.y = element_blank(),
         axis.title.x = element_blank()) +
   scale_fill_gradient2() +
@@ -63,69 +63,4 @@ heatmap.plot <- ggplot(data = df_pi, aes(x = file2, y = file1)) +
 
 
 heatmap.plot
-```
-
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
-df_complete  <- read.csv("~/master/rumen/dataflow/04-analysis-tables/selected_genomes_rbh.csv") 
-
-df_complete$file1 <- gsub("_IMGtaxon_2693429877_annotated_assembly", "", df_complete$file1)
-df_complete$file2 <- gsub("_IMGtaxon_2693429877_annotated_assembly", "", df_complete$file2)
-
-df_complete <- df_complete %>%
-  separate(qseqid, into = c("genome", "contig", "gene"), sep = "_", remove = FALSE) %>%
-  select(-X)
-```
-
-
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
-genomes <- unique(df_complete$file1)
-plots <- list()
-i <- 1
-
-for (genome1 in genomes){
-  
-    df_plot <- df_complete %>%
-      filter(file1 == genome1)
-    
-    
-    xbreaks <- df_plot$qseqid[seq(1, length(df_plot$qseqid), 100)]
-    
-    plot <- ggplot(df_plot, aes(x=qseqid)) +
-    
-      theme_few() +
-      
-
-      geom_point(aes(y = mean_pi, colour = file2), stat = "identity", size = 5) +
-
-      theme(plot.title = element_text(size = 25), 
-        axis.text.x = element_text(angle = 90, hjust = 1, size = 12),  
-        axis.text.y = element_text(size = 20), 
-        axis.title.x = element_text(size = 20), 
-        axis.title.y = element_text(size = 20)) + 
-      
-      ggtitle(paste(genome1)) + 
-      
-      ylab("Percent identity (%)") + 
-      
-      ylim(50,100) +
-      
-      #theme(legend.position="none") +
-      
-      theme(legend.text=element_text(size=20)) + 
-      theme(legend.title=element_text(size=20)) +
-      scale_x_discrete("Ordered genes",  breaks = xbreaks)
-    
-    plots[[i]] <- plot
-    
-    i <- i + 1
-}
-  
-```
-
-```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=20, fig.height=10}
-for (i in 1:length(plots)) {
-  plot(plots[[i]])
-  cat("\r\n\r\n")
-}
-
 ```
