@@ -282,7 +282,7 @@ class Fasta(File):
         else:
             print("\n" + 'File exists: ' + self.outputlocation + self.outputname)
 
-    def runprodigal(self):
+    def runprodigal(self, type = 'prot'):
         '''
         Run prodigal with the meta option. Need to create an option to change the prodigal paramaters
         '''
@@ -293,7 +293,11 @@ class Fasta(File):
             filename = self.name
             fileoutputname = self.outputname
             
-            command = 'prodigal' + ' -i ' + indir + filename + ' -a ' + outdir + fileoutputname + ' -p ' + 'meta'
+            if type == 'prot':
+                command = 'prodigal' + ' -i ' + indir + filename + ' -a ' + outdir + fileoutputname + ' -p ' + 'meta'
+            else:
+                command = 'prodigal' + ' -i ' + indir + filename + ' -d ' + outdir + fileoutputname + ' -p ' + 'meta'
+            
             process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
             output, error = process.communicate()
         else:

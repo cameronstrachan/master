@@ -52,6 +52,26 @@ if runprodigal == 'y':
 		file_obj.runprodigal()
 
 
+runprodigal = input("\n" + "Run prodigal on all Prevotella genomes to generate nucl files? (y or n):")
+
+if runprodigal == 'y':
+
+	genomes_df = pd.read_csv('dataflow/00-meta/checkM_summary_clean_prevotella.csv', low_memory=False)
+	genomes = genomes_df['BinID'].tolist()
+	files = [item + "_rename.fasta" for item in genomes]
+
+	for file in files:
+		# contruct object
+		file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
+
+		# set output name, location
+		outputfilename = file.split(".f")[0] + '.fasta'
+		file_obj.setOutputName(outputfilename)
+		file_obj.setOutputLocation('dataflow/01-prot/genes/')
+		
+		# run prodigal 
+		file_obj.runprodigal(type='nucl')
+
 runallvallblast = input("\n" + "Run all against all blast with just rumen Prevoltella genomes? (y or n):")
 
 if runallvallblast == 'y':
