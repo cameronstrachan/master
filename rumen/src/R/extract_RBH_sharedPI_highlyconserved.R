@@ -81,7 +81,7 @@ df_rbh$file1[is.na(df_rbh$file1)] <- "None"
 df_rbh$file2[is.na(df_rbh$file2)] <- "None"
 df_rbh$mean_pi[is.na(df_rbh$mean_pi)] <- 0.0
 
-df_pi_hom <- df_pi %>%
+df_pi_hom <- df_rbh %>%
   group_by(qseqid) %>%
   mutate(ngenomes = length(unique(file2))) %>%
   mutate(mean_pi_gene = mean(mean_pi)) %>%
