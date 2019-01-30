@@ -106,3 +106,9 @@ if makeheadermap == 'y':
 		df['file'] = file
 		
 		df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
+
+
+runcommand = input("\n" + "Make shared blast tables? (y or n):")
+
+if runcommand == 'y':
+	os.system("Rscript src/R/extract_RBH_sharedPI.R")
