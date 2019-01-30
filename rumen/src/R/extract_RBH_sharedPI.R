@@ -3,7 +3,7 @@ library(stringi)
 library(reshape2)
 library(readr)
 
-checkM_summary_clean_prevotella <- read_csv("master/rumen/dataflow/00-meta/checkM_summary_clean_prevotella.csv")
+checkM_summary_clean_prevotella <- read_csv("dataflow/00-meta/checkM_summary_clean_prevotella.csv")
 
 checkM_summary_clean_prevotella_rumen <- checkM_summary_clean_prevotella %>%
   filter(source == "rumen")
