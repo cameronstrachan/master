@@ -20,13 +20,13 @@ library(ggpubr)
 
 ### methods
 
-All sequence data was demultiplexed before barcode and primer removal. The forward reads were then trimmed to between 8 and 270 bp and the reverse reads to between 8 and 220 bp resulting in a median Phred quality score of over 35 across all reads. The quality trimmed reads were subsequently denoised using DADA2 and clustered to 97% identify using VSEARCH. An alignment of the representative sequences for each cluster was generated using MUSCLE in order to calculate a maximum likelihood phylogenetic tree with phyML. Next, the unweighted UniFrac distance was calculated pairwise between each sample. Only comparing samples of the same type (feces or skin), the mean UniFrac distance was compared for samples coming from the same pack to those from different packs. The same was then done for comparing samples from the same or different animal category (wolf or dog). For each comparison, a unpaired t-test was performed. In the bar plots below, a single star (\*) indicates a p-value lower than 0.05, while three stars (\*\*\*) indicates a p-value lower than 0.001. 
+All sequence data was demultiplexed before barcode and primer removal. The forward reads were then trimmed to between 8 and 270 bp and the reverse reads to between 8 and 220 bp resulting in a median Phred quality score of over 35 across all reads. The quality trimmed reads were subsequently denoised using DADA2 and clustered to 97% identify using VSEARCH. An alignment of the representative sequences for each cluster was generated using MUSCLE in order to calculate a maximum likelihood phylogenetic tree with phyML. Next, the weighted UniFrac distance was calculated pairwise between each sample. Only comparing samples of the same type (feces or skin), the mean UniFrac distance was compared for samples coming from the same pack to those from different packs. The same was then done for comparing samples from the same or different animal category (wolf or dog). For each comparison, a unpaired t-test was performed. In the bar plots below, a single star (\*) indicates a p-value lower than 0.05, while three stars (\*\*\*) indicates a p-value lower than 0.001. 
 
 ### plots
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 df_meta <- read.csv("~/master/wolf/dataflow/00-meta/wetzels2018_wu2018_fastq.csv")
-df_unifrac <- read.csv("~/master/wolf/dataflow/03-distance/unifrac_matrix_unweighted.csv")
+df_unifrac <- read.csv("~/master/wolf/dataflow/03-distance/unifrac_matrix_weighted.csv")
 
 colnames(df_unifrac)[1] <- "id1"
 
@@ -109,8 +109,8 @@ df_unifrac_test_same_sample$Category2 <- gsub("Animal", " animal", df_unifrac_te
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.height=3.5}
 ggbarplot(df_unifrac_test_same_sample, x = "Sample", y = "UniFrac", fill = "Category1", add = "mean_se", add.params = list(group = "Category1"), position = position_dodge(0.8)) + 
   stat_compare_means( aes(label = ..p.signif.., group = Category1), 
-                        label.x = 1.5, label.y = 0.65, method = "t.test") +
-  ylab("Unweighted UniFrac Distance") + theme(legend.title = element_blank(), legend.spacing.x = unit(0.25, 'cm'), legend.text=element_text(size=12)) + guides(fill=guide_legend(
+                        label.x = 1.5, label.y = 0.23) +
+  ylab("Weighted UniFrac Distance") + theme(legend.title = element_blank(), legend.spacing.x = unit(0.25, 'cm'), legend.text=element_text(size=12)) + guides(fill=guide_legend(
                  keywidth=0.5,
                  keyheight=0.5,
                  default.unit="inch")
@@ -121,8 +121,8 @@ ggbarplot(df_unifrac_test_same_sample, x = "Sample", y = "UniFrac", fill = "Cate
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.height=3.5}
 ggbarplot(df_unifrac_test_same_sample, x = "Sample", y = "UniFrac", fill = "Category2", add = "mean_se", add.params = list(group = "Category2"), position = position_dodge(0.8)) + 
   stat_compare_means( aes(label = ..p.signif.., group = Category2), 
-                        label.x = 1.5, label.y = 0.65, method = "t.test") +
-  ylab("Unweighted UniFrac Distance") + theme(legend.title = element_blank(), legend.spacing.x = unit(0.25, 'cm'), legend.text=element_text(size=12)) + guides(fill=guide_legend(
+                        label.x = 1.5, label.y = 0.23) +
+  ylab("Weighted UniFrac Distance") + theme(legend.title = element_blank(), legend.spacing.x = unit(0.25, 'cm'), legend.text=element_text(size=12)) + guides(fill=guide_legend(
                  keywidth=0.5,
                  keyheight=0.5,
                  default.unit="inch")
