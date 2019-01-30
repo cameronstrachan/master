@@ -12,17 +12,20 @@ runcommand = input("\n" + "Run RBH analaysis to export shared homolgoues? (y or 
 if runcommand == 'y':
 	os.system("Rscript src/R/extract_RBH_sharedPI_highlyconserved.R")
 
+runcommand = input("\n" + "Create a fasta with just the homologies? (y or n):")
 
-genomes_df = pd.read_csv('dataflow/00-meta/checkM_summary_clean_prevotella.csv', low_memory=False)
-genomes = genomes_df['BinID'].tolist()
-files = [item + ".fasta" for item in genomes]
+if runcommand == 'y':
 
-sg.concat(inputfolder='dataflow/01-prot/', outputpath='dataflow/01-prot/rumen_prevotella.fasta', filenames=files)
+	genomes_df = pd.read_csv('dataflow/00-meta/checkM_summary_clean_prevotella.csv', low_memory=False)
+	genomes = genomes_df['BinID'].tolist()
+	files = [item + "_rename.fasta" for item in genomes]
 
-genes_df = pd.read_csv('dataflow/00-meta/df_conserved_homologues.csv', low_memory=False)
-genes = genes_df['qseqid'].tolist()
+	sg.concat(inputfolder='dataflow/01-prot/', outputpath='dataflow/01-prot/rumen_prevotella.fasta', filenames=files)
 
-file_obj = sc.Fasta('rumen_prevotella.fasta', 'dataflow/01-prot/')
-file_obj.setOutputName('rumen_prevotella_homologues.fasta')
-file_obj.setOutputLocation('dataflow/01-prot/')
-file_obj.subsetfasta(seqlist = genes, headertag='homologues')
+	genes_df = pd.read_csv('dataflow/00-meta/df_conserved_homologues.csv', low_memory=False)
+	genes = genes_df['qseqid'].tolist()
+
+	file_obj = sc.Fasta('rumen_prevotella.fasta', 'dataflow/01-prot/')
+	file_obj.setOutputName('rumen_prevotella_homologues.fasta')
+	file_obj.setOutputLocation('dataflow/01-prot/')
+	file_obj.subsetfasta(seqlist = genes, headertag='homologues')
