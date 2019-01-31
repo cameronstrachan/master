@@ -1,0 +1,90 @@
+---
+title: "Untitled"
+author: "Cameron Strachan"
+date: '2019-01-07'
+output: html_document
+---
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(stringi)
+library(ggplot2)
+library(ggdendro)
+library(reshape2)
+library(grid)
+library(ape)
+library(adephylo)
+library(stringr)
+library(distory)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5}
+df_distance <- read.csv("~/master/rumen/dataflow/04-analysis-tables/rumen_prevotella_checkMtree_distance.csv") 
+
+df_distance$X <- gsub("_rename", "", df_distance$X)
+df_distance$X <- gsub("submission.assembly", "", df_distance$X)
+df_distance$X <- gsub("final.assembly", "", df_distance$X)
+df_distance$X <- gsub("-", "", df_distance$X)
+df_distance$X <- gsub("_IMGtaxon_2693429877_annotated_assembly", "", df_distance$X)
+df_distance$X <- gsub("_genomic", "", df_distance$X)
+df_distance$X <- gsub("\\.", "", df_distance$X)
+
+df_distance[is.na(df_distance)] <- 100
+
+df_distance_scaled <- df_distance
+df_distance[,2:43] <- scale(df_distance[,2:43])
+
+df_distance.matrix <- as.matrix(df_distance[, -c(1)])
+rownames(df_distance.matrix) <- df_distance$X
+df_distance.matrix.dendro <- as.dendrogram(hclust(d = dist(x = df_distance.matrix)))
+
+dendro.plot <- ggdendrogram(data = df_distance.matrix.dendro, rotate = TRUE) 
+dendro.plot 
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+df_pi <- read.csv("~/master/rumen/dataflow/04-analysis-tables/selected_genomes_sharedPI.csv")
+df_pi$X <- NULL
+
+
+df_pi$file1 <- gsub("_IMGtaxon_2693429877_annotated_assembly", "", df_pi$file1)
+df_pi$file2 <- gsub("_IMGtaxon_2693429877_annotated_assembly", "", df_pi$file2)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+df_pi_shared_spread <- df_pi %>%
+  spread(file2, mean_mean_pi)
+
+df_pi_shared_spread[is.na(df_pi_shared_spread)] <- 100
+ 
+df_pi_shared_spread_scaled <- df_pi_shared_spread
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7.5, fig.width=6}
+df_pi <- melt(df_pi_shared_spread_scaled, by = c("mean_mean_pi"))
+colnames(df_pi) <- c("file1", "file2", "mean_mean_pi")
+
+order <- order.dendrogram(df_distance.matrix.dendro)
+
+df_pi$file1 <- factor(df_pi$file1,
+                               levels = df_distance_scaled$X[order], 
+                               ordered = TRUE)
+
+df_pi$file2 <- factor(df_pi$file2,
+                               levels = df_distance_scaled$X[order], 
+                               ordered = TRUE)
+
+heatmap.plot <- ggplot(data = df_pi, aes(x = file2, y = file1)) +
+  geom_tile(aes(fill = mean_mean_pi)) +
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 20),  
+        axis.text.y = element_text(size = 20),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank()) +
+  scale_fill_gradient2() +
+  theme(legend.position = "top")
+
+
+heatmap.plot
+```
+
