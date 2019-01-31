@@ -293,7 +293,7 @@ class Fasta(File):
             filename = self.name
             fileoutputname = self.outputname
 
-            if gff3 != False:
+            if gff3 == False:
                 if type == 'prot':
                     command = 'prodigal' + ' -i ' + indir + filename + ' -a ' + outdir + fileoutputname + ' -p ' + 'meta'
                 else:
