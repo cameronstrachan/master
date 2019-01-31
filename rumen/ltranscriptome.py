@@ -22,12 +22,10 @@ if runprodigal == 'y':
 	genomes_df_rumen = genomes_df[genomes_df['source'] == 'rumen']
 	genomes = genomes_df_rumen['BinID'].tolist()
 	files = [item + "_rename.fasta" for item in genomes]
-    
     sg.concat(inputfolder='dataflow/01-nucl/', outputpath='dataflow/01-nucl/rumen_prevotella.fasta', filenames=files)
-
     file = "rumen_prevotella.fasta"
 
-	file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
+    file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
 	# set output name, location
 	outputfilename = file.split(".f")[0] + '.gff3'
 	file_obj.setOutputName(outputfilename)
