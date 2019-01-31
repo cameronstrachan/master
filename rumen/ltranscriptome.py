@@ -38,7 +38,7 @@ if runprodigal == 'y':
     # run prodigal
     file_obj.runprodigal(gff3 = True)
 
-    runbowtie = input("\n" + "Run bowtie on rumen_prevotella.fasta? (y or n):")
+runbowtie = input("\n" + "Run bowtie on rumen_prevotella.fasta? (y or n):")
 
 if runbowtie == 'y':
 
