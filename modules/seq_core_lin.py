@@ -9,27 +9,27 @@ from operator import itemgetter
 import argparse
 
 
-sys.path.insert(0, '/home/strachan/master') 
+sys.path.insert(0, '/home/strachan/master')
 from modules.ctb_functions import *
 
 ### Notes
 ### When I have species and annotation in a header, I should come up with
-### a standardized format. 
+### a standardized format.
 
 '''
-This is simply objects that define the different file formats I work with and the 
+This is simply objects that define the different file formats I work with and the
 associated methods for manipulating those files. The main object, from which all other inherit,
 is simply defind as a file name and location. The main method from this object will be
-to open the file.  This set of objects will be specific to sequence data. 
+to open the file.  This set of objects will be specific to sequence data.
 
 '''
 
 class File(object):
-    
+
     '''
     File object defined by the name and location of the file. Only method is to open the file,
     which will be used by methods in sub classes. The print for this object will simply print
-    the file name and location. 
+    the file name and location.
     '''
 
     def __init__(self, theName, theLocation, theOutputLocation='none', theOutputName='none'):
@@ -71,7 +71,7 @@ class File(object):
 
     # open and close files
     def openfile(self):
-        
+
         filepath = self.location + self.name
 
         try:
@@ -90,34 +90,34 @@ class File(object):
         return os.path.exists(self.outputlocation + self.outputname)
 
 class Fasta(File):
-    
+
     '''
     There will be a object per type of file, which will have associated attributes for the
     manipulation of the file. The idea is that this class will just contain all the functions
     I write for manipulating fasta files. The first two functions will just create a dictionary
     of the sequence data for me to write further functions with. The next is simply one that creates
     a dictionary for mapping the headers. These dictionaries will be saved as attributes, but
-    all just return the dictionary. 
+    all just return the dictionary.
     '''
-    
+
     def __init__(self, theName, theLocation):
         File.__init__(self, theName, theLocation)
 
         self.fastadict = {} # fasta file represented in a dictionary
         self.headers = {} # faata file headers represented in a mapping file
-    
-    
+
+
     def fasta2dict(self):
-        
+
         '''
         This function takes a .fasta file input and returns a dictionary using the first
         part of the header (after the > and before the first white space) as the key
         and the full sequence as the value. This creates a convenient way to work with the
-        sequences in python. The seqeuence dictionary gets assigned to a attribute called 
-        fastadict. 
+        sequences in python. The seqeuence dictionary gets assigned to a attribute called
+        fastadict.
         '''
-        
-        
+
+
 
         infile = self.openfile()
         i = 1
@@ -132,46 +132,46 @@ class Fasta(File):
                     seqname = headersplit[0][1:]
                     self.fastadict[seqname] = ''
                     i = i + 1
-                
-                else: 
+
+                else:
                     self.fastadict[seqname] = self.fastadict[seqname] + line
 
         return self.fastadict
-  
-        
-        
+
+
+
     def fasta2headermap(self):
-        
+
         '''
         This function takes a .fasta file input and returns a dictionary using the first
         part of the header (after the > and before the first white space) as the key
         and the full header as the value. This creates a mapping file, so that the first
         part of the header can be used as a dictionary key, but then the entire header
         (assuming it contains useful information) can be mapped later. The mapping dictionary
-        gets assigned to an attribute called headers. 
+        gets assigned to an attribute called headers.
         '''
-        
+
         infile = self.openfile()
-        
+
         for line in infile:
             line = line.rstrip()
             if line[0] == '>':
                 headersplit = line.split()
                 seqname = headersplit[0][1:]
                 self.headers[seqname] = line
-            else: 
+            else:
                 pass
-        
+
         return self.headers
-    
+
     def saveonelinefasta(self):
-        
+
         '''
         Calling this function will simply save a new fasta file where all the sequences
         are on one line. This just cleans up the file in a way that makes it easier to work
-        with. Most of the work I do though will be from the dictionary though. 
+        with. Most of the work I do though will be from the dictionary though.
         '''
-    
+
         if not self.outputexists():
             fastadic = self.fasta2dict()
             outputfile = self.openwritefile()
@@ -185,11 +185,11 @@ class Fasta(File):
 
 
     def subsetfasta(self, seqlist = [], headertag='number', length=0, replace='NA'):
-        
+
         '''
-         
+
         '''
-        
+
 
         if not self.outputexists():
             fastadic = self.fasta2dict()
@@ -198,7 +198,7 @@ class Fasta(File):
             outputfile = self.openwritefile()
 
             j = 1
-            
+
             for k,v in fastadic.items():
 
                 if length != 0:
@@ -210,7 +210,7 @@ class Fasta(File):
                 if headertag == 'number':
                     outputfile.write(">" + k + '_' + str(j) + '\n')
                     j = j + 1
-                else: 
+                else:
                     outputfile.write(">" + k + '_' + headertag + '\n')
 
                 outputfile.write(v + '\n')
@@ -220,11 +220,11 @@ class Fasta(File):
 
 
     def headerrename(self):
-        
+
         '''
-        Number the sequences in each file and rename header with the file name and seq number. 
+        Number the sequences in each file and rename header with the file name and seq number.
         '''
-    
+
         if not self.outputexists():
             fastadic = self.fasta2dict()
             outputfile = self.openwritefile()
@@ -245,7 +245,7 @@ class Fasta(File):
     def lengthcutoff(self, replaceheaders = True, length = 500, direction = 'above'):
         '''
         Calling this function simply saves the files with a specific length cutoff
-        in a folder called lengthcutoff. 
+        in a folder called lengthcutoff.
         '''
         if not self.outputexists():
             fastadic = self.fasta2dict()
@@ -268,7 +268,7 @@ class Fasta(File):
                         seqnum = seqnum + 1
 
 
-                else: 
+                else:
 
                     if len(seq) <= length:
                         if replaceheaders == True:
@@ -282,7 +282,7 @@ class Fasta(File):
         else:
             print("\n" + 'File exists: ' + self.outputlocation + self.outputname)
 
-    def runprodigal(self, type = 'prot'):
+    def runprodigal(self, type = 'prot', gff3 = False):
         '''
         Run prodigal with the meta option. Need to create an option to change the prodigal paramaters
         '''
@@ -292,12 +292,15 @@ class Fasta(File):
             outdir = self.outputlocation
             filename = self.name
             fileoutputname = self.outputname
-            
-            if type == 'prot':
-                command = 'prodigal' + ' -i ' + indir + filename + ' -a ' + outdir + fileoutputname + ' -p ' + 'meta'
+
+            if gff3 != false:
+                if type == 'prot':
+                    command = 'prodigal' + ' -i ' + indir + filename + ' -a ' + outdir + fileoutputname + ' -p ' + 'meta'
+                else:
+                    command = 'prodigal' + ' -i ' + indir + filename + ' -d ' + outdir + fileoutputname + ' -p ' + 'meta'
             else:
-                command = 'prodigal' + ' -i ' + indir + filename + ' -d ' + outdir + fileoutputname + ' -p ' + 'meta'
-            
+                command = 'prodigal' + ' -i ' + indir + filename + ' -f gff -o ' + outdir + fileoutputname + ' -p ' + 'meta'
+
             process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
             output, error = process.communicate()
         else:
@@ -310,7 +313,7 @@ class Fasta(File):
         indir = self.location
         outdir = self.outputlocation
         filename = self.name
-        fileoutputname = self.outputname 
+        fileoutputname = self.outputname
 
         command = '../bin/makeblastdb'  + ' -in ' + indir + filename + ' -dbtype ' + dbtype + ' -out ' + outdir + fileoutputname
         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
@@ -325,7 +328,7 @@ class Fasta(File):
             indir = self.location
             outdir = self.outputlocation
             filename = self.name
-            fileoutputname = self.outputname 
+            fileoutputname = self.outputname
 
             command = '../bin/' + blast  + ' -query ' + indir + filename + ' -db ' + dblocation + db +  ' -max_target_seqs ' + str(max_target_seqs) + " -max_hsps 1 -evalue " + str(evalue)  + ' -num_threads ' + str(num_threads) + " -outfmt '6 qseqid sseqid pident sstart send qstart qend evalue bitscore score qlen length sseq'" + ' -out ' + outdir + fileoutputname
             print('Blast command being run:' + '\n' + command)
@@ -359,8 +362,8 @@ class Fasta(File):
 
     def extract16s(self, threads=6, bit_thresh=0, length_thresh=500, masking=False):
         '''
-        Use code from https://github.com/christophertbrown/bioscripts to extract 16s using HMMs. 
-        Masking seems to lower case areas that are thought to be insertions. 
+        Use code from https://github.com/christophertbrown/bioscripts to extract 16s using HMMs.
+        Masking seems to lower case areas that are thought to be insertions.
         '''
 
         bit_thresh = float(bit_thresh)
@@ -381,7 +384,7 @@ class Fasta(File):
 
 
 class GenBank(File):
-    
+
     def __init__(self, theName, theLocation, theOutputLocation='none', theOutputName='none'):
         File.__init__(self, theName, theLocation, theOutputLocation, theOutputName)
 
@@ -389,7 +392,7 @@ class GenBank(File):
         '''
         Calling this function will take an annotated fasta file and save a protein fasta
         with the sequences and annotations. It is essentially extracting the CDS feature
-        from the genbank file. 
+        from the genbank file.
         '''
         filepath = self.location + self.name
         outputfile = self.openwritefile()
@@ -421,7 +424,7 @@ class GenBank(File):
         '''
         Calling this function will take an annotated fasta file and save the main nucleotide
         sequence from a GenBank file. If there are multiple records in a gen bank file, I should
-        check and make sure that these are in fact in the fasta file. 
+        check and make sure that these are in fact in the fasta file.
         '''
 
         filepath = self.location + self.name
@@ -433,6 +436,6 @@ class GenBank(File):
 # Testing program
 def main():
     pass
-    
+
 if __name__ == '__main__':
     main()

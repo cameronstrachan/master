@@ -4,7 +4,7 @@ import subprocess
 import pandas as pd
 
 # custom libraries
-sys.path.insert(0, '/home/strachan/master/') 
+sys.path.insert(0, '/home/strachan/master/')
 from modules import seq_core_lin as sc
 from modules import seq_gen_lin as sg
 
@@ -19,7 +19,7 @@ if runrename == 'y':
 	genomes = genomes_df['BinID'].tolist()
 	files = [item + ".fasta" for item in genomes]
 
-	for file in files:	
+	for file in files:
 
 			file_obj = sc.Fasta(file, "dataflow/01-nucl/")
 
@@ -29,7 +29,7 @@ if runrename == 'y':
 			file_obj.setOutputLocation("dataflow/01-nucl/")
 
 			file_obj.headerrename()
-	
+
 
 runprodigal = input("\n" + "Run prodigal on all Prevotella genomes? (y or n):")
 
@@ -47,8 +47,8 @@ if runprodigal == 'y':
 		outputfilename = file.split(".f")[0] + '.fasta'
 		file_obj.setOutputName(outputfilename)
 		file_obj.setOutputLocation('dataflow/01-prot/')
-		
-		# run prodigal 
+
+		# run prodigal
 		file_obj.runprodigal()
 
 
@@ -68,8 +68,8 @@ if runprodigal == 'y':
 		outputfilename = file.split(".f")[0] + '.fasta'
 		file_obj.setOutputName(outputfilename)
 		file_obj.setOutputLocation('dataflow/01-prot/genes/')
-		
-		# run prodigal 
+
+		# run prodigal
 		file_obj.runprodigal(type='nucl')
 
 runallvallblast = input("\n" + "Run all against all blast with just rumen Prevoltella genomes? (y or n):")
@@ -118,13 +118,13 @@ if makeheadermap == 'y':
 		file_obj = sc.Fasta(file, indir)
 		file_obj.setOutputName(file)
 		file_obj.setOutputLocation(headerfile)
-		
+
 		headers = file_obj.fasta2headermap()
 
 		df = pd.DataFrame.from_dict(headers, orient="index")
 
 		df['file'] = file
-		
+
 		df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
 
 
