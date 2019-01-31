@@ -42,5 +42,5 @@ if runprodigal == 'y':
 
 if runbowtie == 'y':
 
-    os.system("bowtie2-build —threads 8 dataflow/01-nucl/rumen_prevotella.fasta dataflow/03-bowtie/rumen_prevotella")
+    os.system("bowtie2-build dataflow/01-nucl/rumen_prevotella.fasta dataflow/03-bowtie/rumen_prevotella")
     os.system("bowtie2 -p 40 --trim5 10 --trim3 10 --very-sensitive-local --local -x dataflow/03-bowtie/rumen_prevotella -1 dataflow/01-fastq/marre2017/SRX1585089_pass_1.fastq -2 dataflow/01-fastq/marre2017/SRX1585089_pass_2.fastq -S dataflow/03-bowtie/rumen_prevotella.sam")
