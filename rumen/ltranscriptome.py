@@ -9,6 +9,9 @@ from modules import seq_core_lin as sc
 from modules import seq_gen_lin as sg
 from modules import seq_scrape as ss
 
+### MAP TRANSCRIPTOMES
+### Environment: source activate anaconda
+
 downloaddata = input("\n" + "Download data from Marre et al 2017? (y or n):")
 
 if downloaddata == 'y':
@@ -44,5 +47,4 @@ if runbowtie == 'y':
 
     os.system("bowtie2-build dataflow/01-nucl/rumen_prevotella.fasta dataflow/03-bowtie/rumen_prevotella")
     os.system("bowtie2 -p 40 -a --trim5 20 --trim3 20 --very-sensitive-local --local -x dataflow/03-bowtie/rumen_prevotella -1 dataflow/01-fastq/marre2017/SRX1585089_pass_1.fastq dataflow/01-fastq/marre2017/SRX1585089_pass_2.fastq -S dataflow/03-bowtie/rumen_prevotella.sam")
-
-#htseq-count dataflow/03-bowtie/rumen_prevotella.sam dataflow/01-prot/genes/rumen_prevotella.gff3
+    os.system("htseq-count -s no -t CDS -i ID --additional-attr=ID dataflow/03-bowtie/rumen_prevotella.sam dataflow/01-prot/genes/rumen_prevotella.gff3 > dataflow/03-bowtie/rumen_prevotella.txt")
