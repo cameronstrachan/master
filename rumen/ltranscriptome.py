@@ -18,23 +18,27 @@ runprodigal = input("\n" + "Run prodigal on all Prevotella genomes to generate g
 
 if runprodigal == 'y':
 
-	genomes_df = pd.read_csv('dataflow/00-meta/checkM_summary_clean_prevotella.csv', low_memory=False)
-	genomes_df_rumen = genomes_df[genomes_df['source'] == 'rumen']
-	genomes = genomes_df_rumen['BinID'].tolist()
-	files = [item + "_rename.fasta" for item in genomes]
+    genomes_df = pd.read_csv('dataflow/00-meta/checkM_summary_clean_prevotella.csv', low_memory=False)
+    genomes_df_rumen = genomes_df[genomes_df['source'] == 'rumen']
+    genomes = genomes_df_rumen['BinID'].tolist()
+    files = [item + "_rename.fasta" for item in genomes]
+
+
+
     sg.concat(inputfolder='dataflow/01-nucl/', outputpath='dataflow/01-nucl/rumen_prevotella.fasta', filenames=files)
+
     file = "rumen_prevotella.fasta"
 
     file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
-	# set output name, location
-	outputfilename = file.split(".f")[0] + '.gff3'
-	file_obj.setOutputName(outputfilename)
-	file_obj.setOutputLocation('dataflow/01-prot/genes/')
+    # set output name, location
+    outputfilename = file.split(".f")[0] + '.gff3'
+    file_obj.setOutputName(outputfilename)
+    file_obj.setOutputLocation('dataflow/01-prot/genes/')
 
-	# run prodigal
-	file_obj.runprodigal(gff3 = True)
+    # run prodigal
+    file_obj.runprodigal(gff3 = True)
 
-runbowtie = input("\n" + "Run bowtie on rumen_prevotella.fasta? (y or n):")
+    runbowtie = input("\n" + "Run bowtie on rumen_prevotella.fasta? (y or n):")
 
 if runbowtie == 'y':
 
