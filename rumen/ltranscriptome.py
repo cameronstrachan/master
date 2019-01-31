@@ -22,7 +22,7 @@ if runprodigal == 'y':
 	genomes_df_rumen = genomes_df[genomes_df['source'] == 'rumen']
 	genomes = genomes_df_rumen['BinID'].tolist()
 	files = [item + "_rename.fasta" for item in genomes]
-
+    
     sg.concat(inputfolder='dataflow/01-nucl/', outputpath='dataflow/01-nucl/rumen_prevotella.fasta', filenames=files)
 
     file = "rumen_prevotella.fasta"
@@ -39,6 +39,6 @@ if runprodigal == 'y':
 runbowtie = input("\n" + "Run bowtie on rumen_prevotella.fasta? (y or n):")
 
 if runbowtie == 'y':
-    
+
     os.system("bowtie2-build —threads 8 dataflow/01-nucl/rumen_prevotella.fasta dataflow/03-bowtie/rumen_prevotella")
     os.system("bowtie2 -p 40 --trim5 10 --trim3 10 --very-sensitive-local --local -x dataflow/03-bowtie/rumen_prevotella -1 dataflow/01-fastq/marre2017/SRX1585089_pass_1.fastq -2 dataflow/01-fastq/marre2017/SRX1585089_pass_2.fastq -S dataflow/03-bowtie/rumen_prevotella.sam")
