@@ -88,3 +88,43 @@ heatmap.plot <- ggplot(data = df_pi, aes(x = file2, y = file1)) +
 heatmap.plot
 ```
 
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+df_counts <- read.delim("~/master/rumen/rumen_prevotella.txt", header=FALSE) %>%
+  filter(V3 != 0) %>%
+  filter(V1 != "__not_aligned") %>%
+  filter(V1 != "__too_low_aQual") %>%
+  filter(V1 != "__no_feature") %>%
+  filter(V1 != "__ambiguous") %>%
+  select(-V2)
+
+colnames(df_counts) <- c("ID", "count")
+
+df_counts$ID <- as.character(df_counts$ID)
+
+df_gff3 <- read.delim("~/master/rumen/dataflow/01-prot/genes/rumen_prevotella.gff3", header=FALSE, comment.char="#") %>%
+  separate(V9, c("ID"), sep = ";") %>%
+  select(-V2, -V3, -V6, -V8)
+
+df_gff3$ID <- gsub("ID=", "", df_gff3$ID)
+
+colnames(df_gff3)[1:4] <- c("contig", "start", "end", "direction")
+
+df <- inner_join(df_counts, df_gff3) %>%
+  rowwise() %>%
+  mutate(genome = stri_reverse(stri_split_fixed(stri_reverse(contig),"_",n = 2)[[1]][2]))
+
+df_genome <- df %>%
+  group_by(genome) %>%
+  mutate(total_counts = sum(count)) %>%
+  ungroup() %>%
+  select(genome, total_counts) %>%
+  distinct()
+
+df_genome$genome <- gsub("_rename", "", df_genome$genome)
+df_genome$genome <- gsub("submission.assembly", "", df_genome$genome)
+df_genome$genome <- gsub("final.assembly", "", df_genome$genome)
+df_genome$genome <- gsub("-", "", df_genome$genome)
+df_genome$genome <- gsub("_IMGtaxon_2693429877_annotated_assembly", "", df_genome$genome)
+df_genome$genome <- gsub("_genomic", "", df_genome$genome)
+df_genome$genome <- gsub("\\.", "", df_genome$genome)
+```

@@ -3,7 +3,7 @@ library(stringi)
 library(reshape2)
 library(readr)
 
-checkM_summary_clean_prevotella <- read_csv("dataflow/00-meta/checkM_summary_clean_prevotella.csv")
+checkM_summary_clean_prevotella <- read_csv("~/master/rumen/dataflow/00-meta/checkM_summary_clean_prevotella.csv")
 
 checkM_summary_clean_prevotella_rumen <- checkM_summary_clean_prevotella %>%
   filter(source == "rumen")
@@ -40,7 +40,6 @@ colnames(df_compiled)[1:13] <- c("qseqid", "sseqid", "pident", "sstart", "send",
 df_compiled$file <- gsub("submission.assembly", "", df_compiled$file)
 df_compiled$file <- gsub("final.assembly", "", df_compiled$file)
 df_compiled$file <- gsub("\\.1", "1", df_compiled$file)
-df_compiled$file <- gsub("\\.2", "2", df_compiled$file)
 df_compiled$file <- gsub("\\.0", "0", df_compiled$file)
 df_compiled$file <- gsub("_rename", "", df_compiled$file)
 df_compiled$file <- gsub("_genomic", "", df_compiled$file)
