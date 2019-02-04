@@ -72,8 +72,8 @@ df_rbh <- inner_join(df_forward, df_reverse) %>%
   rowwise() %>%
   mutate(samefile = ifelse(file1 == file2, "yes", "no")) %>%
   filter(samefile != "yes") %>%
-  select(-samefile) %>%
-  filter(mean_pi > 40)
+  select(-samefile) #%>%
+  #filter(mean_pi > 40)
 
 df_rbh$sseqid[is.na(df_rbh$sseqid)] <- "None"
 df_rbh$file1[is.na(df_rbh$file1)] <- "None"
