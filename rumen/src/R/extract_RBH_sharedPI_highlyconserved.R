@@ -3,7 +3,7 @@ library(stringi)
 library(reshape2)
 library(readr)
 
-checkM_summary_clean_prevotella <- read_csv("dataflow/00-meta/checkM_summary_clean_prevotella.csv")
+checkM_summary_clean_prevotella <- read_csv("~/master/rumen/dataflow/00-meta/checkM_summary_clean_prevotella.csv")
 
 checkM_summary_clean_prevotella_rumen <- checkM_summary_clean_prevotella %>%
   filter(source == "rumen")
@@ -40,7 +40,6 @@ colnames(df_compiled)[1:13] <- c("qseqid", "sseqid", "pident", "sstart", "send",
 df_compiled$file <- gsub("submission.assembly", "", df_compiled$file)
 df_compiled$file <- gsub("final.assembly", "", df_compiled$file)
 df_compiled$file <- gsub("\\.1", "1", df_compiled$file)
-df_compiled$file <- gsub("\\.2", "2", df_compiled$file)
 df_compiled$file <- gsub("\\.0", "0", df_compiled$file)
 df_compiled$file <- gsub("_rename", "", df_compiled$file)
 df_compiled$file <- gsub("_genomic", "", df_compiled$file)
@@ -74,7 +73,7 @@ df_rbh <- inner_join(df_forward, df_reverse) %>%
   mutate(samefile = ifelse(file1 == file2, "yes", "no")) %>%
   filter(samefile != "yes") %>%
   select(-samefile) %>%
-  filter(mean_pi > 90)
+  filter(mean_pi > 85)
 
 df_rbh$sseqid[is.na(df_rbh$sseqid)] <- "None"
 df_rbh$file1[is.na(df_rbh$file1)] <- "None"
@@ -88,8 +87,8 @@ df_pi_hom <- df_rbh %>%
   ungroup() %>%
   select(qseqid, sseqid, ngenomes, mean_pi_gene) %>%
   distinct() %>%
-  filter(ngenomes > 36) %>%
-  filter(mean_pi_gene > 97) %>%
+  filter(ngenomes > 40) %>%
+  filter(mean_pi_gene > 92.877) %>%
   select(sseqid, ngenomes) %>%
   distinct()
 

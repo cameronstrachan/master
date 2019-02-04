@@ -101,7 +101,9 @@ heatmap.plot <- ggplot(data = df_pi, aes(x = file2, y = file1)) +
         axis.title.x = element_blank(),
         axis.ticks.x = element_blank(),
         axis.ticks.y = element_blank()) +
-  scale_fill_gradient2() 
+  scale_fill_gradient2() +
+    scale_colour_manual(values = c("red","yellow", "green"))+
+    scale_fill_gradient(low = "yellow",  high = "darkgreen")
 
 
 tmp <- ggplot_gtable(ggplot_build(heatmap.plot))
@@ -109,9 +111,9 @@ leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
 legend <- tmp$grobs[[leg]]
 
 heatmap.plot <- heatmap.plot +
-  theme(legend.position = "none")
+  theme(legend.position = "none") 
 
-#heatmap.plot
+heatmap.plot
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7.5, fig.width=6}
