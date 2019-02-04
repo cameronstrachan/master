@@ -2,7 +2,9 @@
 title: "Untitled"
 author: "Cameron Strachan"
 date: '2019-01-07'
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
@@ -17,6 +19,7 @@ library(ape)
 library(adephylo)
 library(stringr)
 library(distory)
+library(gridExtra)
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5}
@@ -39,8 +42,14 @@ df_distance.matrix <- as.matrix(df_distance[, -c(1)])
 rownames(df_distance.matrix) <- df_distance$X
 df_distance.matrix.dendro <- as.dendrogram(hclust(d = dist(x = df_distance.matrix)))
 
-dendro.plot <- ggdendrogram(data = df_distance.matrix.dendro, rotate = TRUE) 
-dendro.plot 
+dendro.plot <- ggdendrogram(data = df_distance.matrix.dendro, rotate = FALSE) +
+  theme(
+        axis.text.y = element_blank(),
+        axis.text.x = element_text(size = 5),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.ticks.y = element_blank()) 
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
@@ -68,7 +77,7 @@ colnames(df_pi) <- c("file1", "file2", "mean_mean_pi")
 order <- order.dendrogram(df_distance.matrix.dendro)
 
 df_pi$file1 <- factor(df_pi$file1,
-                               levels = df_distance_scaled$X[order], 
+                               levels = df_distance_scaled$X[rev(order)], 
                                ordered = TRUE)
 
 df_pi$file2 <- factor(df_pi$file2,
@@ -77,18 +86,26 @@ df_pi$file2 <- factor(df_pi$file2,
 
 heatmap.plot <- ggplot(data = df_pi, aes(x = file2, y = file1)) +
   geom_tile(aes(fill = mean_mean_pi)) +
-      theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 20),  
-        axis.text.y = element_text(size = 20),
+      theme(axis.text.x = element_blank(),  
+        axis.text.y = element_blank(),
         axis.title.y = element_blank(),
-        axis.title.x = element_blank()) +
-  scale_fill_gradient2() +
-  theme(legend.position = "top")
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.ticks.y = element_blank()) +
+  scale_fill_gradient2() 
 
 
-heatmap.plot
+tmp <- ggplot_gtable(ggplot_build(heatmap.plot))
+leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+legend <- tmp$grobs[[leg]]
+
+heatmap.plot <- heatmap.plot +
+  theme(legend.position = "none")
+
+#heatmap.plot
 ```
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7.5, fig.width=6}
 df_counts <- read.delim("~/master/rumen/rumen_prevotella.txt", header=FALSE) %>%
   filter(V3 != 0) %>%
   filter(V1 != "__not_aligned") %>%
@@ -127,4 +144,24 @@ df_genome$genome <- gsub("-", "", df_genome$genome)
 df_genome$genome <- gsub("_IMGtaxon_2693429877_annotated_assembly", "", df_genome$genome)
 df_genome$genome <- gsub("_genomic", "", df_genome$genome)
 df_genome$genome <- gsub("\\.", "", df_genome$genome)
+
+df_genome$genome <- factor(df_genome$genome,
+                               levels = df_distance_scaled$X[rev(order)], 
+                               ordered = TRUE)
+
+bp.y <- ggplot(data = df_genome, aes(x = genome, y = total_counts)) + 
+    geom_bar(stat = "identity", aes(fill = total_counts)) + coord_flip() + theme_gray() +
+    theme(axis.title.x = element_blank(), axis.text.x = element_blank(),
+          axis.ticks.x = element_blank(), axis.text.y = element_text(size = 12), 
+          axis.title.y = element_blank(),
+          legend.position="none") +
+    scale_fill_distiller(name = "Value", palette = "Reds", direction = 1) 
+```
+
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7.5, fig.width=6}
+
+grid.arrange(dendro.plot, legend, heatmap.plot, bp.y, nrow = 2, ncol = 2, 
+             widths = c(30, 40), heights = c(40, 60))
 ```
