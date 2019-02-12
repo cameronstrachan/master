@@ -1,7 +1,4 @@
 ---
-title: "Untitled"
-author: "Cameron Strachan"
-date: '2019-01-07'
 output:
   pdf_document: default
   html_document: default
@@ -20,6 +17,8 @@ library(adephylo)
 library(stringr)
 library(distory)
 library(gridExtra)
+library(phangorn)
+library(phylogram)
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5}
@@ -36,11 +35,12 @@ df_distance$X <- gsub("\\.", "", df_distance$X)
 df_distance[is.na(df_distance)] <- 100
 
 df_distance_scaled <- df_distance
-df_distance[,2:43] <- scale(df_distance[,2:43])
+#df_distance[,2:43] <- scale(df_distance[,2:43])
 
 df_distance.matrix <- as.matrix(df_distance[, -c(1)])
 rownames(df_distance.matrix) <- df_distance$X
-df_distance.matrix.dendro <- as.dendrogram(hclust(d = dist(x = df_distance.matrix)))
+#df_distance.matrix.dendro <- as.dendrogram(hclust(d = dist(x = df_distance.matrix)))
+df_distance.matrix.dendro <- as.dendrogram(NJ(df_distance.matrix))
 
 dendro.plot <- ggdendrogram(data = df_distance.matrix.dendro, rotate = TRUE) +
   theme(
@@ -49,7 +49,9 @@ dendro.plot <- ggdendrogram(data = df_distance.matrix.dendro, rotate = TRUE) +
         axis.title.y = element_blank(),
         axis.title.x = element_blank(),
         axis.ticks.x = element_blank(),
-        axis.ticks.y = element_blank()) 
+        axis.ticks.y = element_blank())
+
+#dendro.plot
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
@@ -59,8 +61,6 @@ df_pi$X <- NULL
 
 df_pi$file1 <- gsub("_IMGtaxon_2693429877_annotated_assembly", "", df_pi$file1)
 df_pi$file2 <- gsub("_IMGtaxon_2693429877_annotated_assembly", "", df_pi$file2)
-
-
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
@@ -82,15 +82,15 @@ df_pi_shared_spread.matrix.dendro <- as.dendrogram(hclust(d = dist(x = df_pi_sha
 df_pi <- melt(df_pi_shared_spread_scaled, by = c("mean_mean_pi"))
 colnames(df_pi) <- c("file1", "file2", "mean_mean_pi")
 
-#order <- order.dendrogram(df_distance.matrix.dendro)
-order <- order.dendrogram(df_pi_shared_spread.matrix.dendro)
+order <- order.dendrogram(df_distance.matrix.dendro)
+#order <- order.dendrogram(df_pi_shared_spread.matrix.dendro)
 
 df_pi$file1 <- factor(df_pi$file1,
-                               levels = df_pi_shared_spread$file1[order],
+                               levels = df_distance_scaled$X[order],
                                ordered = TRUE)
 
 df_pi$file2 <- factor(df_pi$file2,
-                               levels = df_pi_shared_spread$file1[order],
+                               levels = df_distance_scaled$X[rev(order)],
                                ordered = TRUE)
 
 heatmap.plot <- ggplot(data = df_pi, aes(x = file2, y = file1)) +
@@ -112,12 +112,10 @@ legend <- tmp$grobs[[leg]]
 
 heatmap.plot <- heatmap.plot +
   theme(legend.position = "none") 
-
-heatmap.plot
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7.5, fig.width=6}
-df_counts <- read.delim("~/master/rumen/rumen_prevotella.txt", header=FALSE) %>%
+df_counts <- read.delim("~/master/rumen/dataflow/03-sam-counts/marre2017_rumen_prevotella.txt", header=FALSE) %>%
   filter(V3 != 0) %>%
   filter(V1 != "__not_aligned") %>%
   filter(V1 != "__too_low_aQual") %>%
@@ -137,16 +135,25 @@ df_gff3$ID <- gsub("ID=", "", df_gff3$ID)
 
 colnames(df_gff3)[1:4] <- c("contig", "start", "end", "direction")
 
-df <- inner_join(df_counts, df_gff3) %>%
+df_gff3 <- df_gff3 %>%
   rowwise() %>%
-  mutate(genome = stri_reverse(stri_split_fixed(stri_reverse(contig),"_",n = 2)[[1]][2]))
+  mutate(genome = stri_reverse(stri_split_fixed(stri_reverse(contig),"_",n = 2)[[1]][2])) %>%
+  group_by(genome) %>%
+  mutate(num_genes= length(unique(ID))) %>%
+  ungroup() 
+
+df <- inner_join(df_counts, df_gff3) 
 
 df_genome <- df %>%
   group_by(genome) %>%
   mutate(total_counts = sum(count)) %>%
   ungroup() %>%
-  select(genome, total_counts) %>%
-  distinct()
+  select(genome, total_counts, num_genes) %>%
+  distinct() %>%
+  mutate(sum = sum(total_counts)) %>%
+  rowwise() %>%
+  mutate(percent_mapped = (total_counts / sum)*100) %>%
+  ungroup()
 
 df_genome$genome <- gsub("_rename", "", df_genome$genome)
 df_genome$genome <- gsub("submission.assembly", "", df_genome$genome)
@@ -157,22 +164,26 @@ df_genome$genome <- gsub("_genomic", "", df_genome$genome)
 df_genome$genome <- gsub("\\.", "", df_genome$genome)
 
 df_genome$genome <- factor(df_genome$genome,
-                               levels = df_pi_shared_spread$file1[order], 
-                               ordered = TRUE)
+                           levels = df_distance_scaled$X[order], 
+                           ordered = TRUE)
 
-bp.y <- ggplot(data = df_genome, aes(x = genome, y = total_counts)) + 
-    geom_bar(stat = "identity", aes(fill = total_counts)) + coord_flip() + theme_gray() +
-    theme(axis.title.x = element_blank(), axis.text.x = element_blank(),
-          axis.ticks.x = element_blank(), axis.text.y = element_text(size = 10), 
-          axis.title.y = element_blank(),
-          legend.position="none") +
-    scale_fill_distiller(name = "Value", palette = "Reds", direction = 1) 
+bp.y <- ggplot(data = df_genome, aes(x = genome, y = percent_mapped)) + 
+  geom_bar(stat = "identity", aes(fill = percent_mapped)) + coord_flip() + theme_gray() +
+  theme(axis.title.x = element_blank(), axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(), axis.text.y = element_text(size = 10), 
+        axis.title.y = element_blank()) +
+  scale_fill_distiller(name = "Value", palette = "Reds", direction = 1) 
+
+tmp <- ggplot_gtable(ggplot_build(bp.y))
+leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+legend2 <- tmp$grobs[[leg]]
 ```
 
 
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7.5, fig.width=6}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=10, fig.width=15}
 
 grid.arrange(dendro.plot, legend, heatmap.plot, bp.y, nrow = 2, ncol = 2, 
              widths = c(30, 40), heights = c(40, 60))
+
 ```
