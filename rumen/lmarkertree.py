@@ -3,7 +3,7 @@ import os, sys
 import subprocess
 import pandas as pd
 
-custom libraries
+#custom libraries
 sys.path.insert(0, '/home/strachan/master/')
 from modules import seq_core_lin as sc
 from modules import seq_gen_lin as sg
