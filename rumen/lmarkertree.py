@@ -32,7 +32,7 @@ if runprodigal == 'y':
     # run prodigal
     file_obj.runprodigal()
 
-hsp70_df = pd.read_csv('dataflow/02-hmm/out.test', comment='#', header=None, sep="\s*")
+hsp70_df = pd.read_csv('dataflow/02-hmm/out.test', comment='#', header=None, delim_whitespace=True)
 hsp70_genes = hsp70_df.iloc[:,2].tolist()
 
 file_obj = sc.Fasta('rumen_prevotella.fasta', 'dataflow/01-prot/')
