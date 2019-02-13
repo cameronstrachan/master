@@ -32,18 +32,43 @@ if runprodigal == 'y':
     # run prodigal
     file_obj.runprodigal()
 
-hsp70_df = pd.read_csv('dataflow/02-hmm/out.test', comment='#', header=None, delim_whitespace=True)
-hsp70_genes = hsp70_df.iloc[:,2].tolist()
+runhmm = input("\n" + "Run hmmer for hsp70? (y or n):")
 
-file_obj = sc.Fasta('rumen_prevotella.fasta', 'dataflow/01-prot/')
-file_obj.setOutputName('rumen_prevotella_hsp70.fasta')
-file_obj.setOutputLocation('dataflow/01-prot/')
-file_obj.subsetfasta(seqlist = hsp70_genes, headertag='hsp70')
+if runhmm == 'y':
+    os.system("hmmpress dataflow/02-hmm/HSP70.hmm")
+    os.system("hmmscan --tblout dataflow/02-hmm/rumen_prevotella_hsp70.txt -T 200 --cpu 60 dataflow/02-hmm/HSP70.hmm dataflow/01-prot/rumen_prevotella.fasta")
 
-file_obj = sc.Fasta('rumen_prevotella_hsp70.fasta', 'dataflow/01-prot/')
-file_obj.setOutputName('rumen_prevotella_hsp70_500.fasta')
-file_obj.setOutputLocation('dataflow/01-prot/')
-file_obj.lengthcutoff(replaceheaders = False, length = 500)
+    hsp70_df = pd.read_csv('dataflow/02-hmm/rumen_prevotella_hsp70.txt', comment='#', header=None, delim_whitespace=True)
+    hsp70_genes = hsp70_df.iloc[:,2].tolist()
+
+    file_obj = sc.Fasta('rumen_prevotella.fasta', 'dataflow/01-prot/')
+    file_obj.setOutputName('rumen_prevotella_hsp70.fasta')
+    file_obj.setOutputLocation('dataflow/01-prot/')
+    file_obj.subsetfasta(seqlist = hsp70_genes, headertag='hsp70')
+
+    file_obj = sc.Fasta('rumen_prevotella_hsp70.fasta', 'dataflow/01-prot/')
+    file_obj.setOutputName('rumen_prevotella_hsp70_500.fasta')
+    file_obj.setOutputLocation('dataflow/01-prot/')
+    file_obj.lengthcutoff(replaceheaders = False, length = 500)
+
+runhmm = input("\n" + "Run hmmer for EF-tu? (y or n):")
+
+if runhmm == 'y':
+    os.system("hmmpress dataflow/02-hmm/GTP_EFTU.hmm")
+    os.system("hmmscan --tblout dataflow/02-hmm/rumen_prevotella_EFTU.txt -T 200 --cpu 60 dataflow/02-hmm/GTP_EFTU.hmm dataflow/01-prot/rumen_prevotella.fasta")
+
+    eftu_df = pd.read_csv('dataflow/02-hmm/rumen_prevotella_EFTU.txt', comment='#', header=None, delim_whitespace=True)
+    eftu_genes = eftu_df.iloc[:,2].tolist()
+
+    file_obj = sc.Fasta('rumen_prevotella.fasta', 'dataflow/01-prot/')
+    file_obj.setOutputName('rumen_prevotella_EFTU.fasta')
+    file_obj.setOutputLocation('dataflow/01-prot/')
+    file_obj.subsetfasta(seqlist = eftu_genes, headertag='EFTU')
+
+    #file_obj = sc.Fasta('rumen_prevotella_EFTU.fasta', 'dataflow/01-prot/')
+    #file_obj.setOutputName('rumen_prevotella_EFTU_500.fasta')
+    #file_obj.setOutputLocation('dataflow/01-prot/')
+    #file_obj.lengthcutoff(replaceheaders = False, length = 500)
 
 
 #hmmpress dataflow/02-hmm/HSP70.hmm
