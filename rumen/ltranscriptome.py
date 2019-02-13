@@ -17,15 +17,15 @@ downloaddata = input("\n" + "Download data from Marre et al 2017? (y or n):")
 if downloaddata == 'y':
     ss.srafastqdownlaod('SRX1585089', outputdir='dataflow/01-fastq/marre2017')
 
-downloaddata = input("\n" + "Download data from Tong et al 2018? (y or n):")
+downloaddata = input("\n" + "Download data from Sandri et al 2018? (y or n):")
 
 if downloaddata == 'y':
 
-    accession_nums = list(range(26, 59, 1))
-    accession_list = ['SRX41683' + str(x) for x in accession_nums]
+    accession_nums = list(range(49, 64, 1))
+    accession_list = ['SRR54207' + str(x) for x in accession_nums]
 
     for acc in accession_list:
-        ss.srafastqdownlaod(acc, outputdir='dataflow/01-fastq/tong2018')
+        ss.srafastqdownlaod(acc, outputdir='dataflow/01-fastq/sandri2018')
 
 runprodigal = input("\n" + "Run prodigal on all Prevotella genomes to generate gff3 files? (y or n):")
 
@@ -62,3 +62,6 @@ runbowtie = input("\n" + "Run BBMap on Mann 2018 data against rumen Prevotella? 
 if runbowtie == 'y':
     os.system("bbmap.sh threads=60 ambig=random in=dataflow/01-fastq/mann2018/11L2_ACAGTG.1.fastq.gz out=dataflow/03-sam/mann2018_rumen_prevotella.sam ref=dataflow/01-nucl/rumen_prevotella.fasta > dataflow/00-logs/mann2018_rumen_prevotella.log")
     os.system("htseq-count -s no -t CDS -i ID --additional-attr=ID dataflow/03-sam/mann2018_rumen_prevotella.sam dataflow/01-prot/genes/rumen_prevotella.gff3 > dataflow/03-sam-counts/mann2018_rumen_prevotella.txt")
+
+
+#-qtrim=lr
