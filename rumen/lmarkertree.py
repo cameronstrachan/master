@@ -3,7 +3,7 @@ import os, sys
 import subprocess
 import pandas as pd
 
-# custom libraries
+custom libraries
 sys.path.insert(0, '/home/strachan/master/')
 from modules import seq_core_lin as sc
 from modules import seq_gen_lin as sg
@@ -31,3 +31,15 @@ if runprodigal == 'y':
 
     # run prodigal
     file_obj.runprodigal()
+
+hsp70_df = pd.read_csv('dataflow/02-hmm/out.test', comment='#', header=None, sep="\s*")
+hsp70_genes = hsp70_df.iloc[:,2].tolist()
+
+file_obj = sc.Fasta('rumen_prevotella.fasta', 'dataflow/01-prot/')
+file_obj.setOutputName('rumen_prevotella_hsp70.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.subsetfasta(seqlist = hsp70_genes, headertag='hsp70')
+
+
+#hmmpress dataflow/02-hmm/HSP70.hmm
+#hmmscan --tblout dataflow/02-hmm/out.test -T 200 --cpu 60 dataflow/02-hmm/HSP70.hmm dataflow/01-prot/rumen_prevotella.fasta
