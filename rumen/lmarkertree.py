@@ -40,6 +40,11 @@ file_obj.setOutputName('rumen_prevotella_hsp70.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
 file_obj.subsetfasta(seqlist = hsp70_genes, headertag='hsp70')
 
+file_obj = sc.Fasta('rumen_prevotella_hsp70.fasta', 'dataflow/01-prot/')
+file_obj.setOutputName('rumen_prevotella_hsp70_500.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.lengthcutoff(replaceheaders = False, length = 500)
+
 
 #hmmpress dataflow/02-hmm/HSP70.hmm
 #hmmscan --tblout dataflow/02-hmm/out.test -T 200 --cpu 60 dataflow/02-hmm/HSP70.hmm dataflow/01-prot/rumen_prevotella.fasta
