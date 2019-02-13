@@ -65,10 +65,10 @@ if runhmm == 'y':
     file_obj.setOutputLocation('dataflow/01-prot/')
     file_obj.subsetfasta(seqlist = eftu_genes, headertag='EFTU')
 
-    #file_obj = sc.Fasta('rumen_prevotella_EFTU.fasta', 'dataflow/01-prot/')
-    #file_obj.setOutputName('rumen_prevotella_EFTU_500.fasta')
-    #file_obj.setOutputLocation('dataflow/01-prot/')
-    #file_obj.lengthcutoff(replaceheaders = False, length = 500)
+    file_obj = sc.Fasta('rumen_prevotella_EFTU.fasta', 'dataflow/01-prot/')
+    file_obj.setOutputName('rumen_prevotella_EFTU_500.fasta')
+    file_obj.setOutputLocation('dataflow/01-prot/')
+    file_obj.lengthcutoff(replaceheaders = False, length = 500)
 
 
 #hmmpress dataflow/02-hmm/HSP70.hmm
