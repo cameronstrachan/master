@@ -73,7 +73,7 @@ if runhmm == 'y':
 runhmm = input("\n" + "Run hmmer for EF-ts? (y or n):")
 
 if runhmm == 'y':
-    os.system("hmmpress dataflow/02-hmm/EF_TS.hmm.hmm")
+    os.system("hmmpress dataflow/02-hmm/EF_TS.hmm")
     os.system("hmmscan --tblout dataflow/02-hmm/rumen_prevotella_EFTS.txt -T 200 --cpu 60 dataflow/02-hmm/GTP_EFTS.hmm dataflow/01-prot/rumen_prevotella.fasta")
 
     eftu_df = pd.read_csv('dataflow/02-hmm/rumen_prevotella_EFTS.txt', comment='#', header=None, delim_whitespace=True)
