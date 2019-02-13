@@ -17,6 +17,16 @@ downloaddata = input("\n" + "Download data from Marre et al 2017? (y or n):")
 if downloaddata == 'y':
     ss.srafastqdownlaod('SRX1585089', outputdir='dataflow/01-fastq/marre2017')
 
+downloaddata = input("\n" + "Download data from Tong et al 2018? (y or n):")
+
+if downloaddata == 'y':
+
+    accession_nums = list(range(26, 59, 1))
+    accession_list = ['SRX41683' + str(x) for x in accession_nums]
+
+    for acc in accession_list:
+        ss.srafastqdownlaod(acc, outputdir='dataflow/01-fastq/tong2018')
+
 runprodigal = input("\n" + "Run prodigal on all Prevotella genomes to generate gff3 files? (y or n):")
 
 if runprodigal == 'y':
