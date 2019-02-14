@@ -27,6 +27,16 @@ if downloaddata == 'y':
     for acc in accession_list:
         ss.srafastqdownlaod(acc, outputdir='dataflow/01-fastq/sandri2018')
 
+downloaddata = input("\n" + "Download data from Sandri et al 2018 try2? (y or n):")
+
+if downloaddata == 'y':
+
+    accession_nums = list(range(53, 68, 1))
+    accession_list = ['SRX27122' + str(x) for x in accession_nums]
+
+    for acc in accession_list:
+        ss.srafastqdownlaod(acc, outputdir='dataflow/01-fastq/sandri2018')
+
 runprodigal = input("\n" + "Run prodigal on all Prevotella genomes to generate gff3 files? (y or n):")
 
 if runprodigal == 'y':
