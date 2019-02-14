@@ -89,24 +89,6 @@ if runhmm == 'y':
     file_obj.setOutputLocation('dataflow/01-prot/')
     file_obj.lengthcutoff(replaceheaders = False, length = 400)
 
-#runhmm = input("\n" + "Run hmmer for gyrase B? (y or n):")
-
-if runhmm == 'y':
-    os.system("hmmpress dataflow/02-hmm/DNA_gyraseB.hmm")
-    os.system("hmmscan --tblout dataflow/02-hmm/rumen_prevotella_gyraseB.txt -T 200 --cpu 60 dataflow/02-hmm/DNA_gyraseB.hmm dataflow/01-prot/rumen_prevotella.fasta")
-
-    eftu_df = pd.read_csv('dataflow/02-hmm/rumen_prevotella_gyraseB.txt', comment='#', header=None, delim_whitespace=True)
-    eftu_genes = eftu_df.iloc[:,2].tolist()
-
-    file_obj = sc.Fasta('rumen_prevotella.fasta', 'dataflow/01-prot/')
-    file_obj.setOutputName('rumen_prevotella_gyraseB.fasta')
-    file_obj.setOutputLocation('dataflow/01-prot/')
-    file_obj.subsetfasta(seqlist = eftu_genes, headertag='none')
-
-    file_obj = sc.Fasta('rumen_prevotella_gyraseB.fasta', 'dataflow/01-prot/')
-    file_obj.setOutputName('rumen_prevotella_gyraseB_700.fasta')
-    file_obj.setOutputLocation('dataflow/01-prot/')
-    file_obj.lengthcutoff(replaceheaders = False, length = 700)
 
 #runhmm = input("\n" + "Run hmmer for mreB? (y or n):")
 
@@ -123,9 +105,9 @@ if runhmm == 'y':
     file_obj.subsetfasta(seqlist = eftu_genes, headertag='none')
 
     file_obj = sc.Fasta('rumen_prevotella_MreB.fasta', 'dataflow/01-prot/')
-    file_obj.setOutputName('rumen_prevotella_MreB_250.fasta')
+    file_obj.setOutputName('rumen_prevotella_MreB_300.fasta')
     file_obj.setOutputLocation('dataflow/01-prot/')
-    file_obj.lengthcutoff(replaceheaders = False, length = 250)
+    file_obj.lengthcutoff(replaceheaders = False, length = 300)
 
 #MreB_Mbl.hmm
 #DNA_gyraseB.hmm
