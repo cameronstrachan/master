@@ -1,0 +1,176 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(stringi)
+library(ggplot2)
+library(ggdendro)
+library(reshape2)
+library(grid)
+library(ape)
+library(adephylo)
+library(stringr)
+library(distory)
+library(gridExtra)
+library(phangorn)
+library(phylogram)
+library(cowplot)
+library(dendextend)
+library("grid")
+library("ggplotify")
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7.5}
+# this tree was made my selecting a subset of the genomes that had a well aligned hsp70, that was between 500 and 700. I then retrimed the alignment. 
+
+# read in tree
+tree <- read.tree("~/master/rumen/dataflow/03-trees/hsp70_mreB_eftu_dnaA_trimmed_tree.newick") 
+
+# rename tip labels so they are the same as the genome labels
+#tree$tip.label <- gsub("_[^_]+$", "", tree$tip.label)
+#tree$tip.label <- gsub("_[^_]+$", "", tree$tip.label)
+#tree$tip.label <- gsub("_[^_]+$", "", tree$tip.label)
+tree$tip.label <- gsub("submission.assembly", "", tree$tip.label)
+tree$tip.label <- gsub("final.assembly", "", tree$tip.label)
+tree$tip.label <- gsub("-", "", tree$tip.label)
+tree$tip.label <- gsub("_IMGtaxon_2693429877_annotated_assembly", "", tree$tip.label)
+tree$tip.label <- gsub("_genomic", "", tree$tip.label)
+tree$tip.label <- gsub("\\.", "", tree$tip.label)
+
+plot.phylo(tree,  align.tip.label = TRUE)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+# read in shared AAI
+df_pi <- read.csv("~/master/rumen/dataflow/04-analysis-tables/selected_genomes_sharedPI.csv")
+df_pi$X <- NULL
+
+# rename genomes
+df_pi$file1 <- gsub("_IMGtaxon_2693429877_annotated_assembly", "", df_pi$file1)
+df_pi$file2 <- gsub("_IMGtaxon_2693429877_annotated_assembly", "", df_pi$file2)
+
+# spread the data frame to fill in the NAs with 100
+df_pi_spread <- df_pi %>%
+  spread(file2, mean_mean_pi)
+
+df_pi_spread [is.na(df_pi_spread )] <- 100
+
+# re melt the dataframe
+df_pi_filled <- melt(df_pi_spread, by = c("mean_mean_pi"))
+colnames(df_pi_filled) <- c("file1", "file2", "mean_mean_pi")
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7.5, fig.width=6}
+# get the ordering from the dendogram 
+order <- tree$tip.label
+
+# remove genomes without a good hsp70 from the alignments, length, trimming 
+df_pi_filled <- df_pi_filled[df_pi_filled$file1 %in% order,]
+df_pi_filled <- df_pi_filled[df_pi_filled$file2 %in% order,]
+
+# order the x and y axis
+df_pi_filled$file1 <- factor(df_pi_filled$file1,
+                               levels = order,
+                               ordered = TRUE)
+
+df_pi_filled$file2 <- factor(df_pi_filled$file2,
+                               levels = order,
+                               ordered = TRUE)
+
+# plot a heatmap, with the legend seperate
+heatmap.plot <- ggplot(data = df_pi_filled, aes(x = file2, y = file1)) +
+  geom_tile(aes(fill = mean_mean_pi)) +
+      theme(axis.text.x = element_blank(),  
+        #axis.text.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.ticks.y = element_blank()) +
+  scale_fill_gradient2() +
+    scale_colour_manual(values = c("red","yellow", "green"))+
+    scale_fill_gradient(low = "yellow",  high = "darkgreen")
+
+
+tmp <- ggplot_gtable(ggplot_build(heatmap.plot))
+leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+legend <- tmp$grobs[[leg]]
+
+heatmap.plot <- heatmap.plot +
+  theme(legend.position = "none") 
+
+#heatmap.plot
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7.5, fig.width=6}
+df_counts <- read.delim("~/master/rumen/dataflow/03-sam-counts/marre2017_rumen_prevotella.txt", header=FALSE) %>%
+  filter(V3 != 0) %>%
+  filter(V1 != "__not_aligned") %>%
+  filter(V1 != "__too_low_aQual") %>%
+  filter(V1 != "__no_feature") %>%
+  filter(V1 != "__ambiguous") %>%
+  select(-V2)
+
+colnames(df_counts) <- c("ID", "count")
+
+df_counts$ID <- as.character(df_counts$ID)
+
+df_gff3 <- read.delim("~/master/rumen/dataflow/01-prot/genes/rumen_prevotella.gff3", header=FALSE, comment.char="#") %>%
+  separate(V9, c("ID"), sep = ";") %>%
+  select(-V2, -V3, -V6, -V8)
+
+df_gff3$ID <- gsub("ID=", "", df_gff3$ID)
+
+colnames(df_gff3)[1:4] <- c("contig", "start", "end", "direction")
+
+df_gff3 <- df_gff3 %>%
+  rowwise() %>%
+  mutate(genome = stri_reverse(stri_split_fixed(stri_reverse(contig),"_",n = 2)[[1]][2])) %>%
+  group_by(genome) %>%
+  mutate(num_genes= length(unique(ID))) %>%
+  ungroup() 
+
+df <- inner_join(df_counts, df_gff3) 
+
+df_genome <- df %>%
+  group_by(genome) %>%
+  mutate(total_counts = sum(count)) %>%
+  ungroup() %>%
+  select(genome, total_counts, num_genes) %>%
+  distinct() %>%
+  mutate(sum = sum(total_counts)) %>%
+  rowwise() %>%
+  mutate(percent_mapped = (total_counts / sum)*100) %>%
+  ungroup()
+
+df_genome$genome <- gsub("_rename", "", df_genome$genome)
+df_genome$genome <- gsub("submission.assembly", "", df_genome$genome)
+df_genome$genome <- gsub("final.assembly", "", df_genome$genome)
+df_genome$genome <- gsub("-", "", df_genome$genome)
+df_genome$genome <- gsub("_IMGtaxon_2693429877_annotated_assembly", "", df_genome$genome)
+df_genome$genome <- gsub("_genomic", "", df_genome$genome)
+df_genome$genome <- gsub("\\.", "", df_genome$genome)
+
+df_genome <- df_genome[df_genome$genome %in% order,]
+
+df_genome$genome <- factor(df_genome$genome,
+                           levels = order, 
+                           ordered = TRUE)
+
+bp.y <- ggplot(data = df_genome, aes(x = genome, y = percent_mapped)) + 
+  geom_bar(stat = "identity", aes(fill = percent_mapped)) + coord_flip() + theme_gray() +
+  theme(axis.title.x = element_blank(), axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(), axis.text.y = element_blank(), 
+        axis.title.y = element_blank()) +
+  scale_fill_distiller(name = "Value", palette = "Reds", direction = 1) 
+```
+
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=10, fig.width=15}
+plot_grid(heatmap.plot, bp.y, align = 'h')
+```
