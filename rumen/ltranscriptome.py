@@ -72,7 +72,7 @@ if runbowtie == 'y':
 runbowtie = input("\n" + "Run BBMap on sandri 2018 data (4 fastqs) against rumen Prevotella? (y or n):")
 
 if runbowtie == 'y':
-    os.system("bbmap.sh threads=60 ambig=random in=dataflow/01-fastq/mann2018/4forwardread.fasta.gz out=dataflow/03-sam/sandri2018_rumen_prevotella.sam ref=dataflow/01-nucl/rumen_prevotella.fasta > dataflow/00-logs/sandri2018_rumen_prevotella.log")
+    os.system("bbmap.sh threads=60 ambig=random in=dataflow/01-fastq/mann2018/SRR5420749_pass_1.fastq.gz dataflow/01-fastq/mann2018/SRR5420750_pass_1.fastq.gz dataflow/01-fastq/mann2018/SRR5420751_pass_1.fastq.gz dataflow/01-fastq/mann2018/SRR5420752_pass_1.fastq.gz out=dataflow/03-sam/sandri2018_rumen_prevotella.sam ref=dataflow/01-nucl/rumen_prevotella.fasta > dataflow/00-logs/sandri2018_rumen_prevotella.log")
     os.system("htseq-count -s no -t CDS -i ID --additional-attr=ID dataflow/03-sam/sandri2018_rumen_prevotella.sam dataflow/01-prot/genes/rumen_prevotella.gff3 > dataflow/03-sam-counts/sandri2018_rumen_prevotella.txt")
 
 
