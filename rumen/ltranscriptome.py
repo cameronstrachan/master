@@ -70,7 +70,7 @@ if runprodigal == 'y':
 
     file_obj.runprodigal()
 
-runbowtie == 'y'
+runbowtie = 'y'
 
 #runbowtie = input("\n" + "Run BBMap on Marre 2017 data against rumen Prevotella? (y or n):")
 
