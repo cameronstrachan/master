@@ -4,13 +4,20 @@ library(reshape2)
 library(readr)
 
 checkM_summary_clean_prevotella <- read_csv("~/master/rumen/dataflow/00-meta/checkM_summary_clean_prevotella.csv")
+seshadri2018_prevotella <- read_csv("~/master/rumen/dataflow/00-meta/seshadri2018_prevotella.csv")
 
 checkM_summary_clean_prevotella_rumen <- checkM_summary_clean_prevotella %>%
   filter(source == "rumen")
 
+
+
 blastdir <- 'dataflow/02-blast/'
 
-genomes <- unique(checkM_summary_clean_prevotella_rumen$BinID)
+genomes1 <- unique(checkM_summary_clean_prevotella_rumen$BinID)
+genomes2 <- unique(seshadri2018_prevotella$file)
+
+genomes <- unique(c(genomes1, genomes2))
+
 files <- c()
 
 for (genome1 in genomes){
