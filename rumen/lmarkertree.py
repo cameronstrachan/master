@@ -35,8 +35,8 @@ from modules import seq_scrape as ss
 runhmm = input("\n" + "Run hmmer for hsp70? (y or n):")
 
 if runhmm == 'y':
-    #os.system("hmmpress dataflow/02-hmm/HSP70.hmm")
-    #os.system("hmmscan --tblout dataflow/02-hmm/rumen_prevotella_hsp70.txt -T 200 --cpu 60 dataflow/02-hmm/HSP70.hmm dataflow/01-prot/rumen_prevotella.fasta")
+    os.system("hmmpress dataflow/02-hmm/HSP70.hmm")
+    os.system("hmmscan --tblout dataflow/02-hmm/rumen_prevotella_hsp70.txt -T 200 --cpu 60 dataflow/02-hmm/HSP70.hmm dataflow/01-prot/rumen_prevotella.fasta")
 
     hsp70_df = pd.read_csv('dataflow/02-hmm/rumen_prevotella_hsp70.txt', comment='#', header=None, delim_whitespace=True)
     hsp70_genes = hsp70_df.iloc[:,2].tolist()
@@ -54,8 +54,8 @@ if runhmm == 'y':
 #runhmm = input("\n" + "Run hmmer for EF-tu? (y or n):")
 
 if runhmm == 'y':
-    #os.system("hmmpress dataflow/02-hmm/GTP_EFTU.hmm")
-    #os.system("hmmscan --tblout dataflow/02-hmm/rumen_prevotella_EFTU.txt -T 200 --cpu 60 dataflow/02-hmm/GTP_EFTU.hmm dataflow/01-prot/rumen_prevotella.fasta")
+    os.system("hmmpress dataflow/02-hmm/GTP_EFTU.hmm")
+    os.system("hmmscan --tblout dataflow/02-hmm/rumen_prevotella_EFTU.txt -T 200 --cpu 60 dataflow/02-hmm/GTP_EFTU.hmm dataflow/01-prot/rumen_prevotella.fasta")
 
     eftu_df = pd.read_csv('dataflow/02-hmm/rumen_prevotella_EFTU.txt', comment='#', header=None, delim_whitespace=True)
     eftu_genes = eftu_df.iloc[:,2].tolist()
@@ -73,8 +73,8 @@ if runhmm == 'y':
 #runhmm = input("\n" + "Run hmmer for DnaA? (y or n):")
 
 if runhmm == 'y':
-    #os.system("hmmpress dataflow/02-hmm/Bac_DnaA.hmm")
-    #os.system("hmmscan --tblout dataflow/02-hmm/rumen_prevotella_DnaA.txt -T 200 --cpu 60 dataflow/02-hmm/Bac_DnaA.hmm dataflow/01-prot/rumen_prevotella.fasta")
+    os.system("hmmpress dataflow/02-hmm/Bac_DnaA.hmm")
+    os.system("hmmscan --tblout dataflow/02-hmm/rumen_prevotella_DnaA.txt -T 200 --cpu 60 dataflow/02-hmm/Bac_DnaA.hmm dataflow/01-prot/rumen_prevotella.fasta")
 
     eftu_df = pd.read_csv('dataflow/02-hmm/rumen_prevotella_DnaA.txt', comment='#', header=None, delim_whitespace=True)
     eftu_genes = eftu_df.iloc[:,2].tolist()
@@ -93,8 +93,8 @@ if runhmm == 'y':
 #runhmm = input("\n" + "Run hmmer for mreB? (y or n):")
 
 if runhmm == 'y':
-    #os.system("hmmpress dataflow/02-hmm/MreB_Mbl.hmm")
-    #os.system("hmmscan --tblout dataflow/02-hmm/rumen_prevotella_MreB.txt -T 200 --cpu 60 dataflow/02-hmm/MreB_Mbl.hmm dataflow/01-prot/rumen_prevotella.fasta")
+    os.system("hmmpress dataflow/02-hmm/MreB_Mbl.hmm")
+    os.system("hmmscan --tblout dataflow/02-hmm/rumen_prevotella_MreB.txt -T 200 --cpu 60 dataflow/02-hmm/MreB_Mbl.hmm dataflow/01-prot/rumen_prevotella.fasta")
 
     eftu_df = pd.read_csv('dataflow/02-hmm/rumen_prevotella_MreB.txt', comment='#', header=None, delim_whitespace=True)
     eftu_genes = eftu_df.iloc[:,2].tolist()
