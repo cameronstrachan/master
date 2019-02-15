@@ -19,9 +19,9 @@ if runrename == 'y':
 	genomes = genomes_df['BinID'].tolist()
 	files = [item + ".fasta" for item in genomes]
 
-    genomes_df2 = pd.read_csv('dataflow/00-meta/seshadri2018_prevotella.csv', low_memory=False)
-    genomes = genomes_df2['file'].tolist()
-    files2 = [item + "_rename.fasta" for item in genomes]
+	genomes_df2 = pd.read_csv('dataflow/00-meta/seshadri2018_prevotella.csv', low_memory=False)
+	genomes = genomes_df2['file'].tolist()
+	files2 = [item + "_rename.fasta" for item in genomes]
 
 	files = list(set(files1 + files2))
 
@@ -45,9 +45,9 @@ if runprodigal == 'y':
 	genomes = genomes_df['BinID'].tolist()
 	files = [item + "_rename.fasta" for item in genomes]
 
-    genomes_df2 = pd.read_csv('dataflow/00-meta/seshadri2018_prevotella.csv', low_memory=False)
-    genomes = genomes_df2['file'].tolist()
-    files2 = [item + "_rename.fasta" for item in genomes]
+	genomes_df2 = pd.read_csv('dataflow/00-meta/seshadri2018_prevotella.csv', low_memory=False)
+	genomes = genomes_df2['file'].tolist()
+	files2 = [item + "_rename.fasta" for item in genomes]
 
 	files = list(set(files1 + files2))
 
