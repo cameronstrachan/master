@@ -70,7 +70,13 @@ if runprodigal == 'y':
 
 	genomes_df = pd.read_csv('dataflow/00-meta/checkM_summary_clean_prevotella.csv', low_memory=False)
 	genomes = genomes_df['BinID'].tolist()
-	files = [item + "_rename.fasta" for item in genomes]
+	files1 = [item + "_rename.fasta" for item in genomes]
+
+	genomes_df2 = pd.read_csv('dataflow/00-meta/seshadri2018_prevotella.csv', low_memory=False)
+	genomes = genomes_df2['file'].tolist()
+	files2 = [item + "_rename.fasta" for item in genomes]
+
+	files = list(set(files1 + files2))
 
 	for file in files:
 		# contruct object
@@ -91,7 +97,13 @@ if runallvallblast == 'y':
 	genomes_df = pd.read_csv('dataflow/00-meta/checkM_summary_clean_prevotella.csv', low_memory=False)
 	genomes_df_rumen = genomes_df[genomes_df['source'] == 'rumen']
 	genomes = genomes_df_rumen['BinID'].tolist()
-	files = [item + "_rename.fasta" for item in genomes]
+	files1 = [item + "_rename.fasta" for item in genomes]
+
+	genomes_df2 = pd.read_csv('dataflow/00-meta/seshadri2018_prevotella.csv', low_memory=False)
+	genomes = genomes_df2['file'].tolist()
+	files2 = [item + "_rename.fasta" for item in genomes]
+
+	files = list(set(files1 + files2))
 
 	# these are the directories we are working with
 	indir = 'dataflow/01-prot/'
