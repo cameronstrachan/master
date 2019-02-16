@@ -37,8 +37,8 @@ if runrename == 'y':
 			file_obj.headerrename()
 
 
-#runprodigal = input("\n" + "Run prodigal on all Prevotella genomes? (y or n):")
-runprodigal = 'y'
+runprodigal = input("\n" + "Run prodigal on all Prevotella genomes? (y or n):")
+#runprodigal = 'y'
 
 if runprodigal == 'y':
 
@@ -65,7 +65,7 @@ if runprodigal == 'y':
 		file_obj.runprodigal()
 
 
-#runprodigal = input("\n" + "Run prodigal on all Prevotella genomes to generate nucl files? (y or n):")
+runprodigal = input("\n" + "Run prodigal on all Prevotella genomes to generate nucl files? (y or n):")
 
 if runprodigal == 'y':
 
@@ -91,8 +91,8 @@ if runprodigal == 'y':
 		# run prodigal
 		file_obj.runprodigal(type='nucl')
 
-#runallvallblast = input("\n" + "Run all against all blast with just rumen Prevoltella genomes? (y or n):")
-runallvallblast = 'y'
+runallvallblast = input("\n" + "Run all against all blast with just rumen Prevoltella genomes? (y or n):")
+#runallvallblast = 'y'
 
 if runallvallblast == 'y':
 
@@ -131,8 +131,8 @@ if runallvallblast == 'y':
 			file_obj.setOutputName(outputfilename)
 			file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=1, evalue=1e-3, num_threads = 60)
 
-#makeheadermap = input("\n" + "Make a header map? (y or n):")
-makeheadermap = 'y'
+makeheadermap = input("\n" + "Make a header map? (y or n):")
+#makeheadermap = 'y'
 
 if makeheadermap == 'y':
 
@@ -154,8 +154,8 @@ if makeheadermap == 'y':
 		df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
 
 
-#runcommand = input("\n" + "Make shared blast tables? (y or n):")
-runcommand = 'y'
+runcommand = input("\n" + "Make shared blast tables? (y or n):")
+#runcommand = 'y'
 
 if runcommand == 'y':
 	os.system("Rscript src/R/extract_RBH_sharedPI.R")
