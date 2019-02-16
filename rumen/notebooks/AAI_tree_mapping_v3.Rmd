@@ -29,7 +29,7 @@ library("ggplotify")
 # this tree was made my selecting a subset of the genomes that had a well aligned hsp70, that was between 500 and 700. I then retrimed the alignment. 
 
 # read in tree
-tree <- read.tree("~/master/rumen/dataflow/03-trees/hsp70_mreB_eftu_dnaA_trimmed_tree_phyML_45genomes.newick") 
+tree <- read.tree("~/master/rumen/dataflow/03-trees/hsp70_mreB_eftu_dnaA_trimmed_tree_phyML_43genomes.newick") 
 
 # couple labels to fix
 
@@ -46,7 +46,7 @@ tree$tip.label <- gsub("_IMGtaxon_2693429877_annotated", "", tree$tip.label)
 tree$tip.label <- gsub("_genomic", "", tree$tip.label)
 tree$tip.label <- gsub("\\.", "", tree$tip.label)
 
-op <- par(mar = c(0,0,0,10))
+op <- par(mar = c(10,0,0,10))
 plot.phylo(tree,  align.tip.label = TRUE)# plot the square root function
 par(op)
 recordedplot <- recordPlot()
@@ -58,10 +58,8 @@ df_pi <- read.csv("~/master/rumen/dataflow/04-analysis-tables/selected_genomes_s
 df_pi$X <- NULL
 
 # rename genomes
-df_pi$file1 <- gsub("_IMGtaxon_2693429877_annotated_assembly", "", df_pi$file1)
-df_pi$file2 <- gsub("_IMGtaxon_2693429877_annotated_assembly", "", df_pi$file2)
-df_pi$file1 <- gsub(".assembly", "", df_pi$file1)
-df_pi$file2 <- gsub(".assembly", "", df_pi$file2)
+df_pi$file1 <- gsub("_IMGtaxon_2693429877_annotated", "", df_pi$file1)
+df_pi$file2 <- gsub("_IMGtaxon_2693429877_annotated", "", df_pi$file2)
 
 # spread the data frame to fill in the NAs with 100
 df_pi_spread <- df_pi %>%
@@ -254,7 +252,7 @@ mapped_reads.plot
 
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=10, fig.width=12}
-plot_grid(recordedplot, heatmap.plot, mapped_reads.plot, align = 'h', ncol = 3, rel_widths = c(2,2,1))
+plot_grid(recordedplot, heatmap.plot, mapped_reads.plot, align = 'h', ncol = 3, rel_widths = c(1,1,1))
 ```
 
 
