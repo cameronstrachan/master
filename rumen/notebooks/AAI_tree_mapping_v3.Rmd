@@ -29,20 +29,24 @@ library("ggplotify")
 # this tree was made my selecting a subset of the genomes that had a well aligned hsp70, that was between 500 and 700. I then retrimed the alignment. 
 
 # read in tree
-tree <- read.tree("~/master/rumen/dataflow/03-trees/hsp70_mreB_eftu_dnaA_trimmed_tree.newick") 
+tree <- read.tree("~/master/rumen/dataflow/03-trees/hsp70_mreB_eftu_dnaA_trimmed_tree_phyML_45genomes.newick") 
+
+# couple labels to fix
 
 # rename tip labels so they are the same as the genome labels
 #tree$tip.label <- gsub("_[^_]+$", "", tree$tip.label)
 #tree$tip.label <- gsub("_[^_]+$", "", tree$tip.label)
 #tree$tip.label <- gsub("_[^_]+$", "", tree$tip.label)
+tree$tip.label <- gsub("RMG", "RMG_", tree$tip.label)
 tree$tip.label <- gsub("submission.assembly", "", tree$tip.label)
 tree$tip.label <- gsub("final.assembly", "", tree$tip.label)
+tree$tip.label <- gsub(".assembly", "", tree$tip.label)
 tree$tip.label <- gsub("-", "", tree$tip.label)
-tree$tip.label <- gsub("_IMGtaxon_2693429877_annotated_assembly", "", tree$tip.label)
+tree$tip.label <- gsub("_IMGtaxon_2693429877_annotated", "", tree$tip.label)
 tree$tip.label <- gsub("_genomic", "", tree$tip.label)
 tree$tip.label <- gsub("\\.", "", tree$tip.label)
 
-op <- par(mar = c(0.2,0,0.65,0))
+op <- par(mar = c(0,0,0,10))
 plot.phylo(tree,  align.tip.label = TRUE)# plot the square root function
 par(op)
 recordedplot <- recordPlot()
@@ -56,6 +60,8 @@ df_pi$X <- NULL
 # rename genomes
 df_pi$file1 <- gsub("_IMGtaxon_2693429877_annotated_assembly", "", df_pi$file1)
 df_pi$file2 <- gsub("_IMGtaxon_2693429877_annotated_assembly", "", df_pi$file2)
+df_pi$file1 <- gsub(".assembly", "", df_pi$file1)
+df_pi$file2 <- gsub(".assembly", "", df_pi$file2)
 
 # spread the data frame to fill in the NAs with 100
 df_pi_spread <- df_pi %>%
@@ -91,7 +97,7 @@ df_pi_filled$dataset <- "AAI"
 heatmap.plot <- ggplot(data = df_pi_filled, aes(x = file2, y = file1)) +
   geom_tile(aes(fill = mean_mean_pi)) +
       theme(axis.text.x = element_blank(),  
-        axis.text.y = element_blank(),
+        #axis.text.y = element_blank(),
         axis.title.y = element_blank(),
         axis.title.x = element_blank(),
         axis.ticks.x = element_blank(),
@@ -109,9 +115,13 @@ legend <- tmp$grobs[[leg]]
 
 heatmap.plot <- heatmap.plot +
   theme(legend.position = "none") 
+
+heatmap.plot
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7.5, fig.width=6}
+# not aligned is the regions between features (not in my gff3), need to think about this when calclating abundance. 
+
 df_gff3 <- read.delim("~/master/rumen/dataflow/01-prot/genes/rumen_prevotella.gff3", header=FALSE, comment.char="#") %>%
   separate(V9, c("ID"), sep = ";") %>%
   select(-V2, -V3, -V6, -V8)
@@ -185,8 +195,9 @@ for (f in files){
   df_genome$genome <- gsub("_rename", "", df_genome$genome)
   df_genome$genome <- gsub("submission.assembly", "", df_genome$genome)
   df_genome$genome <- gsub("final.assembly", "", df_genome$genome)
+  df_genome$genome <- gsub(".assembly", "", df_genome$genome)
   df_genome$genome <- gsub("-", "", df_genome$genome)
-  df_genome$genome <- gsub("_IMGtaxon_2693429877_annotated_assembly", "", df_genome$genome)
+  df_genome$genome <- gsub("_IMGtaxon_2693429877_annotated", "", df_genome$genome)
   df_genome$genome <- gsub("_genomic", "", df_genome$genome)
   df_genome$genome <- gsub("\\.", "", df_genome$genome)
 
@@ -224,21 +235,26 @@ df_genome_same$dataset <- "Mapping"
 
 mapped_reads.plot <- ggplot(data = df_genome_same, aes(x = genome, y = metagenome)) + 
   geom_bar(stat = "identity", aes(fill = metatranscriptome)) + coord_flip() + theme_gray() +
-  theme(axis.title.x = element_blank(), axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(), axis.text.y = element_blank(), 
-        axis.title.y = element_blank(), axis.ticks.y = element_blank()) +
+  theme(axis.title.x = element_blank(), 
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(), 
+        #axis.text.y = element_blank(), 
+        axis.title.y = element_blank(), 
+        axis.ticks.y = element_blank()) +
   scale_fill_distiller(name = "Value", palette = "Reds", direction = 1)  +
   facet_wrap(. ~ dataset, scales = "free") + 
   scale_fill_distiller(type = "seq", palette = 1, direction = 1, aesthetics = "fill") + scale_fill_gradient(low = "#132B43", high = "#56B1F7",
   space = "Lab", na.value = "grey50", guide = "colourbar",
   aesthetics = "fill") +
     theme(plot.margin = unit(c(0.2,0.2,0.5,0.2), "cm"))
+
+mapped_reads.plot
 ```
 
 
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=10, fig.width=12}
-plot_grid(recordedplot, heatmap.plot, mapped_reads.plot, align = 'h', ncol = 3)
+plot_grid(recordedplot, heatmap.plot, mapped_reads.plot, align = 'h', ncol = 3, rel_widths = c(2,2,1))
 ```
 
 
