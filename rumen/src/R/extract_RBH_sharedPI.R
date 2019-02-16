@@ -46,12 +46,13 @@ colnames(df_compiled)[1:13] <- c("qseqid", "sseqid", "pident", "sstart", "send",
 
 df_compiled$file <- gsub("submission.assembly", "", df_compiled$file)
 df_compiled$file <- gsub("final.assembly", "", df_compiled$file)
+df_compiled$file <- gsub(".assembly", "", df_compiled$file)
 df_compiled$file <- gsub("\\.1", "1", df_compiled$file)
 df_compiled$file <- gsub("\\.0", "0", df_compiled$file)
 df_compiled$file <- gsub("_rename", "", df_compiled$file)
 df_compiled$file <- gsub("_genomic", "", df_compiled$file)
 df_compiled$file <- gsub("-", "", df_compiled$file)
-df_compiled$file <- gsub("_IMG-taxon_2693429877_annotated_assembly", "", df_compiled$file)
+df_compiled$file <- gsub("_IMG-taxon_2693429877_annotated", "", df_compiled$file)
 df_compiled$file <- gsub("\\.txt", "", df_compiled$file)
 
 df_compiled <- df_compiled %>%
