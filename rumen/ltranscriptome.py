@@ -65,10 +65,10 @@ if runprodigal == 'y':
     # run prodigal
     file_obj.runprodigal(gff3 = True)
 
-    file_obj.setOutputName(file)
-    file_obj.setOutputLocation('dataflow/01-prot/')
+    #file_obj.setOutputName(file)
+    #file_obj.setOutputLocation('dataflow/01-prot/')
 
-    file_obj.runprodigal()
+    #file_obj.runprodigal()
 
 runbowtie = 'y'
 
