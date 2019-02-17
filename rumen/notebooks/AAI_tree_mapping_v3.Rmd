@@ -31,7 +31,23 @@ library("ggplotify")
 # read in tree
 tree <- read.tree("~/master/rumen/dataflow/03-trees/hsp70_mreB_eftu_dnaA_trimmed_tree_phyML_43genomes.newick") 
 
-# couple labels to fix
+group1 <- as.data.frame(tree$tip.label[22:43])
+colnames(group1) <- "file"
+group1$group <- "G1"
+group2 <- as.data.frame(tree$tip.label[1:20])
+colnames(group2) <- "file"
+group2$group <- "G2"
+
+groupings <- rbind(group1, group2)
+
+groupings$file <- as.character(groupings$file)
+
+groupings <- groupings %>%
+  arrange(file)
+
+groupings_genomes <- groupings[1:30,]
+
+write.csv(groupings_genomes, "~/master/rumen/dataflow/00-meta/prevotella_groupings.csv")
 
 # rename tip labels so they are the same as the genome labels
 #tree$tip.label <- gsub("_[^_]+$", "", tree$tip.label)
@@ -212,7 +228,7 @@ for (f in files){
   
 }
 
-df_genome <- bind_rows(df_list) %>%
+df_genome <- bind_rows(df_list) #%>%
   filter(dataset != "mann2018_control") %>%
   filter(dataset != "mann2018_SARA")
 
@@ -254,5 +270,41 @@ mapped_reads.plot
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=10, fig.width=12}
 plot_grid(recordedplot, heatmap.plot, mapped_reads.plot, align = 'h', ncol = 3, rel_widths = c(1,1,1))
 ```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+df_file2species <- read.csv("~/master/rumen/dataflow/00-meta/seshadri2018_prevotella.csv")
+
+df_groupings <- read.csv("~/master/rumen/dataflow/00-meta/prevotella_groupings.csv")
+df_groupings$X <- NULL
+
+df_meta <- read.csv("~/master/rumen/dataflow/00-meta/seshadri2018_files_fasta.csv")
+df_meta$X <- NULL
+df_meta$X.1 <- NULL
+
+df_meta$family.order <- gsub(" ", "", df_meta$family.order)
+df_meta$file <- gsub(".fasta", "", df_meta$file)
+
+df_meta <- df_meta %>%
+  filter(family.order == "Prevotellaceae") %>%
+  select(genome, strain.id,  strain.name, file, collection, genus.species, country, origin)
+
+df_meta <- inner_join(df_meta, df_groupings) %>%
+  inner_join(df_file2species)
+
+df_pathways <- read.csv("~/master/rumen/dataflow/00-meta/Seshradi2015_pathways2.csv") 
+df_pathways$Family.Order <- gsub(" ", "", df_pathways$Family.Order)
+
+df_pathways <- df_pathways %>%
+  filter(Family.Order == "Prevotellaceae") %>%
+  distinct() %>%
+  rename(strain.id = Strain)
+
+df_pathways$strain.id <- gsub(" ", "", df_pathways$strain.id)
+df_meta$strain.id <- gsub(" ", "", df_meta$strain.id)
+
+df_meta <- inner_join(df_pathways, df_meta) %>%
+  select(-C_Cellulose, -C_Lactate, -C_Succinate, -C_Lipids, -P_Butyrate, -P_Formate, -P_Lactate)
+```
+
 
 
