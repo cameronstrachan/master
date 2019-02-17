@@ -70,30 +70,30 @@ if runprodigal == 'y':
 
     #file_obj.runprodigal()
 
-runbowtie = 'y'
+#runbowtie = 'y'
 
-#runbowtie = input("\n" + "Run BBMap on Marre 2017 data against rumen Prevotella? (y or n):")
+runbowtie = input("\n" + "Run BBMap on Marre 2017 data against rumen Prevotella? (y or n):")
 
 if runbowtie == 'y':
     os.system("bbmap.sh threads=60 ambig=random in=dataflow/01-fastq/marre2017/SRX1585089_pass_1.fastq out=dataflow/03-sam/marre2017_rumen_prevotella.sam ref=dataflow/01-nucl/rumen_prevotella.fasta > dataflow/00-logs/marre2017_rumen_prevotella.log")
     os.system("htseq-count -s no -t CDS -i ID --additional-attr=ID dataflow/03-sam/marre2017_rumen_prevotella.sam dataflow/01-prot/genes/rumen_prevotella.gff3 > dataflow/03-sam-counts/marre2017_rumen_prevotella.txt")
 
-#runbowtie = input("\n" + "Run BBMap on Mann 2018 data against rumen Prevotella for single non-SARA sample? (y or n):")
+runbowtie = input("\n" + "Run BBMap on Mann 2018 data against rumen Prevotella for single non-SARA sample? (y or n):")
 
 if runbowtie == 'y':
     os.system("bbmap.sh threads=60 ambig=random in=dataflow/01-fastq/mann2018/11L2_ACAGTG.1.fastq.gz out=dataflow/03-sam/mann2018_rumen_prevotella_nonSARA1.sam ref=dataflow/01-nucl/rumen_prevotella.fasta > dataflow/00-logs/mann2018_rumen_prevotella.log")
     os.system("htseq-count -s no -t CDS -i ID --additional-attr=ID dataflow/03-sam/mann2018_rumen_prevotella_nonSARA1.sam dataflow/01-prot/genes/rumen_prevotella.gff3 > dataflow/03-sam-counts/mann2018_rumen_prevotella_nonSARA1.txt")
 
-#runbowtie = input("\n" + "Run BBMap on Mann 2018 data against rumen Prevotella for single SARA sample? (y or n):")
+runbowtie = input("\n" + "Run BBMap on Mann 2018 data against rumen Prevotella for single SARA sample? (y or n):")
 
 if runbowtie == 'y':
     os.system("bbmap.sh threads=60 ambig=random in=dataflow/01-fastq/mann2018/13L2_AFTTCC.1.fastq.gz out=dataflow/03-sam/mann2018_rumen_prevotella_SARA1.sam ref=dataflow/01-nucl/rumen_prevotella.fasta > dataflow/00-logs/mann2018_rumen_prevotella.log")
     os.system("htseq-count -s no -t CDS -i ID --additional-attr=ID dataflow/03-sam/mann2018_rumen_prevotella_SARA1.sam dataflow/01-prot/genes/rumen_prevotella.gff3 > dataflow/03-sam-counts/mann2018_rumen_prevotella_SARA1.txt")
 
-#runbowtie = input("\n" + "Run BBMap on sandri 2018 data (4 fastqs) against rumen Prevotella? (y or n):")
+runbowtie = input("\n" + "Run BBMap on sandri 2018 data (4 fastqs) against rumen Prevotella? (y or n):")
 
 if runbowtie == 'y':
-    os.system("bbmap.sh threads=60 ambig=random in=dataflow/01-fastq/sandri2018/4forwardread.fasta.gz out=dataflow/03-sam/sandri2018_rumen_prevotella.sam ref=dataflow/01-nucl/rumen_prevotella.fasta > dataflow/00-logs/sandri2018_rumen_prevotella.log")
+    os.system("bbmap.sh threads=60 ambig=random in=dataflow/01-fastq/sandri2018/sandri2018forward.fastq.gz out=dataflow/03-sam/sandri2018_rumen_prevotella.sam ref=dataflow/01-nucl/rumen_prevotella.fasta > dataflow/00-logs/sandri2018_rumen_prevotella.log")
     os.system("htseq-count -s no -t CDS -i ID --additional-attr=ID dataflow/03-sam/sandri2018_rumen_prevotella.sam dataflow/01-prot/genes/rumen_prevotella.gff3 > dataflow/03-sam-counts/sandri2018_rumen_prevotella.txt")
 
 

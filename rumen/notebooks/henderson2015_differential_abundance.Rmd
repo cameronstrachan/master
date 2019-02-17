@@ -127,7 +127,7 @@ for(seq in unique(df_plot$asv_id)){
   
 plot(ggplot(df_plot_fam, aes(x=lacto_signal, y=count_norm)) +
             geom_jitter(aes(colour = lacto_signal), size = 5) +
-  facet_wrap(family ~ ., scales="free") +
+  facet_wrap(family ~ asv_id, scales="free") +
   theme() +
           theme(strip.text = element_text(size = 20),
           plot.title = element_text(size = 25),
