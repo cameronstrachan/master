@@ -6,6 +6,7 @@ import pandas as pd
 sys.path.insert(0, '/home/strachan/master/')
 from modules import seq_core_lin as sc
 from modules import seq_gen_lin as sg
+from modules import seq_scrape as ss
 
 ### RUN QIIME HENDERSON 2015
 ### Environment: source activate qiime2-2018.11
