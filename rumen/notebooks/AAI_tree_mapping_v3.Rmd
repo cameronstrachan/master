@@ -62,7 +62,7 @@ tree$tip.label <- gsub("_IMGtaxon_2693429877_annotated", "", tree$tip.label)
 tree$tip.label <- gsub("_genomic", "", tree$tip.label)
 tree$tip.label <- gsub("\\.", "", tree$tip.label)
 
-op <- par(mar = c(10,0,0,10))
+op <- par(mar = c(0.3,0,0.7,0))
 plot.phylo(tree,  align.tip.label = TRUE)# plot the square root function
 par(op)
 recordedplot <- recordPlot()
@@ -111,7 +111,7 @@ df_pi_filled$dataset <- "AAI"
 heatmap.plot <- ggplot(data = df_pi_filled, aes(x = file2, y = file1)) +
   geom_tile(aes(fill = mean_mean_pi)) +
       theme(axis.text.x = element_blank(),  
-        #axis.text.y = element_blank(),
+        axis.text.y = element_blank(),
         axis.title.y = element_blank(),
         axis.title.x = element_blank(),
         axis.ticks.x = element_blank(),
@@ -120,7 +120,8 @@ heatmap.plot <- ggplot(data = df_pi_filled, aes(x = file2, y = file1)) +
     scale_colour_manual(values = c("red","yellow", "green"))+
     scale_fill_gradient(low = "yellow",  high = "darkgreen") +
   facet_wrap(. ~ dataset) + scale_fill_distiller(type = "div", palette = 1, direction = 1,
-  aesthetics = "fill") 
+  aesthetics = "fill") +
+    theme(plot.margin = unit(c(0.7,0.2,0.7,0.2), "cm"))
 
 
 tmp <- ggplot_gtable(ggplot_build(heatmap.plot))
@@ -133,7 +134,7 @@ heatmap.plot <- heatmap.plot +
 heatmap.plot
 ```
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7.5, fig.width=6}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=15, fig.width=15}
 # not aligned is the regions between features (not in my gff3), need to think about this when calclating abundance. 
 
 df_gff3 <- read.delim("~/master/rumen/dataflow/01-prot/genes/rumen_prevotella.gff3", header=FALSE, comment.char="#") %>%
@@ -228,10 +229,26 @@ for (f in files){
   
 }
 
-df_genome <- bind_rows(df_list) #%>%
-  filter(dataset != "mann2018_control") %>%
-  filter(dataset != "mann2018_SARA")
+df_genome <- bind_rows(df_list) 
 
+
+
+mapped_reads.plot <- ggplot(data = df_genome, aes(x = genome, y = percent_mapped)) + 
+  geom_bar(stat = "identity", aes(fill = percent_mapped)) + coord_flip() + theme_gray() +
+  theme(axis.title.x = element_blank(), 
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(), 
+        #axis.text.y = element_blank(), 
+        axis.title.y = element_blank(), 
+        axis.ticks.y = element_blank()) +
+  scale_fill_distiller(name = "Value", palette = "Reds", direction = 1)  +
+  facet_wrap(. ~ dataset, scales = "free") + 
+  scale_fill_distiller(type = "seq", palette = 1, direction = 1, aesthetics = "fill") + scale_fill_gradient(low = "#132B43", high = "#56B1F7",
+  space = "Lab", na.value = "grey50", guide = "colourbar",
+  aesthetics = "fill") +
+    theme(plot.margin = unit(c(0.2,0.2,0.5,0.2), "cm"))
+
+mapped_reads.plot
 
 df_genome_gen <- df_genome %>%
   filter(dataset == "sandri2018") %>%
@@ -252,7 +269,7 @@ mapped_reads.plot <- ggplot(data = df_genome_same, aes(x = genome, y = metagenom
   theme(axis.title.x = element_blank(), 
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(), 
-        #axis.text.y = element_blank(), 
+        axis.text.y = element_blank(), 
         axis.title.y = element_blank(), 
         axis.ticks.y = element_blank()) +
   scale_fill_distiller(name = "Value", palette = "Reds", direction = 1)  +
@@ -260,15 +277,15 @@ mapped_reads.plot <- ggplot(data = df_genome_same, aes(x = genome, y = metagenom
   scale_fill_distiller(type = "seq", palette = 1, direction = 1, aesthetics = "fill") + scale_fill_gradient(low = "#132B43", high = "#56B1F7",
   space = "Lab", na.value = "grey50", guide = "colourbar",
   aesthetics = "fill") +
-    theme(plot.margin = unit(c(0.2,0.2,0.5,0.2), "cm"))
+    theme(plot.margin = unit(c(0.4,0.2,0.7,0.2), "cm"))
 
-mapped_reads.plot
+#mapped_reads.plot
 ```
 
 
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=10, fig.width=12}
-plot_grid(recordedplot, heatmap.plot, mapped_reads.plot, align = 'h', ncol = 3, rel_widths = c(1,1,1))
+plot_grid(recordedplot, heatmap.plot, mapped_reads.plot, align = 'h', ncol = 3)
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
