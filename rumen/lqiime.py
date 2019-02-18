@@ -12,16 +12,6 @@ from modules import seq_gen_lin as sg
 ### RUN QIIME HENDERSON 2015
 ### Environment: source activate qiime2-2018.11
 
-downloaddata = input("\n" + "Download data from Sun et al 2019? (y or n):")
-
-if downloaddata == 'y':
-
-    accession_nums = list(range(326, 659, 1))
-    accession_list = ['SRX4168' + str(x) for x in accession_nums]
-
-    for acc in accession_list:
-        ss.srafastqdownlaod(acc, outputdir='dataflow/01-fastq/sun2019')
-
 runqiime = input("\n" + "Run Qiime on data from Henderson et al. 2015 (switch env qiime2-2018.11)? (y or n):")
 
 if runqiime == 'y':
