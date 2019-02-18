@@ -22,7 +22,7 @@ file_obj.setOutputName('prevotella_groupings_genomes_V3_V4_db')
 file_obj.setOutputLocation('dataflow/02-blast-db/')
 file_obj.runmakeblastdb()
 
-file_obj = sc.Fasta('sun2019-8_428-100.fasta', 'dataflow/01-nucl/')
+file_obj = sc.Fasta('sun2019-8_428-100.fasta', 'dataflow/03-asv-seqs/')
 file_obj.setOutputName('sun2019-8_428_prevotella_groupings_genomes_V3_V4_mapped')
 file_obj.setOutputLocation('dataflow/03-blast-tables/')
 file_obj.runblast(max_target_seqs=1, db='prevotella_groupings_genomes_V3_V4_db')
