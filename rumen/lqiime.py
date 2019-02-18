@@ -17,7 +17,7 @@ runqiime = input("\n" + "Run Qiime on data from Sun et al. 2019 (switch env qiim
 if runqiime == 'y':
 	sg.runqiime(inputfolderloc='dataflow/01-fastq/sun2019', paired=False, numcores=60)
 
-qiime = input("\n" + "Run Qiime on data from Henderson et al. 2015? (switch env qiime2-2018.11)(y or n):")
+runqiime = input("\n" + "Run Qiime on data from Henderson et al. 2015? (switch env qiime2-2018.11)(y or n):")
 
 if runqiime == 'y':
 	sg.runqiime(inputfolderloc='dataflow/01-fastq/henderson2015', paired=False, numcores=60)
