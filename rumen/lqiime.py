@@ -6,7 +6,8 @@ import pandas as pd
 sys.path.insert(0, '/home/strachan/master/')
 from modules import seq_core_lin as sc
 from modules import seq_gen_lin as sg
-from modules import seq_scrape as ss
+
+### Environment: source activate anaconda to dowload data
 
 ### RUN QIIME HENDERSON 2015
 ### Environment: source activate qiime2-2018.11
@@ -21,12 +22,12 @@ if downloaddata == 'y':
     for acc in accession_list:
         ss.srafastqdownlaod(acc, outputdir='dataflow/01-fastq/sun2019')
 
-runqiime = input("\n" + "Run Qiime on data from Henderson et al. 2015? (y or n):")
+runqiime = input("\n" + "Run Qiime on data from Henderson et al. 2015 (switch env qiime2-2018.11)? (y or n):")
 
 if runqiime == 'y':
 	sg.runqiime(inputfolderloc='dataflow/01-fastq/sun2019', paired=False, numcores=60)
 
-qiime = input("\n" + "Run Qiime on data from Henderson et al. 2015? (y or n):")
+qiime = input("\n" + "Run Qiime on data from Henderson et al. 2015? (switch env qiime2-2018.11)(y or n):")
 
 if runqiime == 'y':
 	sg.runqiime(inputfolderloc='dataflow/01-fastq/henderson2015', paired=False, numcores=60)
