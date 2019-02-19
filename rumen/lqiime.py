@@ -20,7 +20,7 @@ if runqiime == 'y':
 runqiime = input("\n" + "Run Qiime on data from Henderson et al. 2015? (switch env qiime2-2018.11)(y or n):")
 
 if runqiime == 'y':
-	sg.runqiime(inputfolderloc='dataflow/01-fastq/henderson2015', paired=False, numcores=60)
+	sg.runqiime(inputfolderloc='dataflow/01-fastq/henderson2015/trimmed', paired=False, numcores=60)
 
 
 #for f in *.fastq.gz; do mv -- "$f" "${f//_pass/_1_L001_R1_001}"; done
