@@ -15,12 +15,13 @@ from modules import seq_gen_lin as sg
 runqiime = input("\n" + "Run Qiime on data from Sun et al. 2019 (switch env qiime2-2018.11)? (y or n):")
 
 if runqiime == 'y':
-	sg.runqiime(inputfolderloc='dataflow/01-fastq/sun2019', paired=False, numcores=60)
+	sg.runqiime(inputfolderloc='dataflow/01-fastq/sun2019/trimmed', paired=True, numcores=60)
 
 runqiime = input("\n" + "Run Qiime on data from Henderson et al. 2015? (switch env qiime2-2018.11)(y or n):")
 
 if runqiime == 'y':
 	sg.runqiime(inputfolderloc='dataflow/01-fastq/henderson2015/trimmed', paired=False, numcores=60)
 
+#for henderson trimming, remove this primer CCGCGGCKGCTGGCAC
 
 #for f in *.fastq.gz; do mv -- "$f" "${f//_pass/_1_L001_R1_001}"; done
