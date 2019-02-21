@@ -127,6 +127,24 @@ _McCann_
 - Measure DM before and after.
 - Lactobacillus also seemed to associate more with barley than corn. Apparently the starch in barley is more accessible (less tightly associate with the protein matrix)
 - Apparently the proteolytic activity of Prevotella is well documented.
-- Prevotella were also predominant digesters of grains. 
+- Prevotella were also predominant digesters of grains.
 
  [paper link](https://www.frontiersin.org/articles/10.3389/fmicb.2018.00718/full)
+
+ ### Metagenomic analysis of the rumen microbial community following inhibition of methane formation by a halogenated methane analog
+
+_Denman_
+
+- There are some H2 consuming Prevotella, which increase with use of a methannogenesis inhibitor
+- The majority of propanoate pathways were in Prevotella and Selenomonas
+- Fumarate and malate have been used by several investigators to stimulate succinate/propionate producers in the rumen which compete with methanogens for H2.
+- Many of these organisms use the succinate–propionate (randomizing) pathway as a major route for propionate synthesis in the rumen (Baldwin et al., 1963)
+- The relative amounts of propionate and acetate formed from fumarate will impact on the H2 pool available to methanogens. Stoichiometrically, propionate production from fumarate consumes one pair of reducing equivalents while acetate production from fumarate releases two pairs of reducing equivalents. Therefore, the production of acetate from fumarate is counterproductive when the objective is to reduce H2 available for methane production.
+- Apparently (checking Hungate collection paper), there is a lot of chemotaxis in the rumen.
+
+[paper link](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4602129/)
+
+### Comparative Genome Analysis of Prevotella ruminicola and Prevotella bryantii: Insights into Their Environmental Niche
+
+- Compared ruminicola 23 and bryantii B14, both rumen isolates falling into the different groups I identified.
+- Noted that 

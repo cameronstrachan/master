@@ -1,0 +1,51 @@
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rumen/dataflow/04-analysis-tables/selected_genomes_sharedPI.csv /Users/cameronstrachan/master/rumen/dataflow/04-analysis-tables/
+rsync -e ssh -avzP --append /Volumes/CamExternal/master/rumen/dataflow/01-fastq/mann2018/* strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rumen/dataflow/mann2018/
+
+
+
+bbmap.sh threads=60 ambig=random in=dataflow/01-fastq/marre2017/SRX1585089_pass_1.fastq out=dataflow/03-sam/marre2017_rumen_prevotella.sam ref=dataflow/01-nucl/rumen_prevotella.fasta > dataflow/00-logs/marre2017_rumen_prevotella.log
+htseq-count -s no -t CDS -i ID --additional-attr=ID dataflow/03-sam/marre2017_rumen_prevotella.sam dataflow/01-prot/genes/rumen_prevotella.gff3 > dataflow/03-sam-counts/marre2017_rumen_prevotella.txt
+
+bbmap.sh threads=60 ambig=random in=dataflow/01-fastq/mann2018/11L2_ACAGTG.1.fastq.gz out=dataflow/03-sam/mann2018_rumen_prevotella.sam ref=dataflow/01-nucl/rumen_prevotella.fasta > dataflow/00-logs/mann2018_rumen_prevotella.log
+htseq-count -s no -t CDS -i ID --additional-attr=ID dataflow/03-sam/mann2018_rumen_prevotella.sam dataflow/01-prot/genes/rumen_prevotella.gff3 > dataflow/03-sam-counts/mann2018_rumen_prevotella.txt
+
+
+
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rumen/dataflow/03-sam-counts/mann2018_rumen_prevotella_nonSARA1.txt /Users/cameronstrachan/master/rumen/dataflow/03-sam-counts/
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rumen/dataflow/03-sam-counts/marre2017_rumen_prevotella.txt /Users/cameronstrachan/master/rumen/dataflow/03-sam-counts/
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rumen/dataflow/03-sam-counts/mann2018_rumen_prevotella_SARA1.txt /Users/cameronstrachan/master/rumen/dataflow/03-sam-counts/
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rumen/dataflow/03-sam-counts/sandri2018_rumen_prevotella.txt /Users/cameronstrachan/master/rumen/dataflow/03-sam-counts/
+
+J5uZUfVJHx
+
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rumen/dataflow/04-analysis-tables/selected_genomes_sharedPI.csv /Users/cameronstrachan/master/rumen/dataflow/04-analysis-tables/
+
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rumen/dataflow/01-prot/sandri2018_rumen_prevotella.txt /Users/cameronstrachan/master/rumen/dataflow/01-prot/
+
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rumen/dataflow/01-prot/rumen_prevotella_hsp70_500.fasta /Users/cameronstrachan/master/rumen/dataflow/01-prot/
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rumen/dataflow/01-prot/rumen_prevotella_EFTU_500.fasta /Users/cameronstrachan/master/rumen/dataflow/01-prot/
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rumen/dataflow/01-prot/rumen_prevotella_DnaA.fasta /Users/cameronstrachan/master/rumen/dataflow/01-prot/
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rumen/dataflow/01-prot/rumen_prevotella_MreB.fasta /Users/cameronstrachan/master/rumen/dataflow/01-prot/
+
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rumen/dataflow/00-meta/
+
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rumen/dataflow/03-blast-table/lacto_signal_differential_all_seqs_tags_grouped_prevotella_mapped /Users/cameronstrachan/master/rumen/dataflow/03-blast-table/
+
+J5uZUfVJHx
+
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rumen/dataflow/01-nucl/prevotella_groupings_genomes_V3_V4.fasta /Users/cameronstrachan/master/rumen/dataflow/01-nucl/
+
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rumen/dataflow/01-prot/genes/rumen_prevotella.gff3 /Users/cameronstrachan/master/rumen/dataflow/01-prot/genes/
+
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rumen/dataflow/03-blast-tables/sun2019-8_428_prevotella_groupings_genomes_V3_V4_mapped /Users/cameronstrachan/master/rumen/dataflow/03-blast-tables/
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rumen/dataflow/03-asv-table/sun2019-8_428-100.txt /Users/cameronstrachan/master/rumen/dataflow/03-asv-table/
+
+
+~/master/rumen/dataflow/01-prot/genes/rumen_prevotella.gff3
+
+rm dataflow/01-nucl/rumen_prevotella.fasta
+rm dataflow/01-prot/genes/rumen_prevotella.fasta
+rm dataflow/01-prot/genes/rumen_prevotella.gff3
+
+
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rumen/dataflow/02-qiime/demux-single-end.qzv /Users/cameronstrachan/master/rumen/dataflow/02-qiime/demux-single-end.qzv
