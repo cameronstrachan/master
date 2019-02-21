@@ -5,12 +5,13 @@ import os, sys
 import subprocess
 #from Bio import SeqIO
 #from Bio.Blast import NCBIWWW
+from Bio.Seq import Seq
 from operator import itemgetter
 import argparse
 
 
-sys.path.insert(0, '/home/strachan/master')
-from modules.ctb_functions import *
+#sys.path.insert(0, '/home/strachan/master')
+#from modules.ctb_functions import *
 
 ### Notes
 ### When I have species and annotation in a header, I should come up with
@@ -210,6 +211,8 @@ class Fasta(File):
                 if headertag == 'number':
                     outputfile.write(">" + k + '_' + str(j) + '\n')
                     j = j + 1
+                elif headertag == 'none':
+                    outputfile.write(">" + k + '\n')
                 else:
                     outputfile.write(">" + k + '_' + headertag + '\n')
 
@@ -281,6 +284,42 @@ class Fasta(File):
 
         else:
             print("\n" + 'File exists: ' + self.outputlocation + self.outputname)
+
+    def extractORFs_gff3(self, gff3_table_loc = 'dataflow/00-meta/rumen_prevotella.csv'):
+
+        fastadic = self.fasta2dict()
+        outputfile = self.openwritefile()
+        orfs_df = pd.read_csv(gff3_table_loc, low_memory=False)
+        orfdic = dict()
+
+        for index, row in orfs_df.iterrows():
+            start = int(int(row['start']) - 1)
+            end = int(row['end'])
+            contig = row['contig']
+            direction = row['direction']
+            orf = row['ID']
+
+            for k,v in fastadic.items():
+                header = k.rstrip()
+                if header == contig:
+                    seq = v.rstrip()
+                    seq_new = seq[start: end]
+                    if direction == '-':
+                        seq_new_obj = Seq(seq_new)
+                        seq_new_rc = str(seq_new_obj.reverse_complement())
+                        orfdic.update({orf: seq_new_rc})
+                    else:
+                        orfdic.update({orf: seq_new})
+
+        for k,v in orfdic.items():
+            header = k.rstrip()
+            seq = v.rstrip()
+            outputfile.write(">" + k + '\n')
+            outputfile.write(v + '\n')
+
+        #seq.complement()
+        #seq.transcribe()
+        #seq.translate()
 
     def runprodigal(self, type = 'prot', gff3 = False):
         '''

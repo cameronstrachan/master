@@ -1,0 +1,473 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(printr)
+library(ggplot2)
+library(cowplot)
+library(reshape2)
+library(knitr)
+library(pwr)
+library("ggpubr")
+library(gmodels)
+library(ggpubr)
+```
+
+## methods
+
+**Sequence denoising and clustering.** All sequence data was demultiplexed before barcode and primer removal. For the paired end WSC data, the forward reads were then trimmed to between 8 and 270 bp and the reverse reads to between 8 and 220 bp resulting in a median Phred quality score of over 35 across all reads. For the non-paired end Wu et al. data, the data was trimmed to between 157 and 432 to obtain a Phred quality score of over 35 across all reads. All quality trimmed reads were subsequently denoised using DADA2 and clustered to 97% identify using VSEARCH. Denoised reads are referred to as amplicon sequence variants (ASVs).
+
+
+**Figure 1.** A representative ASV from each 97% cluster was taxonomically classified using the Ribosomal Database Project (RDP) database and RDP baysian classifier. The counts for each phylum level classification were relativized to the total reads per sample. This is plotted as the percentage of sample with sample IDs along the X axis. In the case of the WSC data (Wetzels et al.), only the wolves are shown. For the Wu et al. data, the data from 4 dogs is also shown (IDs beginning with CD). Here it is clear at the phylum level that there is large differences at the phylum level between the fecal samples from different studies (WSC vs. Wu et al.), as well as between the skin and fecal sample from the same study (WSC). These differences are large than those observed between dogs and wolfs, suggesting that location (both geographical and sample site) is more important in structuring the microbiome compared the differences between wolf and dog. 
+
+**Figure 2.** The data set was limited to wolfs from the WSC and an alignment of the representative sequences for each cluster was generated using MUSCLE in order to calculate a maximum likelihood phylogenetic tree with phyML. Next, the weighted UniFrac distance was calculated pairwise between each sample. Only comparing samples of the same type (feces or skin), the mean UniFrac distance was compared for samples coming from the same pack to those from different packs (a). The same was then done for comparing samples from the same or different animal category (wolf or dog)(b). For each comparison, a Wilcoxon signed-rank test was performed. In the bar plots below, a single star (\*) indicates a p-value lower than 0.05, while three stars (\*\*\*) indicates a p-value lower than 0.001. 
+
+**Figure 3.**  Again using the WSC data for just the wolves, the data was further limited to faces samples and wolf packs of 3 animals for comparison between packs. Using DESeq (differential abundance analysis using a negative bimodal model), ASVs with significant differential abundance in one of the packs were selected (adjusted p-value < 0.05) . A genus is shown here if it contained multiple significant ASVs. Here, it is clear  that there are certain groups at a high-taxonomic level (genus) which a differential abundant in a single pack. 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_meta <- read.csv("~/master/wolf/dataflow/00-meta/wetzels2018_wu2018_fastq.csv")
+colnames(df_meta)[1] <- "sra_accession"
+df_meta$sra_accession <- as.character(df_meta$sra_accession)
+df_meta$type <- as.character(df_meta$type)
+df_meta$study <- as.character(df_meta$study)
+df_meta$region <- as.character(df_meta$region)
+df_meta$sample <- as.character(df_meta$sample)
+df_meta$pack <- as.character(df_meta$pack)
+df_meta$sibling <- as.character(df_meta$sibling)
+df_meta$replicate <- as.character(df_meta$replicate)
+df_meta$sample_id <- as.character(df_meta$sample_id)
+
+df_classification  <- read.csv("~/master/wolf/dataflow/03-asv-taxonomy/wetzels2018_wu2018-97-rdp.csv")
+df_classification[,1] <- NULL
+
+
+df <- read.delim("~/master/wolf/dataflow/03-asv-table-merge/wetzels2018_wu2018-97.txt", skip = 1, header = TRUE)
+df$clustering <- 97
+
+colnames(df)[1] <- 'asv_id'
+
+col_to_gather <- names(df)[!(startsWith(names(df), "SRR") |  startsWith(names(df), "W"))]
+df <- melt(df, id = col_to_gather)
+colnames(df)[3:4] <- c('sra_accession', 'count')
+
+df$asv_id <- as.character(df$asv_id)
+
+
+df_normalization <- df %>%
+  filter(clustering == 97) %>%
+  group_by(sra_accession) %>%
+  mutate(total_16s_reads = sum(count)) %>%
+  ungroup() %>%
+  select(sra_accession, total_16s_reads) %>%
+  ungroup() %>%
+  distinct() 
+
+df_classification <- df_classification %>%
+  select(asv_id, phylum, family, genus)
+
+
+df_complete <- inner_join(df, df_meta) %>%
+  inner_join(df_normalization) %>%
+  inner_join(df_classification)
+
+df_normalization_plot <- inner_join(df_normalization, df_meta)
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_metrics <- df_complete %>% 
+
+  filter(region != "Henan") %>%
+  
+  mutate(count_norm = (count / total_16s_reads)*100) %>%
+  
+  group_by(sample_id, asv_id) %>%
+  
+  mutate(count_norm = median(count_norm)) %>%
+  
+  ungroup() %>%
+  
+  unite(classification, c("phylum", "family", "genus"), sep = ";", remove = FALSE) %>%
+  
+  select(-sra_accession, -replicate, -total_16s_reads, -count) %>%
+  distinct()
+
+df_metrics_wsc <- df_metrics %>%
+  filter(study == "wetzels2018") %>%
+  filter(sample == "fecal") %>%
+  filter(pack == "W_pack_B" | pack == "W_pack_D" | pack == "W_pack_E")
+
+df_metrics_wsc2 <- df_metrics %>%
+  filter(study == "wetzels2018") %>%
+  filter(sample == "skin") %>%
+  filter(pack == "W_pack_B" | pack == "W_pack_D" | pack == "W_pack_E")
+
+df_metrics <- df_metrics #%>% 
+  #filter(type == "Wolf") %>%
+  #filter(sample == "fecal")
+
+  #df_metrics$classification <- gsub(";NA", "", df_metrics$classification)
+```
+
+### Figure 1. 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=15, fig.height=7}
+df_metrics_phylum <- df_metrics %>%
+  filter(count_norm > 0.1) %>%
+  group_by(sample_id, phylum) %>%
+  mutate(phylum_percent = sum(count_norm)) %>%
+  ungroup() %>%
+  select(sample_id, phylum, phylum_percent, study, region, type, sample) %>%
+  distinct() 
+
+df_metrics_phylum$study2 <- gsub("2018", " et al. 2018", df_metrics_phylum$study)
+df_metrics_phylum$study2 <- gsub("w", "W", df_metrics_phylum$study2)
+
+ggplot() + geom_bar(
+  aes(y = phylum_percent, x = sample_id, fill = phylum),
+  data = df_metrics_phylum,
+  stat = "identity" ,
+  position = "fill"
+)  +labs(x="Category" , y= "Percentage (%)")+
+  theme_minimal() +
+  theme(strip.text = element_text(size = 20),
+          plot.title = element_text(size = 20),
+          axis.text.x = element_text(angle = 90, hjust = 1, size = 14),
+          axis.text.y = element_text(size = 14),
+          axis.title.x = element_text(size = 20),
+          axis.title.y = element_text(size = 20)) + 
+  theme(legend.text=element_text(size=14)) +
+  theme(legend.title=element_text(size=20)) +
+     facet_wrap(study2~sample, scales="free")+
+  ylab("Percentage of Sample") +
+  xlab("Individual Sample") 
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_meta <- read.csv("~/master/wolf/dataflow/00-meta/wetzels2018_wu2018_fastq.csv")
+df_unifrac <- read.csv("~/master/wolf/dataflow/03-distance/unifrac_matrix_weighted.csv")
+
+colnames(df_unifrac)[1] <- "id1"
+
+df_unifrac <- melt(df_unifrac, by = "id1")
+colnames(df_unifrac)[2:3] <- c("id2", "UniFrac")
+
+df_meta_trim1 <- df_meta %>%
+  filter(study == "wetzels2018") %>%
+  select(sample_id, sample, pack, type)
+
+colnames(df_meta_trim1) <- c("id1", "sample1", "pack1", "type1") 
+
+df_meta_trim2 <- df_meta %>%
+  filter(study == "wetzels2018") %>%
+  select(sample_id, sample, pack, type)
+
+colnames(df_meta_trim2) <- c("id2", "sample2", "pack2", "type2") 
+
+df_unifrac <- df_unifrac %>%
+  filter(UniFrac != 0) %>%
+  inner_join(df_meta_trim1) %>%
+  inner_join(df_meta_trim2)
+
+df_unifrac_test <- df_unifrac %>%
+  
+  rowwise() %>%
+  mutate(same_pack = ifelse(pack1 == pack2, "SamePack", "DifferentPack")) %>%
+  ungroup() %>%
+  
+  rowwise() %>%
+  mutate(same_sample = ifelse(sample1 == sample2, "SameSample", "DifferentSample")) %>%
+  ungroup() %>%
+  
+  rowwise() %>%
+  mutate(same_animal = ifelse(type1 == type2, "SameAnimal", "DifferentAnimal")) %>%
+  ungroup() %>%
+  
+  group_by(same_sample) %>%
+  
+  mutate(mean_sample_unifrac = mean(UniFrac)) %>%
+  mutate(sd_sample_unifrac = sd(UniFrac)) %>%
+  mutate(ci_sample_unifrac_low = ci(UniFrac)[2]) %>%
+  mutate(ci_sample_unifrac_high = ci(UniFrac)[3]) %>%
+  
+  ungroup()
+
+
+df_unifrac_test_same_sample <- df_unifrac_test %>%
+  
+  filter(same_sample == "SameSample") %>%
+  
+  select(same_pack, same_animal, sample1, UniFrac) %>%
+  
+  group_by(same_pack, sample1) %>%
+  
+  mutate(mean_pack_unifrac = mean(UniFrac)) %>%
+  mutate(ci_pack_unifrac_low = ci(UniFrac)[2]) %>%
+  mutate(ci_pack_unifrac_high = ci(UniFrac)[3]) %>%
+  
+  ungroup() %>%
+  
+  group_by(same_animal, sample1) %>%
+  
+  mutate(mean_animal_unifrac = mean(UniFrac)) %>%
+  mutate(ci_animal_unifrac_low = ci(UniFrac)[2]) %>%
+  mutate(ci_animal_unifrac_high = ci(UniFrac)[3]) %>%
+  
+  ungroup() %>%
+  
+  rename(Category1 = same_pack) %>%
+  rename(Category2 = same_animal) %>%
+  rename(Sample = sample1) 
+
+df_unifrac_test_same_sample$Category1 <- gsub("Pack", " pack", df_unifrac_test_same_sample$Category1)
+df_unifrac_test_same_sample$Category2 <- gsub("Animal", " group", df_unifrac_test_same_sample$Category2)
+```
+
+\vspace{12pt}
+
+###Figure 2a.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.height=3.5}
+ggbarplot(df_unifrac_test_same_sample, x = "Sample", y = "UniFrac", fill = "Category1", add = "mean_se", add.params = list(group = "Category1"), position = position_dodge(0.8)) + 
+  stat_compare_means( aes(label = ..p.signif.., group = Category1), 
+                        label.x = 1.5, label.y = 0.23) +
+  ylab("Weighted UniFrac Distance") + theme(legend.title = element_blank(), legend.spacing.x = unit(0.25, 'cm'), legend.text=element_text(size=12)) + guides(fill=guide_legend(
+                 keywidth=0.5,
+                 keyheight=0.5,
+                 default.unit="inch")
+      ) 
+```
+
+###Figure 2b.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.height=3.5}
+ggbarplot(df_unifrac_test_same_sample, x = "Sample", y = "UniFrac", fill = "Category2", add = "mean_se", add.params = list(group = "Category2"), position = position_dodge(0.8)) + 
+  stat_compare_means( aes(label = ..p.signif.., group = Category2), 
+                        label.x = 1.5, label.y = 0.23) +
+  ylab("Weighted UniFrac Distance") + theme(legend.title = element_blank(), legend.spacing.x = unit(0.25, 'cm'), legend.text=element_text(size=12)) + guides(fill=guide_legend(
+                 keywidth=0.5,
+                 keyheight=0.5,
+                 default.unit="inch")
+      ) 
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_meta <- read.csv("~/master/wolf/dataflow/00-meta/wetzels2018_wu2018_fastq.csv")
+colnames(df_meta)[1] <- "sra_accession"
+
+df_meta$sra_accession <- as.character(df_meta$sra_accession)
+df_meta$type <- as.character(df_meta$type)
+df_meta$study <- as.character(df_meta$study)
+df_meta$region <- as.character(df_meta$region)
+df_meta$sample <- as.character(df_meta$sample)
+df_meta$pack <- as.character(df_meta$pack)
+df_meta$sibling <- as.character(df_meta$sibling)
+df_meta$replicate <- as.character(df_meta$replicate)
+df_meta$sample_id <- as.character(df_meta$sample_id)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_classification  <- read.csv("~/master/wolf/dataflow/03-asv-taxonomy/wetzels2018-8_270_8_220-100-rdp.csv")
+df_classification[,1] <- NULL
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df <- read.delim("~/master/wolf/dataflow/03-asv-table/wetzels2018-8_270_8_220-100.txt", skip = 1, header = TRUE)
+df$clustering <- 100
+colnames(df)[1] <- 'asv_id'
+
+col_to_gather <- names(df)[!(startsWith(names(df), "W"))]
+df <- melt(df, id = col_to_gather)
+colnames(df)[3:4] <- c('sra_accession', 'count')
+
+df$asv_id <- as.character(df$asv_id)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_normalization <- df %>%
+  filter(clustering == 100) %>%
+  group_by(sra_accession) %>%
+  mutate(total_reads = sum(count)) %>%
+  ungroup() %>%
+  select(sra_accession, total_reads) %>%
+  ungroup() %>%
+  distinct() 
+
+df_classification <- df_classification %>%
+  select(asv_id, phylum, family, genus)
+
+
+df_complete <- inner_join(df, df_meta) %>%
+  inner_join(df_normalization) %>%
+  inner_join(df_classification)
+
+df_normalization_plot <- inner_join(df_normalization, df_meta)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_metrics <- df_complete %>% 
+
+  mutate(count_norm = (count / total_reads)*100) %>%
+  
+  group_by(sample_id, asv_id) %>%
+  
+  mutate(count_norm = median(count_norm)) %>%
+  
+  ungroup() %>%
+  
+  unite(classification, c("phylum", "family", "genus"), sep = ";", remove = FALSE) %>%
+  
+  select(-sra_accession, -replicate) %>%
+  
+  distinct() %>%
+  
+  rowwise() %>%
+  
+  mutate(above_0 = ifelse(count_norm != 0, 1, 0)) %>%
+  
+  group_by(pack, sample) %>%
+  
+  mutate(npack = length(unique(sample_id))) %>%
+  
+  ungroup() %>%
+  
+  filter(npack > 2) %>%
+  
+  group_by(asv_id, sample) %>%
+  
+  mutate(nsamples = sum(above_0)) %>% 
+           
+  ungroup() %>%
+  
+  filter(nsamples > 2) %>%
+  
+  group_by(asv_id, pack) %>%
+  
+  mutate(contains_0 = ifelse(0 %in% above_0, 0, 1)) %>%
+  
+  ungroup() %>%
+  
+  group_by(asv_id) %>%
+  
+  mutate(all_contains_0 = ifelse(sum(contains_0) == 0, TRUE, FALSE)) %>%
+  
+  ungroup() %>%
+  
+  filter(all_contains_0 == FALSE)
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_phlycounts_counts <- df_metrics %>%
+  select(asv_id, sample_id, count) %>%
+  spread(sample_id, count)
+
+df_phlycounts_counts[is.na(df_phlycounts_counts)] <- 0
+
+df_phlycounts_counts <- df_phlycounts_counts[order(df_phlycounts_counts$asv_id),] 
+
+numsamples <- length(df_phlycounts_counts)
+
+otumat <- as.matrix(df_phlycounts_counts[,2:numsamples])
+rownames(otumat) <- as.data.frame(df_phlycounts_counts)[,1]
+
+df_phlycounts_tax <- df_metrics %>%
+  select(asv_id, phylum, family, genus) %>%
+  unique()
+
+df_phlycounts_tax$phylum <- as.character(df_phlycounts_tax$phylum)
+df_phlycounts_tax$family <- as.character(df_phlycounts_tax$family)
+df_phlycounts_tax$genus <- as.character(df_phlycounts_tax$genus)
+
+df_phlycounts_tax[is.na(df_phlycounts_tax)] <- "NotAssigned"
+
+df_phlycounts_tax <- df_phlycounts_tax[order(df_phlycounts_tax$asv_id),] 
+
+taxmat <- as.matrix(df_phlycounts_tax[,2:4])
+rownames(taxmat) <- as.data.frame(df_phlycounts_tax)[,1]
+
+df_phylocounts_meta <- df_metrics %>% 
+  select(sample_id, sample, pack, sibling, cam) %>%
+  unique() %>%
+  rowwise() %>%
+  ungroup()
+
+df_phylocounts_meta$sample <- as.factor(df_phylocounts_meta$sample)
+df_phylocounts_meta$pack <- as.factor(df_phylocounts_meta$pack)
+df_phylocounts_meta$sibling <- as.factor(df_phylocounts_meta$sibling)
+df_phylocounts_meta$cam <- as.factor(df_phylocounts_meta$cam)
+
+df_phylocounts_meta <- as.data.frame(df_phylocounts_meta)
+
+row.names(df_phylocounts_meta) <- df_phylocounts_meta[,1]
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=20, fig.height=25}
+library("phyloseq")
+library("ape")
+library("DESeq2")
+
+OTU = otu_table(otumat, taxa_are_rows = TRUE)
+TAX = tax_table(taxmat)
+physeq = phyloseq(OTU, TAX)
+
+#fast_tree = read.tree("~/master/wolf/dataflow/02-trees/wetzels2018-8_270_8_220-97.out")
+#random_tree = rtree(ntaxa(physeq), rooted=TRUE, tip.label=taxa_names(physeq))
+
+samplesdata <- sample_data(df_phylocounts_meta)
+
+physeq = phyloseq(OTU, TAX, samplesdata)
+
+physeq = subset_samples(physeq, sample == "fecal")
+
+
+diagdds = phyloseq_to_deseq2(physeq, ~ pack)
+
+# calculate geometric means prior to estimate size factors
+#gm_mean = function(x, na.rm=TRUE){
+#  exp(sum(log(x[x > 0]), na.rm=na.rm) / length(x))
+#}
+
+#geoMeans = apply(counts(diagdds), 1, gm_mean)
+#diagdds = estimateSizeFactors(diagdds, geoMeans = geoMeans)
+
+diagdds = DESeq(diagdds, fitType = "parametric", test = "Wald")
+
+res = results(diagdds, cooksCutoff = FALSE)
+alpha = 0.001
+sigtab = res[which(res$padj < alpha), ]
+sigtab = cbind(as(sigtab, "data.frame"), as(tax_table(physeq)[rownames(sigtab), ], "matrix"))
+
+selected_seq_ids <- row.names(sigtab)
+
+df_plot <- df_metrics[df_metrics$asv_id %in% selected_seq_ids,]
+
+df_plot <- df_plot %>%
+  filter(sample == "fecal")
+
+df_plot$pack <- gsub("_", " ", df_plot$pack)
+df_plot$pack <- gsub("W", "", df_plot$pack)
+df_plot$pack <- gsub("p", "P", df_plot$pack)
+
+df_plot <- df_plot %>%
+  filter(genus == "Fusobacterium" | genus == "Lactococcus") 
+```
+
+\vspace{12pt}
+
+###Figure 3.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=5, fig.height=2.5}
+ggboxplot(df_plot, x = "pack", y = "count_norm",
+                color = "pack", palette =c("#00AFBB", "#E7B800", "#FC4E07"),
+                add = "jitter") +
+  facet_wrap( ~ genus, scales="free")
+```
