@@ -178,7 +178,7 @@ print('\n' + CRED + 'Core Metrics' + CEND + '\n')
 
 sampling_depth = int(sys.argv[3])
 
-os.system('q2pipeline/q2_core_metrics.sh' + str(sampling_depth))
+os.system('q2pipeline/q2_core_metrics.sh' + ' ' + str(sampling_depth))
 
 # STEP 8. Run pairwise beta significance
 
