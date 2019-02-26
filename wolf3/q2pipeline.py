@@ -159,7 +159,7 @@ elif str(sys.argv[2]) == 'off':
 
 	print('\n' + CGREEN + 'Using existing classifier - classifier should be re-trained for every set of primers.' + CEND + '\n')
 
-	
+
 # STEP 5. Cluster sequences at 97% identity.
 
 print('\n' + CRED + '97% Clustering' + CEND + '\n')
@@ -176,7 +176,7 @@ os.system('bash/q2pipeline/q2_classify.sh')
 
 print('\n' + CRED + 'Core Metrics' + CEND + '\n')
 
-sampling_depth = 20000
+sampling_depth = int(sys.argv[3])
 
 os.system('bash/q2pipeline/q2_core_metrics.sh' + str(sampling_depth))
 
