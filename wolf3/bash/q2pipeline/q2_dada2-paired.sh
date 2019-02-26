@@ -3,6 +3,7 @@
 # This script runs DADA2. You need to select the trimming parameters as well as the 
 # number of cores that will be used. The DADA2 stats are then made into a visualization,
 # so that it can be seen how many reads were removed by DADA2. The files are the renamed.
+# This script is only for paired end data. 
 
 trimleft_forward=$1
 trimleft_reverse=$2

@@ -1,11 +1,6 @@
 import os, sys
 
-runpipeline = input("\n" + "Would you like to run the qiime2 pipeline? This will make a dataflow directory with several subdirectories. (y or n):")
-
-if runpipeline != 'y':
-	sys.exit()
-
-print("\n" + 'This is a qimme2 wrapper to standaridize running qimme2. Add -h for more info.')
+print("\n" + 'This is a qimme2 wrapper to standaridize running qimme2')
 
 if os.path.exists('dataflow') == False:
 	os.mkdir('dataflow')
