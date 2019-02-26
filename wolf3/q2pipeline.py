@@ -126,7 +126,7 @@ if paired == True:
 
 	command = 'q2pipeline/q2_dada2-paired.sh ' + left_forward + ' ' + left_reverse + ' ' + trunc_forward + ' ' + trunc_reverse + ' ' + cores
 	print('\n')
-	#os.system(command)
+	os.system(command)
 
 	data_params = {'Forward Read, Left Cutoff':left_forward,'Reverse Read, Left Cutoff':left_reverse, "Forward Read, Length Cutoff":trunc_forward, "Reverse Read, Length Cutoff":trunc_reverse}
 
@@ -170,7 +170,7 @@ os.system('q2pipeline/q2_clustering97.sh')
 
 print('\n' + CRED + 'CLASSIFICATION' + CEND + '\n')
 
-#os.system('q2pipeline/q2_classify.sh')
+os.system('q2pipeline/q2_classify.sh')
 
 # STEP 7. Generate core metrics.
 
