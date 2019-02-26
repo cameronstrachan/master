@@ -1,6 +1,6 @@
 import os, sys
 
-Print("\n" + 'This is a qimme2 wrapper to standaridize running qimme2. Add -h for more info.' + '\n')
+print("\n" + 'This is a qimme2 wrapper to standaridize running qimme2. Add -h for more info.' + '\n')
 
 if os.path.exists('dataflow') == False:
 	os.mkdir('dataflow')
@@ -32,7 +32,7 @@ paired = input("\n" + 'Are you working with paired end data (all files contain R
 print('PRIMER TRIMMING' + '\n')
 
 if primers == 'y':
-	
+
 	forward = input('\n' + 'Input forward primer sequence:')
 
 	forward_in = ' -g ' + str(forward) + ' '
@@ -61,7 +61,7 @@ if primers == 'y':
 
 			os.system(command)
 
-		else: 
+		else:
 
 			# Need to check this is the correct way to trim non-paired reads
 
