@@ -5,7 +5,7 @@ runpipeline = input("\n" + "Would you like to run the qiime2 pipeline? This will
 if runpipeline != 'y':
 	sys.exit()
 
-print("\n" + 'This is a qimme2 wrapper to standaridize running qimme2. Add -h for more info.' + '\n')
+print("\n" + 'This is a qimme2 wrapper to standaridize running qimme2. Add -h for more info.')
 
 if os.path.exists('dataflow') == False:
 	os.mkdir('dataflow')
@@ -32,7 +32,7 @@ for dir in dirs:
 	if os.path.exists(dir_to_make) == False:
 		os.mkdir(dir_to_make)
 
-paired = input("\n" + 'Are you working with paired end data (all files contain R1)? (y or n)' + '\n')
+paired = input("\n" + 'Are you working with paired end data (all files contain R1)? (y or n):')
 
 print('\n' + 'PRIMER TRIMMING' + '\n')
 
@@ -43,6 +43,8 @@ forward_in = ' -g ' + str(forward) + ' '
 reverse = input('\n' + 'Input reverse primer sequence:')
 
 reverse_in = ' -g ' + str(reverse) + ' '
+
+print('\n')
 
 dirin = 'dataflow/01-fastq/'
 dirout = 'dataflow/01-fastq/trimmed/'
@@ -92,3 +94,29 @@ else:
 print('\n' + 'Visualize dataflow/02-qiime-viz/demux-paired-end.qzv at https://view.qiime2.org/' + '\n')
 
 print('\n' + 'DADA2' + '\n')
+
+cores = input("\n" + "Number of threads? (interger):")
+
+if paired == 'y':
+
+	left_forward = input("\n" + "Forward Read, Left Cutoff? (interger):")
+
+	left_reverse = input("\n" + "Reverse Read, Left Cutoff? (interger):")
+
+	trunc_forward = input("\n" + "Forward Read, Length Cutoff? (interger):")
+
+	trunc_reverse = input("\n" + "Reverse Read, Length Cutoff? (interger):")
+
+	command = 'bash/q2pipeline/q2_data2-paired.sh ' + left_forward + ' ' + left_reverse + ' ' + trunc_forward + ' ' + trunc_reverse + ' ' + cores
+
+	os.system(command)
+
+else:
+
+	left = input("\n" + "Left Cutoff? (interger):")
+
+	trunc = input("\n" + "Length Cutoff? (interger):")
+
+	command = 'bash/q2pipeline/q2_data2-single.sh ' + left + ' ' + trunc + ' ' + cores
+
+	os.system(command)
