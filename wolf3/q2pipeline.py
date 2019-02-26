@@ -90,28 +90,28 @@ print('\n' + 'Visualize dataflow/02-qiime-viz/demux-paired-end.qzv at https://vi
 
 print('\n' + 'DADA2' + '\n')
 
-cores = input('\n' + 'Number of cores to use with DADA2 (interger):')
+cores = str(input('\n' + 'Number of cores to use with DADA2 (interger):'))
 
 if paired == 'y':
 
-	left_forward = input("\n" + "Forward Read, Left Cutoff? (interger):")
+	left_forward = str(input("\n" + "Forward Read, Left Cutoff? (interger):"))
 
-	left_reverse = input("\n" + "Reverse Read, Left Cutoff? (interger):")
+	left_reverse = str(input("\n" + "Reverse Read, Left Cutoff? (interger):"))
 
-	trunc_forward = input("\n" + "Forward Read, Length Cutoff? (interger):")
+	trunc_forward = str(input("\n" + "Forward Read, Length Cutoff? (interger):"))
 
-	trunc_reverse = input("\n" + "Reverse Read, Length Cutoff? (interger):")
+	trunc_reverse = str(input("\n" + "Reverse Read, Length Cutoff? (interger):"))
 
-	command = 'bash/q2pipeline/q2_data2-paired.sh ' + left_forward + ' ' + left_reverse + ' ' + trunc_forward + ' ' + trunc_reverse + ' ' + cores
+	command = 'bash/q2pipeline/q2_dada2-paired.sh ' + left_forward + ' ' + left_reverse + ' ' + trunc_forward + ' ' + trunc_reverse + ' ' + cores
 
 	os.system(command)
 
 else:
 
-	left = input("\n" + "Left Cutoff? (interger):")
+	left = str(input("\n" + "Left Cutoff? (interger):"))
 
-	trunc = input("\n" + "Length Cutoff? (interger):")
+	trunc = str(input("\n" + "Length Cutoff? (interger):"))
 
-	command = 'bash/q2pipeline/q2_data2-single.sh ' + left + ' ' + trunc + ' ' + cores
+	command = 'bash/q2pipeline/q2_dada2-single.sh ' + left + ' ' + trunc + ' ' + cores
 
 	os.system(command)
