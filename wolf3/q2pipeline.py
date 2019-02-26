@@ -1,5 +1,10 @@
 import os, sys
 
+runpipeline = input("\n" + "Would you like to run the qiime2 pipeline? This will make a dataflow directory with several subdirectories. (y or n):")
+
+if runpipeline != 'y':
+	sys.exit()
+
 print("\n" + 'This is a qimme2 wrapper to standaridize running qimme2. Add -h for more info.' + '\n')
 
 if os.path.exists('dataflow') == False:
@@ -29,7 +34,7 @@ for dir in dirs:
 
 paired = input("\n" + 'Are you working with paired end data (all files contain R1)? (y or n)' + '\n')
 
-print('PRIMER TRIMMING' + '\n')
+print('\n' + 'PRIMER TRIMMING' + '\n')
 
 forward = input('\n' + 'Input forward primer sequence:')
 
@@ -87,10 +92,3 @@ else:
 print('\n' + 'Visualize dataflow/02-qiime-viz/demux-paired-end.qzv at https://view.qiime2.org/' + '\n')
 
 print('\n' + 'DADA2' + '\n')
-
-
-
-if __name__ == "__main__":
-	runpipeline = input("\n" + "Would you like to run the qiime2 pipeline? This will make a dataflow directory with several subdirectories. (y or n):")
-	if runpipeline == 'y':
-		main()
