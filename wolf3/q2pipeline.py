@@ -174,7 +174,7 @@ print('\n' + CRED + 'CLASSIFICATION' + CEND + '\n')
 
 # STEP 7. Generate core metrics.
 
-print('\n' + CRED + 'Core Metrics' + CEND + '\n')
+print('\n' + CRED + 'CORE METRICS' + CEND + '\n')
 
 sampling_depth = int(sys.argv[3])
 
