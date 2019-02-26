@@ -9,10 +9,10 @@ if os.path.exists('dataflow/00-meta') == False:
 	os.mkdir('dataflow/00-meta')
 
 if os.path.exists('dataflow/00-fastq') == False:
-	os.mkdir('dataflow/00-fastq')
+	os.mkdir('dataflow/01-fastq')
 
 if os.path.exists('dataflow/00-fastq/trimmed') == False:
-	os.mkdir('dataflow/00-fastq/trimmed')
+	os.mkdir('dataflow/01-fastq/trimmed')
 
 check = input("\n" + "Ensure that zipped demultiplexed data is in dataflow/00-fastq with the illumina naming format (ex. SampleName_SampleNumber_L001_R1_001.fastq.gz) then hit enter:" + '\n')
 check = input("\n" + "Ensure that meta data file (.tsv) is in dataflow/00-meta as a tsv in qimme2 format and hit enter:" + '\n')
