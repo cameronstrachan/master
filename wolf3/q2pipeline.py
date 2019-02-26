@@ -37,7 +37,7 @@ for dir in dirs:
 	if os.path.exists(dir_to_make) == False:
 		os.mkdir(dir_to_make)
 
-print('\n' + 'PRIMER TRIMMING' + '\n')
+print('\n' + 'PRIMER TRIMMING')
 
 forward = input('\n' + 'Forward primer sequence:')
 
@@ -86,7 +86,7 @@ for file in files:
 
 print('\n' + 'TRAIN CLASSIFIER' + '\n')
 
-command = 'bash/q2pipeline/q2_train-classifier.sh ' + str(forward) + ' ' + str(reverse)
+command = 'bash/q2pipeline/q2_train_classifier.sh ' + str(forward) + ' ' + str(reverse)
 
 os.system(command)
 
