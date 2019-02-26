@@ -54,8 +54,6 @@ reverse = input('\n' + 'Reverse primer sequence:')
 
 reverse_in = ' -g ' + str(reverse) + ' '
 
-print('\n')
-
 dirin = 'dataflow/01-fastq/'
 dirout = 'dataflow/01-fastq/trimmed/'
 
@@ -116,7 +114,7 @@ if paired == True:
 	trunc_reverse = str(input("\n" + "Reverse Read, Length Cutoff? (interger):"))
 
 	command = 'bash/q2pipeline/q2_dada2-paired.sh ' + left_forward + ' ' + left_reverse + ' ' + trunc_forward + ' ' + trunc_reverse + ' ' + cores
-
+	print('\n')
 	os.system(command)
 
 	data_params = {'Forward Read, Left Cutoff':left_forward,'Reverse Read, Left Cutoff':left_reverse, "Forward Read, Length Cutoff":trunc_forward, "Reverse Read, Length Cutoff":trunc_reverse}
@@ -128,12 +126,10 @@ else:
 	trunc = str(input("\n" + "Length Cutoff? (interger):"))
 
 	command = 'bash/q2pipeline/q2_dada2-single.sh ' + left + ' ' + trunc + ' ' + cores
-
+	print('\n')
 	os.system(command)
 
 	data_params = {'Left Cutoff':left,'Length Cutoff':trunc}
-
-print('\n')
 
 print('\n' + 'TRAIN CLASSIFIER' + '\n')
 
