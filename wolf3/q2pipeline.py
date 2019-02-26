@@ -8,10 +8,6 @@ if str(sys.argv[1]) == 'single':
 elif str(sys.argv[1]) == 'paired':
 	print('\n' + 'Processing paired end data')
 	paired = True
-else:
-	print('\n' + 'Specify single or paired')
-	sys.exit()
-
 
 if os.path.exists('dataflow') == False:
 	os.mkdir('dataflow')
