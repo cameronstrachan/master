@@ -66,12 +66,12 @@ for file in files:
 		# Need to check this is the correct way to trim non-paired reads
 
 		type = file.split('_')[3]
-		input = dirin + file
-		output = dirout + file
+		input_f = dirin + file
+		output_f = dirout + file
 
 		if type == 'R1':
-			command = 'cutadapt  -f "fastq"  -o ' + output + forward_in + input
-			command = 'cutadapt  -f "fastq"  -o ' + output + reverse_in + output
+			command = 'cutadapt  -f "fastq"  -o ' + output_f + forward_in + input_f
+			command = 'cutadapt  -f "fastq"  -o ' + output_f + reverse_in + output_f
 
 
 		os.system(command)
