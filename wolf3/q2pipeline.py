@@ -26,7 +26,7 @@ if os.path.exists('dataflow/00-databases') == False:
 
 start_message = 'There needs to be several files in the correct directories before running this pipeline. First, the zipped and demultiplexed sequencing data must be in dataflow/00-fastq/ with the illumina naming (ex. SampleName_SampleNumber_L001_R1_001.fastq.gz). If the data is not paired, then every file will contain the R1, which must be after the 3rd underscore. Second, the file sample-meta.tsv must be in dataflow/00-meta/ and formatted as specified by qiime2. Lastly the silva databases that we are currently using must be in dataflow/00-dabases/. There are two files for the silva database, silva_132_99_16S.fna and taxonomy_7_levels.txt.'
 
-check = input("\n" + start_message + '\n' + 'Hit any key to continue')
+check = input("\n" + start_message + '\n' + '\n' + 'Hit any key to continue')
 
 dirs = ['02-qiime', '02-qiime-viz', '03-asv-seqs', '03-asv-table', '00-logs']
 #dirs_control = [d + '-control' for d in dirs]
@@ -39,11 +39,11 @@ for dir in dirs:
 
 print('\n' + 'PRIMER TRIMMING' + '\n')
 
-forward = input('\n' + 'Input forward primer sequence:')
+forward = input('\n' + 'Forward primer sequence:')
 
 forward_in = ' -g ' + str(forward) + ' '
 
-reverse = input('\n' + 'Input reverse primer sequence:')
+reverse = input('\n' + 'Reverse primer sequence:')
 
 reverse_in = ' -g ' + str(reverse) + ' '
 
@@ -84,13 +84,11 @@ for file in files:
 
 		os.system(command)
 
-retrain = input('\n' + 'Re-train classifier with primer set? (y or n):')
+print('\n' + 'TRAIN CLASSIFIER' + '\n')
 
-if retrain == 'y':
+command = 'bash/q2pipeline/q2_train-classifier.sh ' + str(forward) + ' ' + str(reverse)
 
-	command = 'bash/q2pipeline/q2_train-classifier.sh ' + str(forward) + ' ' + str(reverse)
-
-	os.system(command)
+os.system(command)
 
 
 print('\n' + 'DATA IMPORT' + '\n')
@@ -122,6 +120,8 @@ if paired == True:
 
 	os.system(command)
 
+	data_params = {'Forward Read, Left Cutoff':left_forward,'Reverse Read, Left Cutoff':left_reverse, "Forward Read, Length Cutoff":trunc_forward, "Reverse Read, Length Cutoff":trunc_reverse}
+
 else:
 
 	left = str(input("\n" + "Left Cutoff? (interger):"))
@@ -131,6 +131,10 @@ else:
 	command = 'bash/q2pipeline/q2_dada2-single.sh ' + left + ' ' + trunc + ' ' + cores
 
 	os.system(command)
+
+	data_params = {'Left Cutoff':left,'Length Cutoff':trunc}
+
+print('\n')
 
 print('\n' + '97% Clustering' + '\n')
 
@@ -142,4 +146,8 @@ os.system('bash/q2pipeline/q2_classify.sh')
 
 print('\n' + 'Core Metrics' + '\n')
 
-os.system('bash/q2pipeline/q2_core_metrics.sh')
+sampling_depth = 20000
+
+os.system('bash/q2pipeline/q2_core_metrics.sh' + str(sampling_depth))
+
+data_params.update('Sampling Depth, Core Metrics': sampling_depth)
