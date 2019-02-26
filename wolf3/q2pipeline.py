@@ -8,10 +8,10 @@ if os.path.exists('dataflow') == False:
 if os.path.exists('dataflow/00-meta') == False:
 	os.mkdir('dataflow/00-meta')
 
-if os.path.exists('dataflow/00-fastq') == False:
+if os.path.exists('dataflow/01-fastq') == False:
 	os.mkdir('dataflow/01-fastq')
 
-if os.path.exists('dataflow/00-fastq/trimmed') == False:
+if os.path.exists('dataflow/01-fastq/trimmed') == False:
 	os.mkdir('dataflow/01-fastq/trimmed')
 
 check = input("\n" + "Ensure that zipped demultiplexed data is in dataflow/00-fastq with the illumina naming format (ex. SampleName_SampleNumber_L001_R1_001.fastq.gz) then hit enter:" + '\n')
