@@ -27,7 +27,7 @@ for dir in dirs:
 	if os.path.exists(dir_to_make) == False:
 		os.mkdir(dir_to_make)
 
-paired = input("\n" + 'Are you working with paired end data (all files contain R1)? (y or n):')
+paired = input("\n" + 'Are you working with paired end data? (y or n):')
 
 print('\n' + 'PRIMER TRIMMING' + '\n')
 
@@ -51,13 +51,13 @@ for file in files:
 	if paired == 'y':
 
 		type = file.split('_')[3]
-		input = dirin + file
-		output = dirout + file
+		input_f = dirin + file
+		output_f = dirout + file
 
 		if type == 'R1':
-			command = 'cutadapt  -f "fastq"  -o ' + output + forward_in + input
+			command = 'cutadapt  -f "fastq"  -o ' + output_f + forward_in + input_f
 		else:
-			command = 'cutadapt  -f "fastq"  -o ' + output + reverse_in + input
+			command = 'cutadapt  -f "fastq"  -o ' + output_f + reverse_in + input_f
 
 		os.system(command)
 
