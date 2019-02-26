@@ -24,9 +24,9 @@ if os.path.exists('dataflow/01-fastq/trimmed') == False:
 if os.path.exists('dataflow/00-databases') == False:
 	os.mkdir('dataflow/00-databases')
 
-check = input("\n" + "Ensure that zipped demultiplexed data is in dataflow/00-fastq with the illumina naming (ex. SampleName_SampleNumber_L001_R1_001.fastq.gz) then hit enter:")
-check = input("\n" + "Ensure that sample-metadata.tsv is in dataflow/00-meta in the qimme2 format and hit enter:")
-check = input("\n" + "Ensure silva database files are in 00-databases (silva_132_99_16S.fna and taxonomy_7_levels.txt):")
+start_message = 'There needs to be several files in the correct directories before running this pipeline. First, the zipped and demultiplexed sequencing data must be in dataflow/00-fastq/ with the illumina naming (ex. SampleName_SampleNumber_L001_R1_001.fastq.gz). If the data is not paired, then every file will contain the R1, which must be after the 3rd underscore. Second, the file sample-meta.tsv must be in dataflow/00-meta/ and formatted as specified by qiime2. Lastly the silva databases that we are currently using must be in dataflow/00-dabases/. There are two files for the silva database, silva_132_99_16S.fna and taxonomy_7_levels.txt.'
+
+check = input("\n" + start_message + '\n' + 'Hit any key to continue')
 
 dirs = ['02-qiime', '02-qiime-viz', '03-asv-seqs', '03-asv-table', '00-logs']
 #dirs_control = [d + '-control' for d in dirs]
@@ -36,7 +36,6 @@ for dir in dirs:
 
 	if os.path.exists(dir_to_make) == False:
 		os.mkdir(dir_to_make)
-
 
 print('\n' + 'PRIMER TRIMMING' + '\n')
 
@@ -64,9 +63,9 @@ for file in files:
 		output_f = dirout + file
 
 		if type == 'R1':
-			command = 'cutadapt  -f "fastq"  -o ' + output_f + forward_in + input_f + ' > 00-logs/forward_primer_trimming_stats.txt'
+			command = 'cutadapt  -f "fastq"  -o ' + output_f + forward_in + input_f + ' > dataflow/00-logs/forward_primer_trimming_stats.txt'
 		else:
-			command = 'cutadapt  -f "fastq"  -o ' + output_f + reverse_in + input_f + ' > 00-logs/reverse_primer_trimming_stats.txt'
+			command = 'cutadapt  -f "fastq"  -o ' + output_f + reverse_in + input_f + ' > dataflow/00-logs/reverse_primer_trimming_stats.txt'
 
 		os.system(command)
 
@@ -79,8 +78,8 @@ for file in files:
 		output_f = dirout + file
 
 		if type == 'R1':
-			command = 'cutadapt  -f "fastq"  -o ' + output_f + forward_in + input_f + ' > 00-logs/forward_primer_trimming_stats.txt'
-			command = 'cutadapt  -f "fastq"  -o ' + output_f + reverse_in + output_f + ' > 00-logs/reverse_primer_trimming_stats.txt'
+			command = 'cutadapt  -f "fastq"  -o ' + output_f + forward_in + input_f + ' > dataflow/00-logs/forward_primer_trimming_stats.txt'
+			command = 'cutadapt  -f "fastq"  -o ' + output_f + reverse_in + output_f + ' > dataflow/00-logs/reverse_primer_trimming_stats.txt'
 
 
 		os.system(command)
