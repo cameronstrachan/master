@@ -3,7 +3,7 @@ import pandas as pd
 
 # colours
 CRED = '\033[91m'
-CGREEN  = '\33[102m'
+CGREEN  = '\33[32m'
 CEND = '\033[0m'
 
 # two cut offs are hardcoded currently, the sampling depth and the lengths for extracting reads from silva
@@ -11,7 +11,7 @@ CEND = '\033[0m'
 
 # STEP 1. Make directories and print start message.
 
-print("\n" + CRED + 'This is a qimme2 wrapper to standaridize running qimme2' + CEND)
+print("\n" + CRED + 'This is a qimme2 wrapper to standardize running qimme2' + CEND)
 
 if str(sys.argv[1]) == 'single':
 	print('\n' + 'Processing single end data')
@@ -126,7 +126,7 @@ if paired == True:
 
 	command = 'q2pipeline/q2_dada2-paired.sh ' + left_forward + ' ' + left_reverse + ' ' + trunc_forward + ' ' + trunc_reverse + ' ' + cores
 	print('\n')
-	os.system(command)
+	#os.system(command)
 
 	data_params = {'Forward Read, Left Cutoff':left_forward,'Reverse Read, Left Cutoff':left_reverse, "Forward Read, Length Cutoff":trunc_forward, "Reverse Read, Length Cutoff":trunc_reverse}
 
@@ -162,15 +162,15 @@ elif str(sys.argv[2]) == 'off':
 
 # STEP 5. Cluster sequences at 97% identity.
 
-print('\n' + CRED + '97% Clustering' + CEND + '\n')
+print('\n' + CRED + '97% CLUSTERING' + CEND + '\n')
 
 os.system('q2pipeline/q2_clustering97.sh')
 
 # STEP 6. Taxonomic classify sequences.
 
-print('\n' + CRED + 'Classification' + CEND + '\n')
+print('\n' + CRED + 'CLASSIFICATION' + CEND + '\n')
 
-os.system('q2pipeline/q2_classify.sh')
+#os.system('q2pipeline/q2_classify.sh')
 
 # STEP 7. Generate core metrics.
 
@@ -182,7 +182,7 @@ os.system('q2pipeline/q2_core_metrics.sh' + str(sampling_depth))
 
 # STEP 8. Run pairwise beta significance
 
-print('\n' + CRED + 'Beta Group Significance' + CEND + '\n')
+print('\n' + CRED + 'BETA GROUP SIGNIFICANCE' + CEND + '\n')
 
 df_meta = pd.read_csv('dataflow/00-meta/sample-metadata.tsv', sep = '\t')
 columns = list(df_meta)
