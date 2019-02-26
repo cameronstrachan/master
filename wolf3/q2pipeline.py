@@ -1,6 +1,8 @@
 import os, sys
 import pandas as pd
 
+# two cut offs are hardcoded currently, the sampling depth and the lengths for extracting reads from silva
+
 print("\n" + 'This is a qimme2 wrapper to standaridize running qimme2')
 
 if str(sys.argv[1]) == 'single':
