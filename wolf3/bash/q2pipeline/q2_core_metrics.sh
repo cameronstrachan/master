@@ -3,6 +3,8 @@
 # This script runs various standard analysis from qiime2 and outputs all the 
 # visualizations to dataflow/02-qiime-viz/.
 
+sample_depth=$1
+
 qiime phylogeny align-to-tree-mafft-fasttree \
   --i-sequences dataflow/02-qiime/rep-seqs-dn-97.qza \
   --o-alignment dataflow/02-qiime/aligned-rep-seqs-dn-97.qza \
@@ -18,7 +20,7 @@ qiime feature-table summarize \
 qiime diversity core-metrics-phylogenetic \
   --i-phylogeny dataflow/02-qiime/rooted-tree.qza \
   --i-table dataflow/02-qiime/table-dn-97.qza \
-  --p-sampling-depth 20000 \
+  --p-sampling-depth $sample_depth \
   --m-metadata-file dataflow/00-meta/sample-metadata.tsv \
   --output-dir dataflow/02-qiime-core-metrics
 
@@ -34,6 +36,6 @@ qiime diversity alpha-group-significance \
 qiime diversity alpha-rarefaction \
   --i-table dataflow/02-qiime/table-dn-97.qza \
   --i-phylogeny dataflow/02-qiime/rooted-tree.qza \
-  --p-max-depth 4000 \
+  --p-max-depth 10000 \
   --m-metadata-file dataflow/00-meta/sample-metadata.tsv \
   --o-visualization dataflow/02-qiime-viz/alpha-rarefaction.qzv
