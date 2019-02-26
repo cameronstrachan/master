@@ -2,6 +2,7 @@ import os, sys
 import pandas as pd
 
 # two cut offs are hardcoded currently, the sampling depth and the lengths for extracting reads from silva
+# need to check the cut adapt parameters for the non paired
 
 print("\n" + 'This is a qimme2 wrapper to standaridize running qimme2')
 
@@ -90,15 +91,6 @@ for file in files:
 
 		os.system(command)
 
-print('\n' + 'TRAIN CLASSIFIER' + '\n')
-
-minLength = 100
-maxLength = 400
-
-command = 'bash/q2pipeline/q2_train_classifier.sh ' + str(forward) + ' ' + str(reverse) + ' ' + str(minLength) + ' ' + str(maxLength)
-
-os.system(command)
-
 print('\n' + 'DATA IMPORT' + '\n')
 
 if paired == True:
@@ -142,6 +134,15 @@ else:
 	data_params = {'Left Cutoff':left,'Length Cutoff':trunc}
 
 print('\n')
+
+print('\n' + 'TRAIN CLASSIFIER' + '\n')
+
+minLength = 100
+maxLength = 400
+
+command = 'bash/q2pipeline/q2_train_classifier.sh ' + str(forward) + ' ' + str(reverse) + ' ' + str(minLength) + ' ' + str(maxLength)
+
+os.system(command)
 
 print('\n' + '97% Clustering' + '\n')
 
