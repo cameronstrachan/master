@@ -14,8 +14,8 @@ if os.path.exists('dataflow/01-fastq') == False:
 if os.path.exists('dataflow/01-fastq/trimmed') == False:
 	os.mkdir('dataflow/01-fastq/trimmed')
 
-check = input("\n" + "Ensure that zipped demultiplexed data is in dataflow/00-fastq with the illumina naming format (ex. SampleName_SampleNumber_L001_R1_001.fastq.gz) then hit enter:" + '\n')
-check = input("\n" + "Ensure that meta data file (.tsv) is in dataflow/00-meta as a tsv in qimme2 format and hit enter:" + '\n')
+check = input("\n" + "Ensure that zipped demultiplexed data is in dataflow/00-fastq with the illumina naming format (ex. SampleName_SampleNumber_L001_R1_001.fastq.gz) then hit enter:")
+check = input("\n" + "Ensure that meta data file (.tsv) is in dataflow/00-meta as a tsv in qimme2 format and hit enter:")
 
 
 dirs = ['02-qiime', '02-qiime-viz', '03-asv-seqs', '03-asv-table']
@@ -90,7 +90,7 @@ print('\n' + 'Visualize dataflow/02-qiime-viz/demux-paired-end.qzv at https://vi
 
 print('\n' + 'DADA2' + '\n')
 
-cores = input("\n" + "Number of threads? (interger):")
+cores = input('\n' + 'Number of cores to use with DADA2 (interger):')
 
 if paired == 'y':
 
