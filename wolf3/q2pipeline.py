@@ -14,8 +14,8 @@ if os.path.exists('dataflow/01-fastq') == False:
 if os.path.exists('dataflow/01-fastq/trimmed') == False:
 	os.mkdir('dataflow/01-fastq/trimmed')
 
-check = input("\n" + "Ensure that zipped demultiplexed data is in dataflow/00-fastq with the illumina naming format (ex. SampleName_SampleNumber_L001_R1_001.fastq.gz) then hit enter:")
-check = input("\n" + "Ensure that meta data file (.tsv) is in dataflow/00-meta as a tsv in qimme2 format and hit enter:")
+check = input("\n" + "Ensure that zipped demultiplexed data is in dataflow/00-fastq with the illumina naming (ex. SampleName_SampleNumber_L001_R1_001.fastq.gz) then hit enter:")
+check = input("\n" + "Ensure that sample-metadata.tsv is in dataflow/00-meta in the qimme2 format and hit enter:")
 
 
 dirs = ['02-qiime', '02-qiime-viz', '03-asv-seqs', '03-asv-table']
@@ -26,6 +26,7 @@ for dir in dirs:
 
 	if os.path.exists(dir_to_make) == False:
 		os.mkdir(dir_to_make)
+
 
 paired = input("\n" + 'Are you working with paired end data? (y or n):')
 
@@ -76,6 +77,18 @@ for file in files:
 
 		os.system(command)
 
+retrain = input('\n' + 'Re-train classifier with primer set? (y or n):')
+
+if retrain == 'y':
+	check = input("\n" + "Ensure silva database files are in 00-databases (silva_132_99_16S.fna and taxonomy_7_levels.txt):")
+
+	if os.path.exists('dataflow/00-databases') == False:
+		os.mkdir('dataflow/00-databases')
+
+	command = 'bash/q2pipeline/q2_train-classifier.sh ' + str(forward) + ' ' + str(reverse)
+
+	os.system(command)
+
 
 print('\n' + 'DATA IMPORT' + '\n')
 
@@ -115,3 +128,15 @@ else:
 	command = 'bash/q2pipeline/q2_dada2-single.sh ' + left + ' ' + trunc + ' ' + cores
 
 	os.system(command)
+
+print('\n' + '97% Clustering' + '\n')
+
+os.system('bash/q2pipeline/q2_clustering97.sh')
+
+print('\n' + 'Classification' + '\n')
+
+os.system('bash/q2pipeline/q2_classify.sh')
+
+print('\n' + 'Core Metrics' + '\n')
+
+os.system('bash/q2pipeline/q2_core_metrics.sh')
