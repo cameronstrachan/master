@@ -144,15 +144,22 @@ else:
 
 # STEP 4. Train the taxonomic classifier from SILVA.
 
-print('\n' + CRED + 'TRAIN CLASSIFIER' + CEND + '\n')
+if str(sys.argv[2]) == 'train':
 
-minLength = 100
-maxLength = 400
+	print('\n' + CRED + 'TRAIN CLASSIFIER' + CEND + '\n')
 
-command = 'bash/q2pipeline/q2_train_classifier.sh ' + str(forward) + ' ' + str(reverse) + ' ' + str(minLength) + ' ' + str(maxLength)
+	minLength = 100
+	maxLength = 400
 
-os.system(command)
+	command = 'bash/q2pipeline/q2_train_classifier.sh ' + str(forward) + ' ' + str(reverse) + ' ' + str(minLength) + ' ' + str(maxLength)
 
+	os.system(command)
+
+elif str(sys.argv[2]) == 'off':
+
+	print('\n' + CGREEN + 'Using existing classifier - classifier should be re-trained for every set of primers.' + CEND + '\n')
+
+	
 # STEP 5. Cluster sequences at 97% identity.
 
 print('\n' + CRED + '97% Clustering' + CEND + '\n')
