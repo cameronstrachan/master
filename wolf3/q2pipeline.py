@@ -31,51 +31,48 @@ paired = input("\n" + 'Are you working with paired end data (all files contain R
 
 print('PRIMER TRIMMING' + '\n')
 
-if primers == 'y':
+forward = input('\n' + 'Input forward primer sequence:')
 
-	forward = input('\n' + 'Input forward primer sequence:')
+forward_in = ' -g ' + str(forward) + ' '
 
-	forward_in = ' -g ' + str(forward) + ' '
+reverse = input('\n' + 'Input reverse primer sequence:')
 
-	reverse = input('\n' + 'Input reverse primer sequence:')
+reverse_in = ' -g ' + str(reverse) + ' '
 
-	reverse_in = ' -g ' + str(reverse) + ' '
+dirin = 'dataflow/01-fastq/'
+dirout = 'dataflow/01-fastq/trimmed/'
 
-	dirin = 'dataflow/01-fastq/'
-	dirout = 'dataflow/01-fastq/trimmed/'
+files = [f for f in os.listdir(dirin) if f.endswith('.fastq.gz')]
 
-	files = [f for f in os.listdir(dirin) if f.endswith('.fastq.gz')]
+for file in files:
 
-	for file in files:
+	if paired == 'y':
 
-		if paired == 'y':
+		type = file.split('_')[3]
+		input = dirin + file
+		output = dirout + file
 
-			type = file.split('_')[3]
-			input = dirin + file
-			output = dirout + file
-
-			if type == 'R1':
-				command = 'cutadapt  -f "fastq"  -o ' + output + forward_in + input
-			else:
-				command = 'cutadapt  -f "fastq"  -o ' + output + reverse_in + input
-
-			os.system(command)
-
+		if type == 'R1':
+			command = 'cutadapt  -f "fastq"  -o ' + output + forward_in + input
 		else:
+			command = 'cutadapt  -f "fastq"  -o ' + output + reverse_in + input
 
-			# Need to check this is the correct way to trim non-paired reads
+		os.system(command)
 
-			type = file.split('_')[3]
-			input = dirin + file
-			output = dirout + file
+	else:
 
-			if type == 'R1':
-				command = 'cutadapt  -f "fastq"  -o ' + output + forward_in + input
-				command = 'cutadapt  -f "fastq"  -o ' + output + reverse_in + output
+		# Need to check this is the correct way to trim non-paired reads
+
+		type = file.split('_')[3]
+		input = dirin + file
+		output = dirout + file
+
+		if type == 'R1':
+			command = 'cutadapt  -f "fastq"  -o ' + output + forward_in + input
+			command = 'cutadapt  -f "fastq"  -o ' + output + reverse_in + output
 
 
-			os.system(command)
-
+		os.system(command)
 
 
 print('\n' + 'DATA IMPORT' + '\n')
