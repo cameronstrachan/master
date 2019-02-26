@@ -1,10 +1,17 @@
 import os, sys
 import pandas as pd
 
+# colours
+CRED = '\033[91m'
+CGREEN  = '\33[102m'
+CEND = '\033[0m'
+
 # two cut offs are hardcoded currently, the sampling depth and the lengths for extracting reads from silva
 # need to check the cut adapt parameters for the non paired
 
-print("\n" + 'This is a qimme2 wrapper to standaridize running qimme2')
+# STEP 1. Make directories and print start message.
+
+print("\n" + CRED + 'This is a qimme2 wrapper to standaridize running qimme2' + CEND)
 
 if str(sys.argv[1]) == 'single':
 	print('\n' + 'Processing single end data')
@@ -44,7 +51,9 @@ for dir in dirs:
 if os.path.exists('dataflow/02-qiime-viz/beta-sig') == False:
 	os.mkdir('dataflow/02-qiime-viz/beta-sig')
 
-print('\n' + 'PRIMER TRIMMING')
+# STEP 2. Trim the primers.
+
+print('\n' + CRED + 'PRIMER TRIMMING' + CEND)
 
 forward = input('\n' + 'Forward primer sequence:')
 
@@ -89,7 +98,9 @@ for file in files:
 
 		os.system(command)
 
-print('\n' + 'DATA IMPORT' + '\n')
+# STEP 3. Run DADA2.
+
+print('\n' + CRED + 'DATA IMPORT' + CEND + '\n')
 
 if paired == True:
 	os.system('bash/q2pipeline/q2_import.sh \'SampleData[PairedEndSequencesWithQuality]\'')
@@ -97,9 +108,9 @@ if paired == True:
 else:
 	os.system('bash/q2pipeline/q2_import.sh \'SampleData[SequencesWithQuality]\'')
 
-print('\n' + 'Visualize dataflow/02-qiime-viz/demux-trimmed.qzv at https://view.qiime2.org/' + '\n')
+print('\n' + CGREEN + 'Visualize dataflow/02-qiime-viz/demux-trimmed.qzv at https://view.qiime2.org/' + CEND + '\n')
 
-print('\n' + 'DADA2' + '\n')
+print('\n' + CRED + 'DADA2' + CEND + '\n')
 
 cores = str(input('\n' + 'Number of cores to use with DADA2 (interger):'))
 
@@ -131,7 +142,9 @@ else:
 
 	data_params = {'Left Cutoff':left,'Length Cutoff':trunc}
 
-print('\n' + 'TRAIN CLASSIFIER' + '\n')
+# STEP 4. Train the taxonomic classifier from SILVA.
+
+print('\n' + CRED + 'TRAIN CLASSIFIER' + CEND + '\n')
 
 minLength = 100
 maxLength = 400
@@ -140,21 +153,29 @@ command = 'bash/q2pipeline/q2_train_classifier.sh ' + str(forward) + ' ' + str(r
 
 os.system(command)
 
-print('\n' + '97% Clustering' + '\n')
+# STEP 5. Cluster sequences at 97% identity.
+
+print('\n' + CRED + '97% Clustering' + CEND + '\n')
 
 os.system('bash/q2pipeline/q2_clustering97.sh')
 
-print('\n' + 'Classification' + '\n')
+# STEP 6. Taxonomic classify sequences.
+
+print('\n' + CRED + 'Classification' + CEND + '\n')
 
 os.system('bash/q2pipeline/q2_classify.sh')
 
-print('\n' + 'Core Metrics' + '\n')
+# STEP 7. Generate core metrics.
+
+print('\n' + CRED + 'Core Metrics' + CEND + '\n')
 
 sampling_depth = 20000
 
 os.system('bash/q2pipeline/q2_core_metrics.sh' + str(sampling_depth))
 
-print('\n' + 'Beta Group Significance' + '\n')
+# STEP 8. Run pairwise beta significance
+
+print('\n' + CRED + 'Beta Group Significance' + CEND + '\n')
 
 df_meta = pd.read_csv('dataflow/00-meta/sample-metadata.tsv', sep = '\t')
 columns = list(df_meta)
@@ -165,8 +186,9 @@ for cname in columns:
 	command = 'bash/q2pipeline/q2_beta_sig.sh' + ' ' + str(cname) + ' ' + output_f
 	os.system(command)
 
+# STEP 9. Save parameters to the log directory
+
 data_params.update({'Sampling Depth, Core Metrics': sampling_depth})
 data_params.update({'Paired': paired})
-
 df_data_params = pd.DataFrame.from_dict(data_params, orient="index")
 df_data_params.to_csv("dataflow/00-logs/selected_parameters.csv")
