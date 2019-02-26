@@ -40,6 +40,9 @@ for dir in dirs:
 	if os.path.exists(dir_to_make) == False:
 		os.mkdir(dir_to_make)
 
+if os.path.exists('dataflow/02-qiime-viz/beta-sig') == False:
+	os.mkdir('dataflow/02-qiime-viz/beta-sig')
+
 print('\n' + 'PRIMER TRIMMING')
 
 forward = input('\n' + 'Forward primer sequence:')
@@ -104,7 +107,6 @@ if paired == True:
 else:
 	os.system('bash/q2pipeline/q2_import.sh \'SampleData[SequencesWithQuality]\'')
 
-
 print('\n' + 'Visualize dataflow/02-qiime-viz/demux-trimmed.qzv at https://view.qiime2.org/' + '\n')
 
 print('\n' + 'DADA2' + '\n')
@@ -154,6 +156,17 @@ print('\n' + 'Core Metrics' + '\n')
 sampling_depth = 20000
 
 os.system('bash/q2pipeline/q2_core_metrics.sh' + str(sampling_depth))
+
+print('\n' + 'Beta Group Significance' + '\n')
+
+df_meta = pd.read_csv('dataflow/00-meta/sample-metadata.tsv', sep = '\t')
+columns = list(df_meta)
+columns.remove('#SampleID')
+
+for cname in columns:
+	output_f = 'dataflow/02-qiime-viz/weighted-unifrac-' + str(cname) + '-beta-significance.qzv'
+	command = 'bash/q2pipeline/q2_beta_sig.sh' + ' ' + str(cname) + ' ' + output_f
+	os.system(command)
 
 data_params.update({'Sampling Depth, Core Metrics': sampling_depth})
 data_params.update({'Paired': paired})
