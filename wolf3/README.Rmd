@@ -1,0 +1,73 @@
+---
+title: "Qiime2 Pipeline Wrapper"
+author: Cameron Strachan
+date: '2019-02-18'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+### Summary 
+
+Qiime2 is build up of plugins, which act on *.qza* files. This is a data format specific to qiime2. There is a second type of qimme2 file, the *.qzv* files, which are files that can be visualized on a website (*https://view.qiime2.org/*). When using a plugin, the command always starts with *qimme*, then the name of the plugin and the specific function within that plugin you want to run. There is also always an input file and then an output file or output directory. The documentation is changing constantly for qiime2, so always go to the website (*https://qiime2.org/*), click on DOCS, and search there specifically for plugins and their options. 
+
+**Example plugin**
+  
+The following is an example which takes a single *.qza* file input (rep-seqs-dn-97.qza), which are the sequences. This plugin is going to take the sequences and produce four different output files (an alignment, a masked alignment, a tree and a rooted tree). Input and outputs are the basic options for most plugins, but they also work like any other command line software, where there are paramaters you can set and change. These are all listed in the qimme2 plugin docs (*https://qiime2.org/*). 
+
+```{bash, eval=F}
+qiime phylogeny align-to-tree-mafft-fasttree \
+  --i-sequences dataflow/02-qiime/rep-seqs-dn-97.qza \
+  --o-alignment dataflow/02-qiime/aligned-rep-seqs-dn-97.qza \
+  --o-masked-alignment dataflow/02-qiime/masked-aligned-rep-seqs-dn-97.qza \
+  --o-tree dataflow/02-qiime/unrooted-tree.qza \
+  --o-rooted-tree dataflow/02-qiime/rooted-tree.qza
+```
+
+**Installation**  
+
+When installing qiime2, following the instruction at *https://qiime2.org/* using conda. This will create an environment for qiime2, which is activated each time before running qiime2 using the version name of qiime2 (ex. conda activate qiime2-2019.1).
+
+### Qiime2 processing pipeline (q2pipeline.py)
+
+**Overview**  
+
+I have wrote a program that is a wrapper for qiime2. Basically, all you need to do is tell the program if the data is paired or single end, whether you want to train a new classifier, and what sub sampling depth you would like for the down stream alpha diversity analysis. All you need is the program q2pipeline.py and the folder q2pipeline, which contains bash scripts. When you run the program, it will create all the directories needed. This wrapper program is only meant to standardize and run the core data processing steps, but any qimme plugins can be run individually or in addition. An example command for every plugin used in this pipeline will be in the q2pipeline folder called example_commands.txt. A detailed description of each commoand can be found in a qimme2 tutorial I used to set everything up (https://docs.qiime2.org/2019.1/tutorials/moving-pictures/). Note that this link may not work when qimme2 gets updated again, and so you willl need to go to the main website and navigate to the moving pictures tutorial.   
+
+**A note on the directory structure**  
+
+I have followed a directory structure I typically use to set up this pipeline. Everytime the pipeline is run on a new set of data, it should get a folder with a project name. q2pipeline.py is then run from within this project folder. This will save the parameters used to analyze the data within the project folder, so when a publication is written, it will be easy to make sure it is reproducible. 
+
+**Where to put the data**  
+  
+With the project folder, after running q2pipeline.py, a folder called *dataflow* cotaining 01-fastq and 00-meta will be made. Zipped fastq files go into 01-fastq and the meta data file (sample-metadata.tsv) go into the 00-meta folder. The  sequencing data must follow the illumina naming convention, regardless of whether it is illumina data, so that the character after the 3rd underscore specifies paired reads (R1 vs R2). If the data is not paired, then all files must contain R1 (*ex. W1f_S45_L001_R1_001.fastq.gz*). The meta data must be named sample-metadata.tsv and follow the qiime2 meta data format. An example of this format will be in the q2pipeline folder called sample-metadata-example.tsv.
+
+
+**A note on the output**  
+
+The outputs of the pipline will end up in 4 directories: 00-logs, 02-qiime-viz, 03-asv-seqs and 03-asv-table. 00-logs contains the primer trimming stats and the parameters that were set for the pipeline. It is a good idea to look at the primer trimming stats and make sure that the primer trimming worked. Then, the *selected_parameters.csv* will keep all of the parameters saved for when writing a publication. 02-qiime-viz will contain all of the visualizations, more of which can be read about in the moving pictures tutorial. 03-asv-seqs contains representative sequences (-97), which were clustered from the ASVs at 97% identity. 03-asv-table contains the count tables, the toxonomy table and a txt file that is backward compatible with qiime1, for anyone who is used to doing analysis there. 
+
+
+**Running the pipeline**
+
+
+**1.** Before starting QIIME2, always type the following into terminal.  This enters a separate environment where everything you need for QIIME is installed. Then cd into the directory that we are working from, which contains q2pipeline.py and the folder q2pipeline.
+
+```{bash, eval=F}
+conda activate qiime2-2019.1
+cd project_folder
+```
+
+
+**2.** Then type the following to run the pipeline. If the data is single end, replace *paired* with *single*. If you do not want to re-train the classifier, type *off* instead of *train*. Finally, the last number is the sampling depth used to do some of the downsteam analysis. You can also check the rarefraction curve at the end of the analysis to see if this number is not too low. Also, sample with a number of reads remaining is lower than this, the sample will be removed. 
+
+```{bash, eval=F}
+python q2pipeline.py paired train 20000
+```
+
+  
+**3.** After you have run the pipeline and put the raw data and meta data into the correct folders, then the program will ask for the forward and reverse primers. Copy paste the primers in with no white space before or after. 
+
+**4.** Once the data is imported into a .qza file, it is made into a visualization where we can see the quality across the sequences plotted. This will inform us on how to trim the sequences. Use the online tool to check the *.qzv* file (*https://view.qiime2.org/*). We then need to select a how much we want to trim from the left to which part of the sequence for both the forward and reverse reads. The program will ask you where you want to trim. 
+
+
