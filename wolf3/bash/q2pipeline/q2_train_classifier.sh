@@ -4,6 +4,8 @@
 
 forward_primer=$1
 reverse_primer=$2
+min_length=$3
+max_length=$4
 
 qiime tools import \
   --type 'FeatureData[Sequence]' \
@@ -20,8 +22,8 @@ qiime feature-classifier extract-reads \
   --i-sequences dataflow/02-qiime/silva_132_99_16S.qza \
   --p-f-primer $forward_primer \
   --p-r-primer $reverse_primer \
-  --p-min-length 100 \
-  --p-max-length 400 \
+  --p-min-length $min_length \
+  --p-max-length $max_length \
   --o-reads dataflow/02-qiime/silva_132_99_16S_trimmed.qza
 
 qiime feature-classifier fit-classifier-naive-bayes \

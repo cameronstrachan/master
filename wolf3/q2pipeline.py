@@ -1,4 +1,5 @@
 import os, sys
+import pandas as pd
 
 print("\n" + 'This is a qimme2 wrapper to standaridize running qimme2')
 
@@ -86,10 +87,12 @@ for file in files:
 
 print('\n' + 'TRAIN CLASSIFIER' + '\n')
 
-command = 'bash/q2pipeline/q2_train_classifier.sh ' + str(forward) + ' ' + str(reverse)
+minLength = 100
+maxLength = 400
+
+command = 'bash/q2pipeline/q2_train_classifier.sh ' + str(forward) + ' ' + str(reverse) + ' ' + str(minLength) + ' ' + str(maxLength)
 
 os.system(command)
-
 
 print('\n' + 'DATA IMPORT' + '\n')
 
@@ -151,7 +154,7 @@ sampling_depth = 20000
 os.system('bash/q2pipeline/q2_core_metrics.sh' + str(sampling_depth))
 
 data_params.update({'Sampling Depth, Core Metrics': sampling_depth})
-data_params.update({'Sequencing Type': paired})
+data_params.update({'Paired': paired})
 
 df_data_params = pd.DataFrame.from_dict(data_params, orient="index")
 df_data_params.to_csv("dataflow/00-logs/selected_parameters.csv")

@@ -36,6 +36,6 @@ qiime diversity alpha-group-significance \
 qiime diversity alpha-rarefaction \
   --i-table dataflow/02-qiime/table-dn-97.qza \
   --i-phylogeny dataflow/02-qiime/rooted-tree.qza \
-  --p-max-depth 10000 \
+  --p-max-depth $sample_depth \
   --m-metadata-file dataflow/00-meta/sample-metadata.tsv \
   --o-visualization dataflow/02-qiime-viz/alpha-rarefaction.qzv
