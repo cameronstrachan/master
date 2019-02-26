@@ -150,4 +150,8 @@ sampling_depth = 20000
 
 os.system('bash/q2pipeline/q2_core_metrics.sh' + str(sampling_depth))
 
-data_params.update('Sampling Depth, Core Metrics': sampling_depth)
+data_params.update({'Sampling Depth, Core Metrics': sampling_depth})
+data_params.update({'Sequencing Type': paired})
+
+df_data_params = pd.DataFrame.from_dict(data_params, orient="index")
+df_data_params.to_csv("dataflow/00-logs/selected_parameters.csv")
