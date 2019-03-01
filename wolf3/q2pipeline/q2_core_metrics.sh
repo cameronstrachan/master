@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script runs various standard analysis from qiime2 and outputs all the 
+# This script runs various standard analysis from qiime2 and outputs all the
 # visualizations to dataflow/02-qiime-viz/.
 
 sample_depth=$1
@@ -39,7 +39,7 @@ qiime diversity alpha-rarefaction \
   --p-max-depth $sample_depth \
   --m-metadata-file dataflow/00-meta/sample-metadata.tsv \
   --o-visualization dataflow/02-qiime-viz/alpha-rarefaction.qzv
-  
+
 qiime taxa barplot \
   --i-table dataflow/02-qiime/table-dn-97.qza \
   --i-taxonomy dataflow/02-qiime/silva-taxonomy.qza \

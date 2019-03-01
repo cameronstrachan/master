@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# This script runs paiwise beta significance comparisons and saves the visualizations to 
-dataflow/02-qiime-viz/beta-group-significance/.
+# This script runs paiwise beta significance comparisons and saves the visualizations to
+# dataflow/02-qiime-viz/beta-sig/.
 
 colname=$1
 fileoutput=$2
