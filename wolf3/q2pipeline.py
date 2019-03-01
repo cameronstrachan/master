@@ -77,9 +77,9 @@ for file in files:
 		output_f = dirout + file
 
 		if type == 'R1':
-			command = 'cutadapt  -f "fastq"  -o ' + output_f + forward_in + input_f + ' > dataflow/00-logs/forward_primer_trimming_stats.txt'
+			command = 'cutadapt  -f "fastq"  -o ' + output_f + forward_in + input_f + ' >> dataflow/00-logs/forward_primer_trimming_stats.txt'
 		else:
-			command = 'cutadapt  -f "fastq"  -o ' + output_f + reverse_in + input_f + ' > dataflow/00-logs/reverse_primer_trimming_stats.txt'
+			command = 'cutadapt  -f "fastq"  -o ' + output_f + reverse_in + input_f + ' >> dataflow/00-logs/reverse_primer_trimming_stats.txt'
 
 		os.system(command)
 
@@ -92,8 +92,8 @@ for file in files:
 		output_f = dirout + file
 
 		if type == 'R1':
-			command = 'cutadapt  -f "fastq"  -o ' + output_f + forward_in + input_f + ' > dataflow/00-logs/forward_primer_trimming_stats.txt'
-			command = 'cutadapt  -f "fastq"  -o ' + output_f + reverse_in + output_f + ' > dataflow/00-logs/reverse_primer_trimming_stats.txt'
+			command = 'cutadapt  -f "fastq"  -o ' + output_f + forward_in + input_f + ' >> dataflow/00-logs/forward_primer_trimming_stats.txt'
+			command = 'cutadapt  -f "fastq"  -o ' + output_f + reverse_in + output_f + ' >> dataflow/00-logs/reverse_primer_trimming_stats.txt'
 
 
 		os.system(command)
@@ -189,7 +189,7 @@ columns = list(df_meta)
 columns.remove('#SampleID')
 
 for cname in columns:
-	output_f = 'dataflow/02-qiime-viz/weighted-unifrac-' + str(cname) + '-beta-significance.qzv'
+	output_f = 'dataflow/02-qiime-viz/beta-sig/weighted-unifrac-' + str(cname) + '-beta-significance.qzv'
 	command = 'q2pipeline/q2_beta_sig.sh' + ' ' + str(cname) + ' ' + output_f
 	os.system(command)
 
