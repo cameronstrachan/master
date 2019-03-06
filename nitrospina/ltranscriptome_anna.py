@@ -75,7 +75,7 @@ if runbowtie == 'y':
 
         if file.split('_')[2] == '1.fastq':
 
-            bbmap_command = "bbmap.sh threads=60 ambig=random in=dataflow/01-fastq/" + \
+            bbmap_command = "bbmap.sh threads=60 ambig=random in=dataflow/01-fastq/test/" + \
             file + " " + "out=dataflow/03-sam/" + filename + "_all_nitrospina_genomes.sam" + \
             " ref=dataflow/01-prot/genes/all_nitrospina_genomes.fasta"
 
