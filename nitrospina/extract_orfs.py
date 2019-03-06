@@ -2,7 +2,7 @@ import os, sys
 from Bio.Seq import Seq
 import pandas as pd
 
-sys.path.insert(0, '/Users/cameronstrachan/master/')
+sys.path.insert(0, '/home/strachan/master/')
 from modules import seq_core_lin as sc
 
 file = 'all_nitrospina_genomes.fasta'
