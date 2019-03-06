@@ -49,3 +49,5 @@ def extractORFs_gff3(self, gff3_table_loc = 'dataflow/00-meta/all_nitrospina_gen
     #seq.complement()
     #seq.transcribe()
     #seq.translate()
+
+file_obj.extractORFs_gff3()
