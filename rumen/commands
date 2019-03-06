@@ -2,7 +2,7 @@
 scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/milk-merge/dataflow/02-qiime/silva-taxonomy-no-contam.qza /Users/cameronstrachan/master/milk/milk-merge/dataflow/02-qiime/
 
 
-
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/nitrospina/dataflow/03-sam-counts/* /Users/cameronstrachan/master/nitrospina/dataflow/03-sam-counts/
 
 
 scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rumen/dataflow/04-analysis-tables/selected_genomes_sharedPI.csv /Users/cameronstrachan/master/rumen/dataflow/04-analysis-tables/
