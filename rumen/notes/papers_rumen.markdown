@@ -147,4 +147,30 @@ _Denman_
 ### Comparative Genome Analysis of Prevotella ruminicola and Prevotella bryantii: Insights into Their Environmental Niche
 
 - Compared ruminicola 23 and bryantii B14, both rumen isolates falling into the different groups I identified.
-- Noted that 
+- Noted that
+
+
+### Control of lactate accumulation in ruminants using Prevotella bryantii
+
+_Rodriguez_
+
+- Used Byrantii 25A to compete for starch and produce VFA and not lactate
+- Ruminants evolved to eat roughage
+- Starch elevates VFAs and decreases pH
+- Say that ruminocci, along with Fibrobacter, specialize in cellulose degradation
+- Cellulose fermentation results mainly in acetate, which grain results in propanoate
+- Streptoccosu bovis has a selective advantage in the lowered pH
+- S.bovis switches to lactate production at low pH
+- M.esdenii was formerly Peptostreptoccou, produces valerate and butyrate
+- M.elsdenii prevented SARA in steers but not in dairy cows
+- Selemonas was also tested and showed some effecteviness as a probiotic, again with the idea of consuming lactate
+- Also thought that M.elsdenii doesnt have catabolite repression
+- When M.elsdenii is co-cultured with S.bovis, its growth is greatly reduced during the initial phase of the incubation. Think that the lower pH and switch to lactate fermentation slows the growth dramatically.
+- Selenomas ruminantium and Prionibacteria were tested but were never successful as they use several other sugars and some are acid sensitive.
+- See catbolite repression as the main reason why lactate consumers don't work
+- Lactate utilization is not a predominant pathway in the grain-adapted rumen.
+- Starch utilization theory is that there is competition between microbes that drive starch fermentation to acetate, propinoate and succinate compete against lacate producers, which thrive under the lower pH.
+- Bacteroides ruminicola (now prevotella), though to grow poorly on stach.
+- P bryantii grows well on starch and grows well down to pH 5.5
+- P bryanti produces succinate and acetate as the mahor end products
+- 

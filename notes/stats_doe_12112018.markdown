@@ -32,3 +32,13 @@
 - fractional factorial design gives you the main effects and some interactions. for example, a half factorial design removes half of the variables, but masks the interactions.
 
 [lectures link](http://www.lithoguru.com/scientist/statistics/course.html)
+
+## Machine learning Updates
+
+**Bias Variance trade offs**
+
+- If the method makes similar predictions across different training data sets, then it has low variance. 
+- Bias is how far the model os off from real life - when they don't capture the complexity. 
+- The is a Bias variance trade off:
+	- As model complexity increases, variance increases. Simple models will have less variance across datasets, but will have high bias. 
+	- 
