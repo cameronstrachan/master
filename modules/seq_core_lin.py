@@ -8,6 +8,7 @@ import subprocess
 #from Bio.Seq import Seq
 from operator import itemgetter
 import argparse
+import pandas as pd
 
 
 #sys.path.insert(0, '/home/strachan/master')
