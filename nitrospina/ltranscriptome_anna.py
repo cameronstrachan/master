@@ -21,6 +21,33 @@ if downloaddata == 'y':
         ss.srafastqdownlaod(acc, outputdir='dataflow/01-fastq/OMZ')
 
 
+
+downloaddata = input("\n" + "Download data Luke et all? (y or n):")
+
+
+if downloaddata == 'y':
+
+    accession_list = ["SRX1337936", "SRX1337939"]
+
+
+    for acc in accession_list:
+        ss.srafastqdownlaod(acc, outputdir='dataflow/01-fastq/Luke')
+
+
+downloaddata = input("\n" + "Download data Line P trial? (y or n):")
+
+
+if downloaddata == 'y':
+
+    accession_list = ["SRX1939211", "SRX1939212", "SRX1939213", "SRX1939214", "SRX1939215", "SRX1939252", "SRX1939253"]
+
+
+    for acc in accession_list:
+        ss.srafastqdownlaod(acc, outputdir='dataflow/01-fastq/LineP')
+
+
+
+
 runprodigal = input("\n" + "Rename genomes and run prodigal on all nitrospina genomes to generate gff3 files? (y or n):")
 
 if runprodigal == 'y':
