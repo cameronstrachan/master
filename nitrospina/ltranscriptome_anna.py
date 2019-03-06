@@ -79,10 +79,14 @@ if runbowtie == 'y':
             file + " " + "out=dataflow/03-sam/" + filename + "_all_nitrospina_genomes.sam" + \
             " dataflow/01-prot/genes/all_nitrospina_genomes.gff3"
 
+            print(bbmap_command)
+
             htseq_command = "htseq-count -s no -t CDS -i ID --additional-attr=ID " + \
             "dataflow/03-sam/" + filename + "_all_nitrospina_genomes.sam" + " " + \
             "dataflow/01-prot/genes/all_nitrospina_genomes.gff3 " + \
             "> " + "dataflow/03-sam-counts/" + filename + "_all_nitrospina_genomes.txt"
+
+            print(htseq_command)
 
             os.system(bbmap_command)
             os.system(htseq_command)
