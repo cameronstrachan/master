@@ -77,7 +77,7 @@ if runbowtie == 'y':
 
             bbmap_command = "bbmap.sh threads=60 ambig=random in=dataflow/01-fastq/" + \
             file + " " + "out=dataflow/03-sam/" + filename + "_all_nitrospina_genomes.sam" + \
-            " dataflow/01-prot/genes/all_nitrospina_genomes.gff3"
+            " ref=dataflow/01-prot/genes/all_nitrospina_genomes.gff3"
 
             print(bbmap_command)
 
