@@ -73,7 +73,7 @@ if runbowtie == 'y':
 
         filename = file.split('_')[0]
 
-        if file.split('_')[2] == '2':
+        if file.split('_')[2] == 1:
 
             bbmap_command = "bbmap.sh threads=60 ambig=random in=dataflow/01-fastq/" + \
             file + " " + "out=dataflow/03-sam/" + filename + "_all_nitrospina_genomes.sam" + \
