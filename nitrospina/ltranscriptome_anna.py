@@ -18,7 +18,7 @@ if downloaddata == 'y':
 
 
     for acc in accession_list:
-        ss.srafastqdownlaod(acc, outputdir='dataflow/01-fastq')
+        ss.srafastqdownlaod(acc, outputdir='dataflow/01-fastq/OMZ')
 
 
 runprodigal = input("\n" + "Rename genomes and run prodigal on all nitrospina genomes to generate gff3 files? (y or n):")
@@ -64,7 +64,7 @@ runbowtie = input("\n" + "Run BBMap of all transcriptomes against? (y or n):")
 
 if runbowtie == 'y':
 
-    indir = 'dataflow/01-fastq/test/'
+    indir = 'dataflow/01-fastq/'
 
     files_all = [f for f in os.listdir(indir) if f.endswith(".fastq")]
     files = [ p for p in files_all if not(p.startswith('.'))]
@@ -75,7 +75,7 @@ if runbowtie == 'y':
 
         if file.split('_')[2] == '1.fastq':
 
-            bbmap_command = "bbmap.sh threads=60 ambig=random in=dataflow/01-fastq/test/" + \
+            bbmap_command = "bbmap.sh threads=60 ambig=random in=dataflow/01-fastq/" + \
             file + " " + "out=dataflow/03-sam/" + filename + "_all_nitrospina_genomes.sam" + \
             " ref=dataflow/01-nucl/all_nitrospina_genomes.fasta"
 
