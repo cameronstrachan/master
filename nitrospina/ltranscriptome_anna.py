@@ -40,7 +40,7 @@ if runprodigal == 'y':
 
             file_obj.headerrename()
 
-    files_r = [item + "_rename.fasta" for item in files]
+    files_r = [item.split('.f')[0] + "_rename.fasta" for item in files]
 
     sg.concat(inputfolder='dataflow/01-nucl/', outputpath='dataflow/01-nucl/all_nitrospina_genomes.fasta', filenames=files_r )
 
