@@ -66,7 +66,7 @@ if runbowtie == 'y':
 
     indir = 'dataflow/01-fastq/test/'
 
-    files_all = [f for f in os.listdir(indir) if f.endswith(".fastq.gz")]
+    files_all = [f for f in os.listdir(indir) if f.endswith(".fastq")]
     files = [ p for p in files_all if not(p.startswith('.'))]
 
     for file in files:
