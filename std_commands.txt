@@ -1,0 +1,19 @@
+### STANDARD COMMANDS
+
+# Login
+
+J5uZUfVJHx
+
+# SCP
+
+strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/
+
+/Users/cameronstrachan/master/
+
+# RSYNC
+
+rsync -e ssh -avzP --append
+
+# Renaming
+
+for f in *.fastq.gz; do mv -- "$f" "$\{f//-/x\}"; done}
