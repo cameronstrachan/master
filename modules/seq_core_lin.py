@@ -5,7 +5,7 @@ import os, sys
 import subprocess
 #from Bio import SeqIO
 #from Bio.Blast import NCBIWWW
-#from Bio.Seq import Seq
+from Bio.Seq import Seq
 from operator import itemgetter
 import argparse
 import pandas as pd
@@ -304,7 +304,7 @@ class Fasta(File):
                 header = k.rstrip()
                 if header == contig:
                     seq = v.rstrip()
-                    seq_new = seq[start: end]
+                    seq_new = seq[start:end]
                     if direction == '-':
                         seq_new_obj = Seq(seq_new)
                         seq_new_rc = str(seq_new_obj.reverse_complement())
