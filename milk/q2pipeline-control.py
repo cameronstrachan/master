@@ -23,14 +23,14 @@ elif str(sys.argv[1]) == 'paired':
 if os.path.exists('dataflow') == False:
 	os.mkdir('dataflow')
 
-if os.path.exists('dataflow/00-meta') == False:
-	os.mkdir('dataflow/00-meta')
+if os.path.exists('dataflow/00-meta-control') == False:
+	os.mkdir('dataflow/00-meta-control')
 
-if os.path.exists('dataflow/01-fastq') == False:
-	os.mkdir('dataflow/01-fastq')
+if os.path.exists('dataflow/01-fastq-control') == False:
+	os.mkdir('dataflow/01-fastq-control')
 
-if os.path.exists('dataflow/01-fastq/trimmed') == False:
-	os.mkdir('dataflow/01-fastq/trimmed')
+if os.path.exists('dataflow/01-fastq-control/trimmed') == False:
+	os.mkdir('dataflow/01-fastq-control/trimmed')
 
 if os.path.exists('dataflow/00-databases') == False:
 	os.mkdir('dataflow/00-databases')
@@ -39,7 +39,7 @@ start_message = 'There needs to be several files in the correct directories befo
 
 check = input("\n" + start_message + '\n' + '\n' + 'Hit any key to continue')
 
-dirs = ['02-qiime', '02-qiime-viz', '03-asv-seqs', '03-asv-table', '00-logs']
+dirs = ['02-qiime-control', '02-qiime-viz-control', '03-asv-seqs-control', '03-asv-table-control', '00-logs-control']
 #dirs_control = [d + '-control' for d in dirs]
 
 for dir in dirs:
@@ -48,8 +48,8 @@ for dir in dirs:
 	if os.path.exists(dir_to_make) == False:
 		os.mkdir(dir_to_make)
 
-if os.path.exists('dataflow/02-qiime-viz/beta-sig') == False:
-	os.mkdir('dataflow/02-qiime-viz/beta-sig')
+if os.path.exists('dataflow/02-qiime-viz-control/beta-sig') == False:
+	os.mkdir('dataflow/02-qiime-viz-control/beta-sig')
 
 # STEP 2. Trim the primers.
 
@@ -63,8 +63,8 @@ reverse = input('\n' + 'Reverse primer sequence:')
 
 reverse_in = ' -g ' + str(reverse) + ' '
 
-dirin = 'dataflow/01-fastq/'
-dirout = 'dataflow/01-fastq/trimmed/'
+dirin = 'dataflow/01-fastq-control/'
+dirout = 'dataflow/01-fastq-control/trimmed/'
 
 files = [f for f in os.listdir(dirin) if f.endswith('.fastq.gz')]
 
@@ -77,9 +77,9 @@ for file in files:
 		output_f = dirout + file
 
 		if type == 'R1':
-			command = 'cutadapt  -f "fastq"  -o ' + output_f + forward_in + input_f + ' >> dataflow/00-logs/forward_primer_trimming_stats.txt'
+			command = 'cutadapt  -f "fastq"  -o ' + output_f + forward_in + input_f + ' >> dataflow/00-logs-control/forward_primer_trimming_stats.txt'
 		else:
-			command = 'cutadapt  -f "fastq"  -o ' + output_f + reverse_in + input_f + ' >> dataflow/00-logs/reverse_primer_trimming_stats.txt'
+			command = 'cutadapt  -f "fastq"  -o ' + output_f + reverse_in + input_f + ' >> dataflow/00-logs-control/reverse_primer_trimming_stats.txt'
 
 		os.system(command)
 
@@ -92,8 +92,8 @@ for file in files:
 		output_f = dirout + file
 
 		if type == 'R1':
-			command = 'cutadapt  -f "fastq"  -o ' + output_f + forward_in + input_f + ' >> dataflow/00-logs/forward_primer_trimming_stats.txt'
-			command = 'cutadapt  -f "fastq"  -o ' + output_f + reverse_in + output_f + ' >> dataflow/00-logs/reverse_primer_trimming_stats.txt'
+			command = 'cutadapt  -f "fastq"  -o ' + output_f + forward_in + input_f + ' >> dataflow/00-logs-control/forward_primer_trimming_stats.txt'
+			command = 'cutadapt  -f "fastq"  -o ' + output_f + reverse_in + output_f + ' >> dataflow/00-logs-control/reverse_primer_trimming_stats.txt'
 
 
 		os.system(command)
@@ -103,12 +103,12 @@ for file in files:
 print('\n' + CRED + 'DATA IMPORT' + CEND + '\n')
 
 if paired == True:
-	os.system('q2pipeline/q2_import.sh \'SampleData[PairedEndSequencesWithQuality]\'')
+	os.system('../bash/q2pipeline_control/q2_import.sh \'SampleData[PairedEndSequencesWithQuality]\'')
 
 else:
-	os.system('q2pipeline/q2_import.sh \'SampleData[SequencesWithQuality]\'')
+	os.system('../bash/q2pipeline_control/q2_import.sh \'SampleData[SequencesWithQuality]\'')
 
-print('\n' + CGREEN + 'Visualize dataflow/02-qiime-viz/demux-trimmed.qzv at https://view.qiime2.org/' + CEND + '\n')
+print('\n' + CGREEN + 'Visualize dataflow/02-qiime-viz-control/demux-trimmed.qzv at https://view.qiime2.org/' + CEND + '\n')
 
 print('\n' + CRED + 'DADA2' + CEND + '\n')
 
@@ -124,7 +124,7 @@ if paired == True:
 
 	trunc_reverse = str(input("\n" + "Reverse Read, Length Cutoff? (interger):"))
 
-	command = 'q2pipeline/q2_dada2-paired.sh ' + left_forward + ' ' + left_reverse + ' ' + trunc_forward + ' ' + trunc_reverse + ' ' + cores
+	command = '../bash/q2pipeline_control/q2_dada2-paired.sh ' + left_forward + ' ' + left_reverse + ' ' + trunc_forward + ' ' + trunc_reverse + ' ' + cores
 	print('\n')
 	os.system(command)
 
@@ -136,7 +136,7 @@ else:
 
 	trunc = str(input("\n" + "Length Cutoff? (interger):"))
 
-	command = 'q2pipeline/q2_dada2-single.sh ' + left + ' ' + trunc + ' ' + cores
+	command = '../bash/q2pipeline_control/q2_dada2-single.sh ' + left + ' ' + trunc + ' ' + cores
 	print('\n')
 	os.system(command)
 
@@ -151,7 +151,7 @@ if str(sys.argv[2]) == 'train':
 	#minLength = 100
 	#maxLength = 500
 
-	command = 'q2pipeline/q2_train_classifier.sh ' + str(forward) + ' ' + str(reverse)
+	command = '../bash/q2pipeline_control/q2_train_classifier.sh ' + str(forward) + ' ' + str(reverse)
 
 	os.system(command)
 
@@ -164,13 +164,13 @@ elif str(sys.argv[2]) == 'off':
 
 print('\n' + CRED + '97% CLUSTERING' + CEND + '\n')
 
-os.system('q2pipeline/q2_clustering97.sh')
+os.system('../bash/q2pipeline_control/q2_clustering97.sh')
 
 # STEP 6. Taxonomic classify sequences.
 
 print('\n' + CRED + 'CLASSIFICATION' + CEND + '\n')
 
-os.system('q2pipeline/q2_classify.sh')
+os.system('../bash/q2pipeline_control/q2_classify.sh')
 
 # STEP 7. Generate core metrics.
 
@@ -178,19 +178,19 @@ print('\n' + CRED + 'CORE METRICS' + CEND + '\n')
 
 sampling_depth = int(sys.argv[3])
 
-os.system('q2pipeline/q2_core_metrics.sh' + ' ' + str(sampling_depth))
+os.system('../bash/q2pipeline_control/q2_core_metrics.sh' + ' ' + str(sampling_depth))
 
 # STEP 8. Run pairwise beta significance
 
 print('\n' + CRED + 'BETA GROUP SIGNIFICANCE' + CEND + '\n')
 
-df_meta = pd.read_csv('dataflow/00-meta/sample-metadata.tsv', sep = '\t')
+df_meta = pd.read_csv('dataflow/00-meta-control/sample-metadata.tsv', sep = '\t')
 columns = list(df_meta)
 columns.remove('#SampleID')
 
 for cname in columns:
-	output_f = 'dataflow/02-qiime-viz/beta-sig/weighted-unifrac-' + str(cname) + '-beta-significance.qzv'
-	command = 'q2pipeline/q2_beta_sig.sh' + ' ' + str(cname) + ' ' + output_f
+	output_f = 'dataflow/02-qiime-viz-control/beta-sig/weighted-unifrac-' + str(cname) + '-beta-significance.qzv'
+	command = '../bash/q2pipeline_control/q2_beta_sig.sh' + ' ' + str(cname) + ' ' + output_f
 	os.system(command)
 
 # STEP 9. Save parameters to the log directory
@@ -198,4 +198,4 @@ for cname in columns:
 data_params.update({'Sampling Depth, Core Metrics': sampling_depth})
 data_params.update({'Paired': paired})
 df_data_params = pd.DataFrame.from_dict(data_params, orient="index")
-df_data_params.to_csv("dataflow/00-logs/selected_parameters.csv")
+df_data_params.to_csv("dataflow/00-logs-control/selected_parameters.csv")
