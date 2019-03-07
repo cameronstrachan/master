@@ -39,7 +39,7 @@ downloaddata = input("\n" + "Download data Line P trial? (y or n):")
 
 if downloaddata == 'y':
 
-    accession_list = ["SRX1939211", "SRX1939212", "SRX1939213", "SRX1939214", "SRX1939215", "SRX1939252", "SRX1939253"]
+    accession_list = ["SRR3883063", "SRR3883064", "SRR3883065", "SRR3883066", "SRR3883067", "SRR3883179", "SRR3883180"]
 
 
     for acc in accession_list:
