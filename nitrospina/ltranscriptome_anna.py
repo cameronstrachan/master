@@ -87,11 +87,11 @@ if runprodigal == 'y':
 
     file_obj.runprodigal()
 
-runbowtie = input("\n" + "Run BBMap of all transcriptomes against? (y or n):")
+runbowtie = input("\n" + "Run BBMap of 3 project transcriptomes against Nitrospina? (y or n):")
 
 if runbowtie == 'y':
 
-    indir = 'dataflow/01-fastq/'
+    indir = 'dataflow/01-fastq/OMZ'
 
     files_all = [f for f in os.listdir(indir) if f.endswith(".fastq")]
     files = [ p for p in files_all if not(p.startswith('.'))]
@@ -117,3 +117,33 @@ if runbowtie == 'y':
 
             os.system(bbmap_command)
             os.system(htseq_command)
+
+
+runbowtie = input("\n" + "Run BBMap of Luke et al against Nitrospina? (y or n):")
+
+if runbowtie == 'y':
+
+    indir = 'dataflow/01-fastq/Luke'
+
+    files_all = [f for f in os.listdir(indir) if f.endswith(".fastq")]
+    files = [ p for p in files_all if not(p.startswith('.'))]
+
+    for file in files:
+
+        filename = file.split('_')[0]
+
+        bbmap_command = "bbmap.sh threads=60 ambig=random in=dataflow/01-fastq/" + \
+        file + " " + "out=dataflow/03-sam/" + filename + "_all_nitrospina_genomes.sam" + \
+        " ref=dataflow/01-nucl/all_nitrospina_genomes.fasta"
+
+        print(bbmap_command)
+
+        htseq_command = "htseq-count -s no -t CDS -i ID --additional-attr=ID " + \
+        "dataflow/03-sam/" + filename + "_all_nitrospina_genomes.sam" + " " + \
+        "dataflow/01-prot/genes/all_nitrospina_genomes.gff3 " + \
+        "> " + "dataflow/03-sam-counts/" + filename + "_all_nitrospina_genomes.txt"
+
+        print(htseq_command)
+
+        os.system(bbmap_command)
+        os.system(htseq_command)

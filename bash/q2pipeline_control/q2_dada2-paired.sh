@@ -13,19 +13,19 @@ numthreads=$5
 
 
 qiime dada2 denoise-paired \
-	--i-demultiplexed-seqs dataflow/02-qiime/demux-trimmed.qza \
+	--i-demultiplexed-seqs dataflow/02-qiime-control/demux-trimmed.qza \
 	--p-trim-left-f $trimleft_forward \
 	--p-trim-left-r $trimleft_reverse \
 	--p-trunc-len-f $trunclength_forward \
 	--p-trunc-len-r $trunclength_reverse \
-	--o-representative-sequences dataflow/02-qiime/rep-seqs-dada2.qza \
-	--o-table dataflow/02-qiime/table-dada2.qza \
-	--o-denoising-stats dataflow/02-qiime/stats-dada2.qza \
+	--o-representative-sequences dataflow/02-qiime-control/rep-seqs-dada2.qza \
+	--o-table dataflow/02-qiime-control/table-dada2.qza \
+	--o-denoising-stats dataflow/02-qiime-control/stats-dada2.qza \
 	--p-n-threads $numthreads
 	
 qiime metadata tabulate \
-  --m-input-file dataflow/02-qiime/stats-dada2.qza \
-  --o-visualization dataflow/02-qiime-viz/stats-dada2.qzv
+  --m-input-file dataflow/02-qiime-control/stats-dada2.qza \
+  --o-visualization dataflow/02-qiime-viz-control/stats-dada2.qzv
   
-mv dataflow/02-qiime/rep-seqs-dada2.qza dataflow/02-qiime/rep-seqs.qza
-mv dataflow/02-qiime/table-dada2.qza dataflow/02-qiime/table.qza
+mv dataflow/02-qiime-control/rep-seqs-dada2.qza dataflow/02-qiime-control/rep-seqs.qza
+mv dataflow/02-qiime-control/table-dada2.qza dataflow/02-qiime-control/table.qza
