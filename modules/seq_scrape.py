@@ -9,7 +9,7 @@ genomic data
 '''
 
 def ncbigenomescrape(searchterm, searchterm2='complete genome[title]', location='none'):
-		
+
 	Entrez.email = "strachc@gmail.com"
 
 	searchterm = str(searchterm)
@@ -20,7 +20,7 @@ def ncbigenomescrape(searchterm, searchterm2='complete genome[title]', location=
 	gen_ids = searchrecord["IdList"]
 
 	num_genomes = len(gen_ids)
-	
+
 	print('Number of genomes: %1d' % num_genomes)
 
 	if num_genomes == 0:
@@ -43,14 +43,13 @@ def ncbigenomescrape(searchterm, searchterm2='complete genome[title]', location=
 
 def srafastqdownlaod(accession, outputdir='dataflow/01-fastq'):
 
-	command = '../bin/fastq-dump.2.9.2 ' + '--outdir ' + outputdir + ' --gzip --skip-technical  --readids --read-filter pass --dumpbase --split-3 --clip  ' + accession
+	command = '../bin/fastq-dump.2.9.4 ' + '--outdir ' + outputdir + ' --gzip --skip-technical  --readids --read-filter pass --dumpbase --split-3 --clip  ' + accession
 	process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
 	output, error = process.communicate()
 
 # Testing program
 def main():
 	pass
-    
+
 if __name__ == '__main__':
     main()
-
