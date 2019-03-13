@@ -1,4 +1,5 @@
-library(tidyverse)
+library(tidyr)
+library(dplyr)
 
 # load meta data that specifies control data
 df_phylocounts_meta <- read.csv("~/master/wolf/dataflow/00-meta-merge/sample-complete-all.csv")
@@ -70,7 +71,7 @@ physeq = phyloseq(OTU, TAX, samplesdata, tree)
 library(decontam)
 
 sample_data(physeq)$is.neg <- sample_data(physeq)$SampleOrControl == "Control"
-contam.prev05 <- isContaminant(physeq, method="prevalence", neg="is.neg", threshold=0.2)
+contam.prev05 <- isContaminant(physeq, method="prevalence", neg="is.neg", threshold=0.5)
 
 List_of_contaminants <- subset(contam.prev05,contam.prev05$contaminant == TRUE)
 List_of_contaminants$asv_id <- rownames(List_of_contaminants)
@@ -89,10 +90,10 @@ df.pres <- data.frame(prevalence.pos=taxa_sums(physeq.pos.presence), prevalence.
 
 ggplot(data=df.pres, aes(x=prevalence.neg, y=prevalence.pos, color=contam.prev.contaminant)) + geom_jitter() + ggtitle("Contamination - TRUE")
 
-#over10 <- rownames(subset(df.pres, prevalence.neg > 1))
+over10 <- rownames(subset(df.pres, prevalence.neg > 1))
 all_taxa = taxa_names(physeq)
 my_contaminants <- c(subset(List_of_contaminants, select = asv_id))
-#my_contaminants <- unique(unlist(c(my_contaminants, over10)))
+my_contaminants <- unique(unlist(c(my_contaminants, over10)))
 my_taxa <- all_taxa[!(all_taxa %in% my_contaminants)]
 physeq_no_cont = prune_taxa(my_taxa, physeq)
 

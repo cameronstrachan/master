@@ -3,7 +3,9 @@ import pandas as pd
 
 metadata = 'sample-metadata.tsv'
 
-files = ['feature-table-no-contam-all-feces.txt', 'feature-table-no-contam-all-skin.txt', 'feature-table-no-contam-wild_animals-feces.txt', 'feature-table-no-contam-wild_animals-skin.txt', 'feature-table-no-contam-pet_animals-feces.txt', 'feature-table-no-contam-pet_animals-skin.txt', 'feature-table-no-contam-wild_animals-skin_pack3.txt', 'feature-table-no-contam-wild_animals-feces_pack3.txt']
+#files = ['feature-table-no-contam-all-feces.txt', 'feature-table-no-contam-all-skin.txt', 'feature-table-no-contam-wild_animals-feces.txt', 'feature-table-no-contam-wild_animals-skin.txt', 'feature-table-no-contam-pet_animals-feces.txt', 'feature-table-no-contam-pet_animals-skin.txt', 'feature-table-no-contam-wild_animals-skin_pack3.txt', 'feature-table-no-contam-wild_animals-feces_pack3.txt', 'feature-table-no-contam-all_animals-skin.txt', 'feature-table-no-contam-all_animals-feces.txt']
+
+files = ['feature-table-no-contam-all_animals-skin.txt', 'feature-table-no-contam-all_animals-feces.txt']
 
 df_meta = pd.read_csv('dataflow/00-meta-merge/sample-metadata.tsv', sep = '\t')
 columns = list(df_meta)
