@@ -16,4 +16,4 @@ rsync -e ssh -avzP --append
 
 # Renaming
 
-for f in *.fastq.gz; do mv -- "$f" "$\{f//-/x\}"; done}
+for f in *.fastq.gz; do mv -- "$f" "$\{f//-/x\}"; done

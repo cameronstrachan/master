@@ -14,7 +14,7 @@ for (file in files){
   i <- i + 1
 }
 
-df <- bind_rows(file_list) %>%
+df <- bind_rows(file_list) #%>%
   filter(V2 != "") %>%
   filter(V2 != "1_195") %>%
   filter(V3 >= 2)
@@ -35,7 +35,9 @@ df_gff3 <- df_gff3 %>%
 colnames(df_gff3)[1:4] <- c("contig", "start", "end", "direction")
 
 df_gff3 <- df_gff3 %>%
-  filter(contig != "Ecoli_1")
+  filter(contig != "Ecoli_1") %>%
+  filter(Count > 10) %>%
+  arrange(desc(Count))
 
 write.csv(df_gff3, "~/master/nitrospina/dataflow/00-meta/all_nitrospina_genomes.csv")
 

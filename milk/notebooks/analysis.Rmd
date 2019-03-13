@@ -10,7 +10,7 @@ library(cowplot)
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-df_phylocounts_meta <- read.csv("~/master/milk/milk-merge/dataflow/00-meta/sample-complete-all.txt", sep = "\t")
+df_phylocounts_meta <- read.csv("~/master/milk/dataflow/00-meta-merge/sample-complete-all.txt", sep = "\t")
 
 df_phylocounts_meta$SampleID <- as.character(df_phylocounts_meta$SampleID)
 df_phylocounts_meta$Cow <- as.factor(df_phylocounts_meta$Cow)
@@ -28,7 +28,7 @@ df_phylocounts_meta[,1] <- NULL
 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-df_phlycounts_counts <- read.csv("~/master/milk/milk-merge/dataflow/03-asv-table/feature-table-97.txt", sep = '\t', skip = 1)
+df_phlycounts_counts <- read.csv("~/master/milk/dataflow/03-asv-table-merge/feature-table-97.txt", sep = '\t', skip = 1)
 colnames(df_phlycounts_counts)[1] <- "asv_id"
 
 df_phlycounts_counts <- df_phlycounts_counts[order(df_phlycounts_counts$asv_id),] 
@@ -40,7 +40,7 @@ rownames(otumat) <- as.data.frame(df_phlycounts_counts)[,1]
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-df_phlycounts_tax  <- read.csv("~/master/milk/milk-merge/dataflow/03-asv-table/taxonomy.tsv", sep = '\t')
+df_phlycounts_tax  <- read.csv("~/master/milk/dataflow/03-asv-table-merge/taxonomy.tsv", sep = '\t')
 df_phlycounts_tax$Confidence <- NULL
 colnames(df_phlycounts_tax)[1] <- 'asv_id'
 df_phlycounts_tax$Taxon <- gsub("D_.__", "", df_phlycounts_tax$Taxon)
@@ -70,7 +70,7 @@ library("phyloseq")
 library("ape")
 library(plyr)
 
-tree = read.tree("~/master/milk/milk-merge/dataflow/04-tree/tree.nwk")
+tree = read.tree("~/master/milk/dataflow/04-tree-merge/tree.nwk")
 
 OTU = otu_table(otumat, taxa_are_rows = TRUE)
 TAX = tax_table(taxmat)
@@ -78,7 +78,9 @@ samplesdata <- sample_data(df_phylocounts_meta)
 physeq = phyloseq(OTU, TAX, samplesdata, tree)
 ```
 
-### Contamination
+### Contamination  
+  
+Blue points in addition to those with a prevelance of over 10 in the negative control were removed (prevelance is the number of samples with an OTU observed)
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=3, fig.width=7}
 library(decontam)
@@ -108,18 +110,105 @@ all_taxa = taxa_names(physeq)
 my_contaminants <- c(subset(List_of_contaminants, select = asv_id))
 my_contaminants <- unique(unlist(c(my_contaminants, over10)))
 my_taxa <- all_taxa[!(all_taxa %in% my_contaminants)]
+
 physeq_no_cont = prune_taxa(my_taxa, physeq)
 
 
 physeq_no_cont_trim = prune_samples(sample_sums(physeq_no_cont)>=4000, physeq_no_cont)
+
+physeq_no_cont_trim_df <- psmelt(physeq_no_cont_trim)
+
 physeq_no_cont_trim_rel  = transform_sample_counts(physeq_no_cont_trim, function(x) x / sum(x) )
 
 physeq_no_cont_trim_rel = filter_taxa(physeq_no_cont_trim_rel, function(x) sum(x > 0.05) > (0.2*length(x)), TRUE)
 
 physeq_no_cont_trim_rel_df <- psmelt(physeq_no_cont_trim_rel)
+
+physeq_no_cont_trim_rel_df <- physeq_no_cont_trim_rel_df[!(grepl("LK", physeq_no_cont_trim_rel_df$Sample)), ]
 ```
 
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+physeq_no_cont_trim_500 = prune_samples(sample_sums(physeq_no_cont)>=500, physeq_no_cont)
+
+physeq_no_cont_trim_df_500 <- psmelt(physeq_no_cont_trim_500)
+
+physeq_no_cont_trim_rel_500  = transform_sample_counts(physeq_no_cont_trim_500, function(x) x / sum(x) )
+
+physeq_no_cont_trim_rel_500 = filter_taxa(physeq_no_cont_trim_rel_500, function(x) sum(x > 0.025) > (0.2*length(x)), TRUE)
+
+physeq_no_cont_trim_rel_df_500 <- psmelt(physeq_no_cont_trim_rel_500)
+
+physeq_no_cont_trim_rel_df_500 <- physeq_no_cont_trim_rel_df_500[!(grepl("LK", physeq_no_cont_trim_rel_df_500$Sample)), ]
+
+df_list <- list()
+i <- 1
+
+for (cow_num in unique(physeq_no_cont_trim_rel_df_500$Cow)){
+  df_sub <- subset(physeq_no_cont_trim_rel_df_500, Cow == cow_num)
+  n_cow <- length(unique(df_sub$Sample))
+  
+  if (n_cow == 4){
+    
+    df_list[[i]] <- df_sub
+    i <- i + 1
+  }
+}
+
+physeq_no_cont_trim_rel_df_500_ncow <- bind_rows(df_list)
+```
+  
+There were originally 45802723 total reads. After contamination removal, there were 1113798 reads remaining. Approximately 25% of the data was removed.  
+  
+As for OTUs, there were originally 2937 OTUs. After contamination, 2763 OTUs were remaining. Approximately 5% of the OTUs were removed. Therefore, a small number of OTUs in the controls were responsible for removing most of the data.  
+  
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_before <- df_phlycounts_counts %>%
+  gather(Sample, Abundance, -asv_id) %>%
+  filter(Abundance != 0) %>%
+  distinct()
+
+colnames(df_before)[1] <- "OTU"
+
+df_before <- df_before[!(grepl("LK", df_before$Sample)), ]
+
+df_after <- physeq_no_cont_trim_df %>%
+  select(OTU, Sample, Abundance) %>%
+  filter(Abundance != 0) %>%
+  distinct()
+
+df_after <- df_after[!(grepl("LK", df_after$Sample)), ]
+
+
+total_reads_before <- sum(df_before$Abundance)
+total_reads_after <- sum(df_after$Abundance)
+
+total_otus_before <- length(unique(df_before$OTU))
+total_otus_after <- length(unique(df_after$OTU))
+```
+
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#total_reads_before
+#total_reads_after
+#(total_reads_after / total_reads_before)*100
+```
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#total_otus_before
+#total_otus_after
+#(total_otus_after / total_otus_before)*100
+```
+
+
 ### Prevelant Taxa
+
+Here we are looking at only samples with more than 4000 reads remaining and the most prevelant OTUs. 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 bar_plot <- ggplot() + geom_bar(
@@ -277,6 +366,97 @@ plot_grid(legend)
 
 
 
+
+
+
+### Cow to Cow Comparisons  
+
+Here we are looking at all samples with more than 500 reads remaining and only cows where all 4 treatments were still remaining. 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+physeq_no_cont_trim_rel_df_500_ncow_1half <- subset(physeq_no_cont_trim_rel_df_500_ncow, Cow == 1 | Cow == 7 | Cow == 9 | Cow == 10)
+physeq_no_cont_trim_rel_df_500_ncow_2half <- subset(physeq_no_cont_trim_rel_df_500_ncow, Cow == 12 | Cow == 14 | Cow == 16 | Cow == 17 | Cow == 18)
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+bar_plot <- ggplot() + geom_bar(
+  aes(y = Abundance, x = Sample, fill = family),
+  data = physeq_no_cont_trim_rel_df_500_ncow_1half ,
+  stat = "identity" ,
+  position = "stack"
+)  +labs(x="Category" , y= "Percentage (%)")+
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 16),
+        #axis.text.x = element_blank(), 
+        axis.text.y = element_text(size = 16), 
+        strip.text.x = element_text(size = 20),
+        axis.title.y = element_text(size = 26),
+        axis.title.x = element_text(size = 26)) +
+        #axis.title.x = element_blank()) + 
+     facet_wrap(Cow~Time+Group, scales = 'free_x', ncol = 8)+
+  ylab("Percentage of Sample") #+
+  #xlab("Individual Sample") 
+
+
+tmp <- ggplot_gtable(ggplot_build(bar_plot))
+leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+legend <- tmp$grobs[[leg]]
+
+bar_plot <- bar_plot +
+  theme(legend.position = "none") + 
+  ggtitle("FAMILY") + 
+  theme(plot.title = element_text(size=45))
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=20, fig.width=20}
+plot_grid(bar_plot)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=20, fig.width=20}
+plot_grid(legend)
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+bar_plot <- ggplot() + geom_bar(
+  aes(y = Abundance, x = Sample, fill = family),
+  data = physeq_no_cont_trim_rel_df_500_ncow_2half,
+  stat = "identity" ,
+  position = "stack"
+)  +labs(x="Category" , y= "Percentage (%)")+
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 16),
+        #axis.text.x = element_blank(), 
+        axis.text.y = element_text(size = 16), 
+        strip.text.x = element_text(size = 20),
+        axis.title.y = element_text(size = 26),
+        axis.title.x = element_text(size = 26)) +
+        #axis.title.x = element_blank()) + 
+     facet_wrap(Cow~Time+Group, scales = 'free_x', ncol = 8)+
+  ylab("Percentage of Sample") #+
+  #xlab("Individual Sample") 
+
+
+tmp <- ggplot_gtable(ggplot_build(bar_plot))
+leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+legend <- tmp$grobs[[leg]]
+
+bar_plot <- bar_plot +
+  theme(legend.position = "none") + 
+  ggtitle("FAMILY") + 
+  theme(plot.title = element_text(size=45))
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=20, fig.width=20}
+plot_grid(bar_plot)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=20, fig.width=20}
+plot_grid(legend)
+```
+
+
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 physeq_no_cont_df_count <- as.data.frame(physeq_no_cont@otu_table) %>%
   select(starts_with("c"))
@@ -295,67 +475,113 @@ mat2 <- matrix(mat2, ncol = ncol(features_noheader), dimnames = NULL)
 
 mat_final <- rbind(mat2, mat)
 
-write.table(mat_final, '~/master/milk/milk-merge/dataflow/03-asv-table/feature-table-no-contam.txt', col.names = FALSE, quote = FALSE, row.names = FALSE, sep = "\t")
+write.table(mat_final, '~/master/milk/dataflow/03-asv-table-merge/feature-table-no-contam.txt', col.names = FALSE, quote = FALSE, row.names = FALSE, sep = "\t")
 ```
+
+
 
 ### Rarefaction
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 library(printr)
 library(reshape2)
-
-#df_rarefaction <- read.csv("~/master/milk/milk-merge/dataflow/vis-downloads/observed_otus.csv")
-
-#cols2melt <- colnames(df_rarefaction)[startsWith(colnames(df_rarefaction), "depth")]
-
-#df_rarefaction_melt <- melt(df_rarefaction, by = cols2melt)
-#colnames(df_rarefaction_melt)[4] <- "Value"
-
-#df_rarefaction_melt$Value <- gsub("depth\\.", "", df_rarefaction_melt$Value)
-
-#df_rarefaction_melt <- df_rarefaction_melt %>%
-#  separate(Value, sep = "_iter\\.", into = c("Depth", "Rep"))
-  
 ```
 
 \newpage
 
-![alt text](~/master/milk/milk-merge/dataflow/vis-downloads/rarefaction.png)
+![alt text](~/master/milk/snips/photos/rarefaction.png)
 
 
 
 ### Alpha Diversity
 
-![alt text](~/master/milk/milk-merge/dataflow/vis-downloads/alpha-compare.png)
+**Pilou evenness**
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-ad <- read.csv("~/master/milk/milk-merge/dataflow/vis-downloads/kruskal-wallis-pairwise-Category.csv")
+ad <- read.csv("~/master/milk/snips/tables/piloue_e.csv")
 
 ad$H <- NULL
 
 ad
 ```
 
-### Permanova weighted
+
+**ACE**
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-ad <- read.csv("~/master/milk/milk-merge/dataflow/vis-downloads/permanova-pairwise-weighted.csv")
+ad <- read.csv("~/master/milk/snips/tables/ace.csv")
 
-ad$Sample.size <- NULL
-ad$Permutations <- NULL
-ad$pseudo.F <- NULL
+ad$H <- NULL
 
 ad
 ```
 
-### Permanova unweighted
+**Oberserved OTUs**
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-ad <- read.csv("~/master/milk/milk-merge/dataflow/vis-downloads/permanova-pairwise-unweighted.csv")
+ad <- read.csv("~/master/milk/snips/tables/observed_otus.csv")
+
+ad$H <- NULL
+
+ad
+```
+
+\newpage
+
+**Shannon**
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+ad <- read.csv("~/master/milk/snips/tables/shannon.csv")
+
+ad$H <- NULL
+
+ad
+```
+
+**Simpson Eveness**
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+ad <- read.csv("~/master/milk/snips/tables/simpson_e.csv")
+
+ad$H <- NULL
+
+ad
+```
+
+**Simpson**
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+ad <- read.csv("~/master/milk/snips/tables/simpson.csv")
+
+ad$H <- NULL
+
+ad
+```
+
+\newpage
+
+### Beta divsersity
+
+**unifrac - permanova, weighted**
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+ad <- read.csv("~/master/milk/snips/tables/permanova-pairwise-weighted.csv")
 
 ad$Sample.size <- NULL
 ad$Permutations <- NULL
-ad$pseudo.F <- NULL
+#ad$pseudo.F <- NULL
+
+ad
+```
+
+**unifrac - permanova, unweighted**
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+ad <- read.csv("~/master/milk/snips/tables/permanova-pairwise-unweighted.csv")
+
+ad$Sample.size <- NULL
+ad$Permutations <- NULL
+#ad$pseudo.F <- NULL
 
 ad
 ```
