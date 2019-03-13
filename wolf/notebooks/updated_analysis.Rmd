@@ -329,7 +329,7 @@ mat2 <- matrix(mat2, ncol = ncol(features_noheader), dimnames = NULL)
 
 mat_final <- rbind(mat2, mat)
 
-write.table(mat_final, '~/master/wolf/dataflow/03-asv-table-merge/feature-table-no-contam-pet-animals-skin.txt', col.names = FALSE, quote = FALSE, row.names = FALSE, sep = "\t")
+write.table(mat_final, '~/master/wolf/dataflow/03-asv-table-merge/feature-table-no-contam-pet_animals-skin.txt', col.names = FALSE, quote = FALSE, row.names = FALSE, sep = "\t")
 ```
 
 
