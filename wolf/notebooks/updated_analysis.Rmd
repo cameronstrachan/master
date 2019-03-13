@@ -333,10 +333,58 @@ write.table(mat_final, '~/master/wolf/dataflow/03-asv-table-merge/feature-table-
 ```
 
 
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# save decontaminated table with all animals
+physeq_no_cont_df_count <- as.data.frame(physeq_no_cont@otu_table) %>%
+  select(-Mock, -NTCf, -NTCs) %>%
+  select(-starts_with("H")) %>%
+  select(ends_with("f"))
+
+physeq_no_cont_df_count <- cbind(rownames(physeq_no_cont_df_count), physeq_no_cont_df_count)
+
+colnames(physeq_no_cont_df_count)[1] <- "OTU ID"
+
+features_noheader <- physeq_no_cont_df_count[1:nrow(physeq_no_cont_df_count ),]
+
+mat <- as.matrix(features_noheader)
+mat <- matrix(mat, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat2 <- t(as.matrix(colnames(features_noheader)))
+mat2 <- matrix(mat2, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat_final <- rbind(mat2, mat)
+
+write.table(mat_final, '~/master/wolf/dataflow/03-asv-table-merge/feature-table-no-contam-all_animals-feces.txt', col.names = FALSE, quote = FALSE, row.names = FALSE, sep = "\t")
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# save decontaminated table with all animals
+physeq_no_cont_df_count <- as.data.frame(physeq_no_cont@otu_table) %>%
+  select(-Mock, -NTCf, -NTCs) %>%
+  select(-starts_with("H")) %>%
+  select(ends_with("s"))
+
+physeq_no_cont_df_count <- cbind(rownames(physeq_no_cont_df_count), physeq_no_cont_df_count)
+
+colnames(physeq_no_cont_df_count)[1] <- "OTU ID"
+
+features_noheader <- physeq_no_cont_df_count[1:nrow(physeq_no_cont_df_count ),]
+
+mat <- as.matrix(features_noheader)
+mat <- matrix(mat, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat2 <- t(as.matrix(colnames(features_noheader)))
+mat2 <- matrix(mat2, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat_final <- rbind(mat2, mat)
+
+write.table(mat_final, '~/master/wolf/dataflow/03-asv-table-merge/feature-table-no-contam-all_animals-skin.txt', col.names = FALSE, quote = FALSE, row.names = FALSE, sep = "\t")
+```
+
+
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # qiime1 file for Peffi
-
 taxonomy <- read.delim("~/master/wolf/dataflow/03-asv-table-merge/taxonomy-no-contam.tsv", header=FALSE)
 features <- read.delim("~/master/wolf/dataflow/03-asv-table-merge/feature-table-97-no-contam.txt", header=FALSE, skip=1)
 
@@ -354,6 +402,4 @@ mat2 <- matrix(mat2, ncol = ncol(df_heading), dimnames = NULL)
 mat_final <- rbind(mat2, mat)
 
 write.table(mat_final, '~/master/wolf/dataflow/03-asv-table-merge/merged_count_taxonomy-no-contam_qimme1.txt', col.names = FALSE, quote = FALSE, row.names = FALSE)
-
-
 ```
