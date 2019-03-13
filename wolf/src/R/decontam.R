@@ -1,4 +1,5 @@
 library(tidyr)
+library(plyr)
 library(dplyr)
 
 # load meta data that specifies control data
@@ -55,7 +56,7 @@ rownames(taxmat) <- as.data.frame(df_phlycounts_tax)[,1]
 
 library("phyloseq")
 library("ape")
-library(plyr)
+
 
 # import tree and load phyloseq obect
 
@@ -88,7 +89,7 @@ physeq.pos.presence <- transform_sample_counts(physeq.pos, function(abund) 1*(ab
 df.pres <- data.frame(prevalence.pos=taxa_sums(physeq.pos.presence), prevalence.neg=taxa_sums(physeq.neg.presence),
                       contam.prev=contam.prev05)
 
-ggplot(data=df.pres, aes(x=prevalence.neg, y=prevalence.pos, color=contam.prev.contaminant)) + geom_jitter() + ggtitle("Contamination - TRUE")
+#ggplot(data=df.pres, aes(x=prevalence.neg, y=prevalence.pos, color=contam.prev.contaminant)) + geom_jitter() + ggtitle("Contamination - TRUE")
 
 over10 <- rownames(subset(df.pres, prevalence.neg > 1))
 all_taxa = taxa_names(physeq)
