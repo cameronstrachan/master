@@ -121,13 +121,12 @@ qiime feature-table summarize \
 qiime diversity core-metrics-phylogenetic \
   --i-phylogeny dataflow/02-qiime-merge/rooted-no-contam.qza \
   --i-table dataflow/02-qiime-merge/table-dn-97-no-contam.qza \
-  --p-sampling-depth 14000 \
+  --p-sampling-depth 4000 \
   --m-metadata-file dataflow/00-meta-merge/sample-metadata.tsv \
   --output-dir dataflow/02-qiime-core-metrics
 
-
-mv dataflow/02-qiime-core-metrics/*.qza dataflow/02-qiime-merge/
-mv dataflow/02-qiime-core-metrics/*.qzv dataflow/02-qiime-viz-merge/
+mv dataflow/02-qiime-core-metrics/*.qza dataflow/02-qiime/
+mv dataflow/02-qiime-core-metrics/*.qzv dataflow/02-qiime-viz/
 rm -r dataflow/02-qiime-core-metrics/
 
 qiime diversity alpha-group-significance \
@@ -138,31 +137,93 @@ qiime diversity alpha-group-significance \
 qiime diversity alpha-rarefaction \
   --i-table dataflow/02-qiime-merge/table-dn-97-no-contam.qza \
   --i-phylogeny dataflow/02-qiime-merge/rooted-no-contam.qza \
-  --p-max-depth 14000 \
+  --p-max-depth 4000 \
   --m-metadata-file dataflow/00-meta-merge/sample-metadata.tsv \
   --o-visualization dataflow/02-qiime-viz-merge/alpha-rarefaction-no-contam.qzv
 
 qiime taxa barplot \
   --i-table dataflow/02-qiime-merge/table-dn-97-no-contam.qza \
-  --i-taxonomy dataflow/02-qiime-merge/silva-taxonomy-no-contam.qza \
+  --i-taxonomy mdataflow/02-qiime-merge/silva-taxonomy-no-contam.qza \
   --m-metadata-file dataflow/00-meta-merge/sample-metadata.tsv \
   --o-visualization dataflow/02-qiime-viz-merge/taxa-bar-plots-no-contam.qzv
 
-#python snippet
+qiime diversity beta-group-significance \
+  --i-distance-matrix dataflow/02-qiime-merge/weighted_unifrac_distance_matrix.qza \
+  --m-metadata-file dataflow/00-meta-merge/sample-metadata.tsv \
+  --m-metadata-column Category \
+  --o-visualization dataflow/02-qiime-viz-merge/category-pairwise-beta-weighted.qzv \
+  --p-pairwise
 
-#import os, sys
-#import pandas as pd
+qiime diversity beta-group-significance \
+  --i-distance-matrix dataflow/02-qiime-merge/unweighted_unifrac_distance_matrix.qza \
+  --m-metadata-file dataflow/00-meta-merge/sample-metadata.tsv \
+  --m-metadata-column Category \
+  --o-visualization dataflow/02-qiime-viz-merge/category-pairwise-beta-unweighted.qzv \
+  --p-pairwise
 
-#df_meta = pd.read_csv('dataflow/00-meta-merge/sample-metadata.tsv', sep = '\t')
-#columns = list(df_meta)
-#columns.remove('#SampleID')
 
-#for cname in columns:
-#	output_f = 'dataflow/02-qiime-viz-merge/beta-sig/weighted-unifrac-' + str(cname) + '-beta-significance.qzv'
-#	command = '../bash/q2pipeline/q2_beta_sig.sh' + ' ' + str(cname) + ' ' + output_f
-#	os.system(command)
+### more alpha metrics
 
-#for cname in columns:
-#	output_f = 'dataflow/02-qiime-viz-merge/beta-sig/unweighted-unifrac-' + str(cname) + '-beta-significance.qzv'
-#	command = '../bash/q2pipeline/q2_beta_sig-unweighted.sh' + ' ' + str(cname) + ' ' + output_f
-#	os.system(command)
+qiime diversity alpha \
+  --i-table dataflow/02-qiime-merge/rarefied_table.qza \
+  --p-metric observed_otus \
+  --o-alpha-diversity dataflow/02-qiime-merge/observed_otus_vector.qza
+
+qiime diversity alpha \
+  --i-table dataflow/02-qiime-merge/rarefied_table.qza \
+  --p-metric ace \
+  --o-alpha-diversity dataflow/02-qiime-merge/ace_vector.qza
+
+qiime diversity alpha \
+  --i-table dataflow/02-qiime-merge/rarefied_table.qza \
+  --p-metric chao1 \
+  --o-alpha-diversity dataflow/02-qiime-merge/chao1_vector.qza
+  
+qiime diversity alpha \
+  --i-table dataflow/02-qiime-merge/rarefied_table.qza \
+  --p-metric shannon \
+  --o-alpha-diversity dataflow/02-qiime-merge/shannon_vector.qza
+
+qiime diversity alpha \
+  --i-table dataflow/02-qiime-merge/rarefied_table.qza \
+  --p-metric simpson_e \
+  --o-alpha-diversity dataflow/02-qiime-merge/simpson_e_vector.qza
+  
+qiime diversity alpha \
+  --i-table dataflow/02-qiime-merge/rarefied_table.qza \
+  --p-metric simpson \
+  --o-alpha-diversity dataflow/02-qiime-merge/simpson_vector.qza
+
+
+
+qiime diversity alpha-group-significance \
+  --i-alpha-diversity dataflow/02-qiime-merge/observed_otus_vector.qza \
+  --m-metadata-file dataflow/00-meta-merge/sample-metadata.tsv \
+  --o-visualization dataflow/02-qiime-viz-merge/observed_otus-group-significance.qzv
+  
+qiime diversity alpha-group-significance \
+  --i-alpha-diversity dataflow/02-qiime-merge/ace_vector.qza \
+  --m-metadata-file dataflow/00-meta-merge/sample-metadata.tsv \
+  --o-visualization dataflow/02-qiime-viz-merge/ace-group-significance.qzv
+  
+qiime diversity alpha-group-significance \
+  --i-alpha-diversity dataflow/02-qiime-merge/chao1_vector.qza \
+  --m-metadata-file dataflow/00-meta-merge/sample-metadata.tsv \
+  --o-visualization dataflow/02-qiime-viz-merge/chao1-group-significance.qzv
+  
+qiime diversity alpha-group-significance \
+  --i-alpha-diversity dataflow/02-qiime-merge/shannon_vector.qza \
+  --m-metadata-file dataflow/00-meta-merge/sample-metadata.tsv \
+  --o-visualization dataflow/02-qiime-viz-merge/shannon-group-significance.qzv
+  
+qiime diversity alpha-group-significance \
+  --i-alpha-diversity dataflow/02-qiime-merge/simpson_e_vector.qza \
+  --m-metadata-file dataflow/00-meta-merge/sample-metadata.tsv \
+  --o-visualization dataflow/02-qiime-viz-merge/simpson_e_-group-significance.qzv
+  
+qiime diversity alpha-group-significance \
+  --i-alpha-diversity dataflow/02-qiime-merge/simpson_vector.qza \
+  --m-metadata-file dataflow/00-meta-merge/sample-metadata.tsv \
+  --o-visualization dataflow/02-qiime-viz-merge/simpson-group-significance.qzv
+
+
