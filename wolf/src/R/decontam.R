@@ -3,7 +3,7 @@ library(plyr)
 library(dplyr)
 
 # load meta data that specifies control data
-df_phylocounts_meta <- read.csv("~/master/wolf/dataflow/00-meta-merge/sample-complete-all.csv")
+df_phylocounts_meta <- read.csv("~/master/wolf/dataflow/00-meta-merge/sample-metadata-sub.csv")
 
 df_phylocounts_meta$SampleID <- as.character(df_phylocounts_meta$SampleID)
 df_phylocounts_meta$Cow <- as.factor(df_phylocounts_meta$Sample)
