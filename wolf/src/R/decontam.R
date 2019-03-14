@@ -6,7 +6,6 @@ library(dplyr)
 df_phylocounts_meta <- read.csv("~/master/wolf/dataflow/00-meta-merge/sample-metadata-sub.csv")
 
 df_phylocounts_meta$SampleID <- as.character(df_phylocounts_meta$SampleID)
-df_phylocounts_meta$Cow <- as.factor(df_phylocounts_meta$Sample)
 df_phylocounts_meta$SampleOrControl <- as.factor(df_phylocounts_meta$SampleOrControl)
 
 df_phylocounts_meta <- df_phylocounts_meta %>% 
