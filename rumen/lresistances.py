@@ -52,6 +52,7 @@ file_obj = sc.Fasta(file, indir)
 file_obj.setOutputLocation(blastdir)
 
 outputfilename = "rumen_prevotella_card.txt"
+blastdb = "carde_db.fasta"
 
 file_obj.setOutputName(outputfilename)
 file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=1, evalue=1e-3, num_threads = 60)
