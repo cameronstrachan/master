@@ -131,7 +131,7 @@ legend <- tmp$grobs[[leg]]
 heatmap.plot <- heatmap.plot +
   theme(legend.position = "none") 
 
-heatmap.plot
+#heatmap.plot
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=15, fig.width=15}
@@ -283,7 +283,6 @@ mapped_reads.plot <- ggplot(data = df_genome_same, aes(x = genome, y = metagenom
 ```
 
 
-
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=10, fig.width=12}
 plot_grid(recordedplot, heatmap.plot, mapped_reads.plot, align = 'h', ncol = 3)
 ```
@@ -323,5 +322,52 @@ df_meta <- inner_join(df_pathways, df_meta) %>%
   select(-C_Cellulose, -C_Lactate, -C_Succinate, -C_Lipids, -P_Butyrate, -P_Formate, -P_Lactate)
 ```
 
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+df_num_genes <- df_gff3 %>%
+  select(genome, num_genes) %>%
+  distinct()
+
+colnames(df_num_genes)[1] <- "file"
+
+resistances <- read.delim("~/master/rumen/dataflow/02-blast/rumen_prevotella_card.txt", header=FALSE) 
+aro_categories <- read.delim("~/master/databases/aro_categories_index.csv")
+
+colnames(resistances) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+
+resistances <- resistances %>%
+  select(-sseq) %>%
+  separate(sseqid, into = c("rm", "Protein.Accession", "ARO.Accession", "gene"), sep = "\\|") %>%
+  inner_join(aro_categories) %>%
+  rowwise() %>%
+  mutate(file = stri_reverse(stri_split_fixed(stri_reverse(qseqid),"_",n = 3)[[1]][3])) %>%
+  ungroup() %>%
+  inner_join(groupings) %>%
+  inner_join(df_num_genes) %>%
+  group_by(group) %>%
+  mutate(total_genes_group = sum(num_genes)) %>%
+  ungroup() %>%
+  filter(pident > 45) %>%
+  filter(length > 50) %>%
+  #filter(bitscore > 200) %>%
+  filter(Resistance.Mechanism == "antibiotic inactivation") %>%
+  filter(gene == "vatA" | gene == "vatB" | gene == "vatC" | gene == "vatD" | gene == "vetE" | gene == "vatF" | gene == "vatH" | gene == "VatI")
+
+resistances$AMR.Gene.Family <- as.character(resistances$AMR.Gene.Family)
+
+resistances_select <- resistances %>%
+  inner_join(df_meta) %>%
+  select(file, gene, pident, length, country, group, total_genes_group) %>%
+  group_by(gene, group) %>%
+  mutate(num_each_gene = length(file)) %>%
+  ungroup() %>%
+  mutate(percent_gene = (num_each_gene / total_genes_group)*1000000) %>%
+  select(gene, group, total_genes_group, num_each_gene, percent_gene) %>%
+  distinct()
+
+resistances_select
+#Virginiamycin
+```
 
 

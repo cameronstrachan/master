@@ -36,6 +36,15 @@ if runprodigal == 'y':
 
     file_obj.runprodigal()
 
+    file = "rumen_genomes.fasta"
+
+    file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
+    file_obj.setOutputName(file)
+    file_obj.setOutputLocation('dataflow/01-prot/')
+    file_obj.runprodigal()
+
+# prevotella against resistance determinants
+
 file = "card_db.fasta"
 indir = 'dataflow/01-prot/'
 blastdbdir = 'dataflow/02-blast-db/'
@@ -52,6 +61,21 @@ file_obj = sc.Fasta(file, indir)
 file_obj.setOutputLocation(blastdir)
 
 outputfilename = "rumen_prevotella_card.txt"
+blastdb = "card_db.fasta"
+
+file_obj.setOutputName(outputfilename)
+file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=1, evalue=1e-3, num_threads = 60)
+
+
+# all genomes against resistance determinants
+
+
+file = "rumen_genomes.fasta"
+
+file_obj = sc.Fasta(file, indir)
+file_obj.setOutputLocation(blastdir)
+
+outputfilename = "rumen_genomes_card.txt"
 blastdb = "card_db.fasta"
 
 file_obj.setOutputName(outputfilename)
