@@ -19,3 +19,12 @@ file_obj = sc.Fasta('rumen_genomes_resistance_genes.fasta', 'dataflow/01-nucl/')
 file_obj.setOutputName('rumen_genomes_resistance_genes.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
 file_obj.runprodigal()
+
+
+file = 'resistance_island_blast_hits_concatenated.fasta'
+file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
+    # set output name, location
+outputfilename = file.split(".f")[0] + '_extractedCONTIGs' + '.fasta'
+file_obj.setOutputName(outputfilename)
+file_obj.setOutputLocation('dataflow/01-nucl/')
+file_obj.extractORFs_gff3(self, gff3_table_loc = 'dataflow/00-meta/resistance_blast_hit_cotigs.csv')
