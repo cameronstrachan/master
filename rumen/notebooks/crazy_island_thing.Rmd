@@ -1,0 +1,95 @@
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+```
+
+## Crazy resistance thing
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+colnames(df_num_genes)[1] <- "file"
+
+resistances <- read.delim("~/master/rumen/dataflow/02-blast/rumen_genomes_card.txt", header=FALSE) 
+aro_categories <- read.delim("~/master/databases/aro_categories_index.csv")
+
+colnames(resistances) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+
+resistances <- resistances %>%
+  select(-sseq) %>%
+  separate(sseqid, into = c("rm", "Protein.Accession", "ARO.Accession", "gene"), sep = "\\|", remove = FALSE) 
+
+
+resistances$gene <- gsub("_", " ", resistances$gene)
+
+
+resistances <- resistances %>%
+    separate(gene, into = c("gene", "organism"), sep = "\\[", remove = FALSE) 
+
+resistances$organism <- gsub("\\]", " ", resistances$organism)
+
+resistances <- resistances %>%
+  inner_join(aro_categories) %>%
+  rowwise() %>%
+  mutate(file = stri_reverse(stri_split_fixed(stri_reverse(qseqid),"_",n = 3)[[1]][3])) %>%
+  ungroup() %>%
+  filter(pident > 50) %>%
+  filter(length > 50) %>%
+  #filter(bitscore >= 50) %>%
+  filter(Resistance.Mechanism == "antibiotic inactivation") %>%
+  group_by(gene) %>%
+  mutate(gene_occurences = length(file)) %>%
+  ungroup()
+
+resistances_summary <- resistances %>%
+  filter(pident == 100) %>%
+  group_by(file) %>%
+  mutate(nfiles = length(file)) %>%
+  ungroup() %>%
+  filter(nfiles > 1)
+
+unique(resistances_summary$qseqid)
+```
+
+
+then extracted these 3 contigs in python, blasted them online, took the top 50 hits of each. the next just takes the blast output to get the coordinates and extract the island from all the pathogens. 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+df_blast_hits <- read.csv("~/master/rumen/dataflow/00-meta/resistance_island_blast.csv")
+
+df_blast_hits_CP033865.1 <- df_blast_hits %>%
+  filter(accession == "CP033865.1") %>%
+  rowwise() %>%
+  mutate(duplicate = ifelse(start < 400000, 1, 2)) %>%
+  ungroup()
+
+df_blast_hits$duplicate <- 1
+
+df_blast_hits <- df_blast_hits %>%
+  filter(accession != "CP033865.1") 
+
+
+df_blast_hits <- bind_rows(df_blast_hits, df_blast_hits_CP033865.1)
+
+df_blast_hits <- df_blast_hits %>%
+  select(-query, -pident) %>%
+  group_by(accession, duplicate) %>%
+  mutate(lowest_start = min(start)) %>%
+  mutate(highest_start = max(start)) %>%
+  mutate(lowest_stop = min(stop)) %>%
+  mutate(highest_stop = max(stop)) %>%
+  ungroup() %>%
+  select(-start, -stop) %>%
+  gather(name, value, -accession, -duplicate) %>%
+  group_by(accession, duplicate) %>%
+  mutate(start = min(value)) %>%
+  mutate(stop = max(value)) %>%
+  ungroup() %>%
+  select(-name, -value) %>%
+  mutate(length = stop - start) %>%
+  distinct() %>%
+  unite(ID, c("accession", "duplicate"), sep = "_", remove = FALSE)
+  
+df_blast_hits$direction <- "+"
+
+colnames(df_blast_hits)[2] <- "contig"
+
+write.csv(df_blast_hits, "~/master/rumen/dataflow/00-meta/resistance_blast_hit_cotigs.csv")
+```
