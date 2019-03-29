@@ -27,4 +27,4 @@ file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
 outputfilename = file.split(".f")[0] + '_extractedCONTIGs' + '.fasta'
 file_obj.setOutputName(outputfilename)
 file_obj.setOutputLocation('dataflow/01-nucl/')
-file_obj.extractORFs_gff3(self, gff3_table_loc = 'dataflow/00-meta/resistance_blast_hit_cotigs.csv')
+file_obj.extractORFs_gff3(gff3_table_loc = 'dataflow/00-meta/resistance_blast_hit_cotigs.csv')
