@@ -46,7 +46,7 @@ df = pd.DataFrame.from_dict(headers, orient="index")
 df['file'] = file
 df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
 
-# blast islands to each other
+# blast islands against rumen islands
 
 file = "rumen_genomes_resistance_genes.fasta"
 indir = 'dataflow/01-nucl/'
@@ -68,3 +68,27 @@ blastdb = "rumen_genomes_resistance_genes.fasta"
 
 file_obj.setOutputName(outputfilename)
 file_obj.runblast(blast='blastn', db=blastdb, dblocation=blastdbdir, max_target_seqs=10, evalue=1e-3, num_threads = 60, max_hsps = 5)
+
+# blast all islands against each other to find out which are the same
+
+
+file = "resistance_island_blast_hits_concatenated_extractedCONTIGs_3rumen.fasta"
+indir = 'dataflow/01-nucl/'
+blastdbdir = 'dataflow/02-blast-db/'
+blastdir = 'dataflow/02-blast/'
+
+file_obj = sc.Fasta(file, indir)
+file_obj.setOutputName(file)
+file_obj.setOutputLocation(blastdbdir)
+file_obj.runmakeblastdb(dbtype='nucl')
+
+file = "resistance_island_blast_hits_concatenated_extractedCONTIGs_3rumen.fasta"
+
+file_obj = sc.Fasta(file, indir)
+file_obj.setOutputLocation(blastdir)
+
+outputfilename = "resistance_island_mapping_allvall.txt"
+blastdb = "resistance_island_blast_hits_concatenated_extractedCONTIGs_3rumen.fasta"
+
+file_obj.setOutputName(outputfilename)
+file_obj.runblast(blast='blastn', db=blastdb, dblocation=blastdbdir, max_target_seqs=2, evalue=1e-3, num_threads = 60, max_hsps = 1)
