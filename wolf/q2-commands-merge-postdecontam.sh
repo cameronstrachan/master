@@ -44,9 +44,11 @@ qiime phylogeny align-to-tree-mafft-fasttree \
   --o-tree dataflow/02-qiime-merge/unrooted-tree-no-contam.qza \
   --o-rooted-tree dataflow/02-qiime-merge/rooted-no-contam.qza
 
-#qiime tools export \
-#    --input-path dataflow/02-qiime-merge/rooted-no-contam.qza \
-#    --output-path dataflow/04-tree-merge
+qiime tools export \
+    --input-path dataflow/02-qiime-merge/rooted-no-contam.qza \
+    --output-path dataflow/04-tree-merge
+
+mv dataflow/04-tree-merge/tree.nwk dataflow/04-tree-merge/tree-97-no-contam.nwk
 
 qiime feature-table summarize \
   --i-table dataflow/02-qiime-merge/table-dn-97-no-contam.qza \

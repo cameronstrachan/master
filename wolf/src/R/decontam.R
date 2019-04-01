@@ -118,3 +118,246 @@ mat2 <- matrix(mat2, ncol = ncol(features_noheader), dimnames = NULL)
 mat_final <- rbind(mat2, mat)
 
 write.table(mat_final, '~/master/wolf/dataflow/03-asv-table-merge/feature-table-no-contam.txt', col.names = FALSE, quote = FALSE, row.names = FALSE, sep = "\t")
+
+# save decontaminated table feces
+
+physeq_no_cont_df_count <- as.data.frame(physeq_no_cont@otu_table) %>%
+  select(-Mock, -NTCf, -NTCs) %>%
+  select(ends_with("f"))
+
+physeq_no_cont_df_count <- cbind(rownames(physeq_no_cont_df_count), physeq_no_cont_df_count)
+
+colnames(physeq_no_cont_df_count)[1] <- "OTU ID"
+
+features_noheader <- physeq_no_cont_df_count[1:nrow(physeq_no_cont_df_count ),]
+
+mat <- as.matrix(features_noheader)
+mat <- matrix(mat, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat2 <- t(as.matrix(colnames(features_noheader)))
+mat2 <- matrix(mat2, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat_final <- rbind(mat2, mat)
+
+write.table(mat_final, '~/master/wolf/dataflow/03-asv-table-merge/feature-table-no-contam-all-feces.txt', col.names = FALSE, quote = FALSE, row.names = FALSE, sep = "\t")
+
+# save decontaminated table skin
+
+physeq_no_cont_df_count <- as.data.frame(physeq_no_cont@otu_table) %>%
+  select(-Mock, -NTCf, -NTCs) %>%
+  select(ends_with("s"))
+
+physeq_no_cont_df_count <- cbind(rownames(physeq_no_cont_df_count), physeq_no_cont_df_count)
+
+colnames(physeq_no_cont_df_count)[1] <- "OTU ID"
+
+features_noheader <- physeq_no_cont_df_count[1:nrow(physeq_no_cont_df_count ),]
+
+mat <- as.matrix(features_noheader)
+mat <- matrix(mat, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat2 <- t(as.matrix(colnames(features_noheader)))
+mat2 <- matrix(mat2, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat_final <- rbind(mat2, mat)
+
+write.table(mat_final, '~/master/wolf/dataflow/03-asv-table-merge/feature-table-no-contam-all-skin.txt', col.names = FALSE, quote = FALSE, row.names = FALSE, sep = "\t")
+
+# save decontaminated table with only wild animals feces
+physeq_no_cont_df_count <- as.data.frame(physeq_no_cont@otu_table) %>%
+  select(-Mock, -NTCf, -NTCs) %>%
+  select(starts_with("D"), starts_with("W")) %>%
+  select(ends_with("f"))
+
+physeq_no_cont_df_count <- cbind(rownames(physeq_no_cont_df_count), physeq_no_cont_df_count)
+
+colnames(physeq_no_cont_df_count)[1] <- "OTU ID"
+
+features_noheader <- physeq_no_cont_df_count[1:nrow(physeq_no_cont_df_count ),]
+
+mat <- as.matrix(features_noheader)
+mat <- matrix(mat, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat2 <- t(as.matrix(colnames(features_noheader)))
+mat2 <- matrix(mat2, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat_final <- rbind(mat2, mat)
+
+write.table(mat_final, '~/master/wolf/dataflow/03-asv-table-merge/feature-table-no-contam-wild_animals-feces.txt', col.names = FALSE, quote = FALSE, row.names = FALSE, sep = "\t")
+
+# save decontaminated table with only wild animals skin
+physeq_no_cont_df_count <- as.data.frame(physeq_no_cont@otu_table) %>%
+  select(-Mock, -NTCf, -NTCs) %>%
+  select(starts_with("D"), starts_with("W")) %>%
+  select(ends_with("s"))
+
+physeq_no_cont_df_count <- cbind(rownames(physeq_no_cont_df_count), physeq_no_cont_df_count)
+
+colnames(physeq_no_cont_df_count)[1] <- "OTU ID"
+
+features_noheader <- physeq_no_cont_df_count[1:nrow(physeq_no_cont_df_count ),]
+
+mat <- as.matrix(features_noheader)
+mat <- matrix(mat, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat2 <- t(as.matrix(colnames(features_noheader)))
+mat2 <- matrix(mat2, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat_final <- rbind(mat2, mat)
+
+write.table(mat_final, '~/master/wolf/dataflow/03-asv-table-merge/feature-table-no-contam-wild_animals-skin.txt', col.names = FALSE, quote = FALSE, row.names = FALSE, sep = "\t")
+
+# save decontaminated table with only wild animals feces, n=3 pack
+physeq_no_cont_df_count <- as.data.frame(physeq_no_cont@otu_table) %>%
+  select(-Mock, -NTCf, -NTCs) %>%
+  select(starts_with("D"), starts_with("W")) %>%
+  select(-starts_with("W9f"), -starts_with("D15f"), -starts_with("D2f"), -starts_with("D14f"), -starts_with("D13f"), -starts_with("D1f"), -starts_with("W4f"), -starts_with("W13f"), -starts_with("W16f"), -starts_with("W1f"), -starts_with("W14f"), -starts_with("W3f")) %>%
+  select(ends_with("f"))
+
+physeq_no_cont_df_count <- cbind(rownames(physeq_no_cont_df_count), physeq_no_cont_df_count)
+
+colnames(physeq_no_cont_df_count)[1] <- "OTU ID"
+
+features_noheader <- physeq_no_cont_df_count[1:nrow(physeq_no_cont_df_count ),]
+
+mat <- as.matrix(features_noheader)
+mat <- matrix(mat, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat2 <- t(as.matrix(colnames(features_noheader)))
+mat2 <- matrix(mat2, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat_final <- rbind(mat2, mat)
+
+write.table(mat_final, '~/master/wolf/dataflow/03-asv-table-merge/feature-table-no-contam-wild_animals-feces_pack3.txt', col.names = FALSE, quote = FALSE, row.names = FALSE, sep = "\t")
+
+# save decontaminated table with only wild animals skin, n=3 pack
+physeq_no_cont_df_count <- as.data.frame(physeq_no_cont@otu_table) %>%
+  select(-Mock, -NTCf, -NTCs) %>%
+  select(starts_with("D"), starts_with("W")) %>%
+  select(-starts_with("W9s"), -starts_with("D15s"), -starts_with("D2s"), -starts_with("D14s"), -starts_with("D13s"), -starts_with("D1s"), -starts_with("W4s"), -starts_with("W13s"), -starts_with("W16s"), -starts_with("W1s"), -starts_with("W14s"), -starts_with("W3s")) %>%
+  select(ends_with("s"))
+
+physeq_no_cont_df_count <- cbind(rownames(physeq_no_cont_df_count), physeq_no_cont_df_count)
+
+colnames(physeq_no_cont_df_count)[1] <- "OTU ID"
+
+features_noheader <- physeq_no_cont_df_count[1:nrow(physeq_no_cont_df_count ),]
+
+mat <- as.matrix(features_noheader)
+mat <- matrix(mat, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat2 <- t(as.matrix(colnames(features_noheader)))
+mat2 <- matrix(mat2, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat_final <- rbind(mat2, mat)
+
+write.table(mat_final, '~/master/wolf/dataflow/03-asv-table-merge/feature-table-no-contam-wild_animals-skin_pack3.txt', col.names = FALSE, quote = FALSE, row.names = FALSE, sep = "\t")
+
+# save decontaminated table with only pet animals feces
+physeq_no_cont_df_count <- as.data.frame(physeq_no_cont@otu_table) %>%
+  select(-Mock, -NTCf, -NTCs) %>%
+  select(starts_with("P")) %>%
+  select(ends_with("f"))
+
+physeq_no_cont_df_count <- cbind(rownames(physeq_no_cont_df_count), physeq_no_cont_df_count)
+
+colnames(physeq_no_cont_df_count)[1] <- "OTU ID"
+
+features_noheader <- physeq_no_cont_df_count[1:nrow(physeq_no_cont_df_count ),]
+
+mat <- as.matrix(features_noheader)
+mat <- matrix(mat, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat2 <- t(as.matrix(colnames(features_noheader)))
+mat2 <- matrix(mat2, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat_final <- rbind(mat2, mat)
+
+write.table(mat_final, '~/master/wolf/dataflow/03-asv-table-merge/feature-table-no-contam-pet_animals-feces.txt', col.names = FALSE, quote = FALSE, row.names = FALSE, sep = "\t")
+
+# save decontaminated table with only pet animals skin
+physeq_no_cont_df_count <- as.data.frame(physeq_no_cont@otu_table) %>%
+  select(-Mock, -NTCf, -NTCs) %>%
+  select(starts_with("P")) %>%
+  select(ends_with("s"))
+
+physeq_no_cont_df_count <- cbind(rownames(physeq_no_cont_df_count), physeq_no_cont_df_count)
+
+colnames(physeq_no_cont_df_count)[1] <- "OTU ID"
+
+features_noheader <- physeq_no_cont_df_count[1:nrow(physeq_no_cont_df_count ),]
+
+mat <- as.matrix(features_noheader)
+mat <- matrix(mat, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat2 <- t(as.matrix(colnames(features_noheader)))
+mat2 <- matrix(mat2, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat_final <- rbind(mat2, mat)
+
+write.table(mat_final, '~/master/wolf/dataflow/03-asv-table-merge/feature-table-no-contam-pet_animals-skin.txt', col.names = FALSE, quote = FALSE, row.names = FALSE, sep = "\t")
+
+# save decontaminated table with all animals
+physeq_no_cont_df_count <- as.data.frame(physeq_no_cont@otu_table) %>%
+  select(-Mock, -NTCf, -NTCs) %>%
+  select(-starts_with("H")) %>%
+  select(ends_with("f"))
+
+physeq_no_cont_df_count <- cbind(rownames(physeq_no_cont_df_count), physeq_no_cont_df_count)
+
+colnames(physeq_no_cont_df_count)[1] <- "OTU ID"
+
+features_noheader <- physeq_no_cont_df_count[1:nrow(physeq_no_cont_df_count ),]
+
+mat <- as.matrix(features_noheader)
+mat <- matrix(mat, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat2 <- t(as.matrix(colnames(features_noheader)))
+mat2 <- matrix(mat2, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat_final <- rbind(mat2, mat)
+
+write.table(mat_final, '~/master/wolf/dataflow/03-asv-table-merge/feature-table-no-contam-all_animals-feces.txt', col.names = FALSE, quote = FALSE, row.names = FALSE, sep = "\t")
+
+# save decontaminated table with all animals
+physeq_no_cont_df_count <- as.data.frame(physeq_no_cont@otu_table) %>%
+  select(-Mock, -NTCf, -NTCs) %>%
+  select(-starts_with("H")) %>%
+  select(ends_with("s"))
+
+physeq_no_cont_df_count <- cbind(rownames(physeq_no_cont_df_count), physeq_no_cont_df_count)
+
+colnames(physeq_no_cont_df_count)[1] <- "OTU ID"
+
+features_noheader <- physeq_no_cont_df_count[1:nrow(physeq_no_cont_df_count ),]
+
+mat <- as.matrix(features_noheader)
+mat <- matrix(mat, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat2 <- t(as.matrix(colnames(features_noheader)))
+mat2 <- matrix(mat2, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat_final <- rbind(mat2, mat)
+
+write.table(mat_final, '~/master/wolf/dataflow/03-asv-table-merge/feature-table-no-contam-all_animals-skin.txt', col.names = FALSE, quote = FALSE, row.names = FALSE, sep = "\t")
+
+# qiime1 file for Peffi
+taxonomy <- read.delim("~/master/wolf/dataflow/03-asv-table-merge/taxonomy-no-contam.tsv", header=FALSE)
+features <- read.delim("~/master/wolf/dataflow/03-asv-table-merge/feature-table-97-no-contam.txt", header=FALSE, skip=1)
+
+features_noheader <- features[2:nrow(features),]
+taxonomy_noheader <- taxonomy[3:nrow(taxonomy), 1:2]
+
+df <- merge(features_noheader, taxonomy_noheader, by = 'V1')
+mat <- as.matrix(df)
+mat <- matrix(mat, ncol = ncol(df), dimnames = NULL)
+
+df_heading <- cbind(as.matrix(features[1,]), 'ConcensusLineage')
+mat2 <- as.matrix(df_heading)
+mat2 <- matrix(mat2, ncol = ncol(df_heading), dimnames = NULL)
+
+mat_final <- rbind(mat2, mat)
+
+write.table(mat_final, '~/master/wolf/dataflow/03-asv-table-merge/merged_count_taxonomy-no-contam_qimme1.txt', col.names = FALSE, quote = FALSE, row.names = FALSE)
+
+

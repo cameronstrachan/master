@@ -14,9 +14,9 @@ library(cowplot)
 # load meta data that specifies control data
 df_phylocounts_meta <- read.csv("~/master/wolf/dataflow/00-meta-merge/sample-metadata-sub.csv")
 
-df_phylocounts_meta$SampleID <- as.character(df_phylocounts_meta$SampleID)
-df_phylocounts_meta$Cow <- as.factor(df_phylocounts_meta$Sample)
-df_phylocounts_meta$SampleOrControl <- as.factor(df_phylocounts_meta$SampleOrControl)
+#df_phylocounts_meta$SampleID <- as.character(df_phylocounts_meta$SampleID)
+#df_phylocounts_meta$Cow <- as.factor(df_phylocounts_meta$Sample)
+#df_phylocounts_meta$SampleOrControl <- as.factor(df_phylocounts_meta$SampleOrControl)
 
 df_phylocounts_meta <- df_phylocounts_meta %>% 
   unique()
@@ -114,6 +114,8 @@ my_contaminants <- unique(unlist(c(my_contaminants, over10)))
 my_taxa <- all_taxa[!(all_taxa %in% my_contaminants)]
 physeq_no_cont = prune_taxa(my_taxa, physeq)
 ```
+
+
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # save decontaminated table
@@ -402,4 +404,36 @@ mat2 <- matrix(mat2, ncol = ncol(df_heading), dimnames = NULL)
 mat_final <- rbind(mat2, mat)
 
 write.table(mat_final, '~/master/wolf/dataflow/03-asv-table-merge/merged_count_taxonomy-no-contam_qimme1.txt', col.names = FALSE, quote = FALSE, row.names = FALSE)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# decontamination check
+
+# physeq_norm= transform_sample_counts(physeq, function(x) x / sum(x))
+# 
+# physeq_df <- as.data.frame(physeq_norm@otu_table)
+# physeq_df$asv_id <- rownames(physeq_df)
+# rownames(physeq_df) <- c()
+# 
+# df.pres$asv_id <- rownames(df.pres)
+# 
+# df_contamination_labelled <- df.pres %>%
+#   select(asv_id, prevalence.neg)
+# 
+# rownames(contamination_labelled) <- c()
+# 
+# df_removed <- as.data.frame(my_contaminants)
+# colnames(df_removed) <- "asv_id"
+# df_removed$removed <- TRUE
+# 
+# df_contamination_assesment <- inner_join(physeq_df, df_contamination_labelled) %>%
+#   full_join(df_removed)
+# 
+# df_contamination_assesment[c("removed")][is.na(df_contamination_assesment[c("removed")])] <- FALSE
+# 
+# df_contamination_assesment_not_removed <- df_contamination_assesment %>%
+#   rowwise() %>%
+#   mutate(not_removed_present = ifelse(removed == FALSE & prevalence.neg > 0, TRUE, FALSE)) %>%
+#   filter(not_removed_present  == TRUE)
+
 ```

@@ -24,14 +24,14 @@ qiime phylogeny align-to-tree-mafft-fasttree \
 qiime diversity alpha-rarefaction \
   --i-table dataflow/02-qiime-temp/table-dn-97-temp.qza \
   --i-phylogeny dataflow/02-qiime-temp/rooted-tree-temp.qza \
-  --p-max-depth 14000 \
+  --p-max-depth 4000 \
   --m-metadata-file dataflow/00-meta-merge/$metadata \
   --o-visualization dataflow/02-qiime-viz-temp/$outname-alpha-rarefaction.qzv
 
 qiime diversity core-metrics-phylogenetic \
   --i-phylogeny dataflow/02-qiime-temp/rooted-tree-temp.qza \
   --i-table dataflow/02-qiime-temp/table-dn-97-temp.qza \
-  --p-sampling-depth 14000 \
+  --p-sampling-depth 4000 \
   --m-metadata-file dataflow/00-meta-merge/$metadata \
   --output-dir dataflow/02-qiime-core-metrics
 
