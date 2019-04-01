@@ -108,5 +108,7 @@ file_obj = sc.Fasta('resistance_island_blast_hits_concatenated_extractedCONTIGs_
 file_obj.setOutputName('resistance_island_blast_hits_concatenated_extractedCONTIGs_3rumen_unique.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
 file_obj.runprodigal()
+
+file_obj = sc.Fasta('resistance_island_blast_hits_concatenated_extractedCONTIGs_3rumen_unique.fasta', 'dataflow/01-prot/')
 file_obj.setOutputLocation('dataflow/03-blast-tables/')
 file_obj.runonlineblast()
