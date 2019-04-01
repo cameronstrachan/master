@@ -49,7 +49,7 @@ df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
 # blast islands to each other
 
 file = "rumen_genomes_resistance_genes.fasta"
-indir = 'dataflow/01-prot/'
+indir = 'dataflow/01-nucl/'
 blastdbdir = 'dataflow/02-blast-db/'
 blastdir = 'dataflow/02-blast/'
 
