@@ -2,6 +2,7 @@ import os, sys
 import subprocess
 import pandas as pd
 from Bio.Seq import Seq
+from Bio import SeqIO
 
 # custom libraries
 sys.path.insert(0, '/home/strachan/master/')
