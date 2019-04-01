@@ -3,8 +3,8 @@
 
 import os, sys
 import subprocess
-#from Bio import SeqIO
-#from Bio.Blast import NCBIWWW
+from Bio import SeqIO
+from Bio.Blast import NCBIWWW
 from Bio.Seq import Seq
 from operator import itemgetter
 import argparse
