@@ -91,4 +91,4 @@ outputfilename = "resistance_island_mapping_allvall.txt"
 blastdb = "resistance_island_blast_hits_concatenated_extractedCONTIGs_3rumen.fasta"
 
 file_obj.setOutputName(outputfilename)
-file_obj.runblast(blast='blastn', db=blastdb, dblocation=blastdbdir, max_target_seqs=2, evalue=1e-3, num_threads = 60, max_hsps = 1)
+file_obj.runblast(blast='blastn', db=blastdb, dblocation=blastdbdir, max_target_seqs=50, evalue=1e-3, num_threads = 60, max_hsps = 1)
