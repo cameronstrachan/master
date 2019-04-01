@@ -60,3 +60,5 @@ qiime phylogeny align-to-tree-mafft-fasttree \
 qiime tools export \
     --input-path dataflow/02-qiime-merge/rooted-tree.qza \
     --output-path dataflow/04-tree-merge
+    
+mv dataflow/04-tree-merge/tree.nwk dataflow/04-tree-merge/tree-97.nwk

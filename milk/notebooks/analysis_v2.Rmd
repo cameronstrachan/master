@@ -1,0 +1,181 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyr)
+library(dplyr)
+library(cowplot)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_phylocounts_meta <- read.csv("~/master/milk/dataflow/00-meta-merge/sample-complete-all.txt", sep = "\t")
+
+df_phylocounts_meta <- df_phylocounts_meta %>% 
+  unite(Time_Injection, c("Time", "Injection"), sep = "-") %>%
+  unique()
+
+df_phylocounts_meta <- as.data.frame(df_phylocounts_meta)
+row.names(df_phylocounts_meta) <- df_phylocounts_meta[,1]
+df_phylocounts_meta[,1] <- NULL
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_phlycounts_counts <- read.csv("~/master/milk/dataflow/03-asv-table-merge/feature-table-97.txt", sep = '\t', skip = 1)
+colnames(df_phlycounts_counts)[1] <- "asv_id"
+
+df_phlycounts_counts <- df_phlycounts_counts[order(df_phlycounts_counts$asv_id),] 
+
+numsamples <- length(df_phlycounts_counts)
+
+otumat <- as.matrix(df_phlycounts_counts[,2:numsamples])
+rownames(otumat) <- as.data.frame(df_phlycounts_counts)[,1]
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df_phlycounts_tax  <- read.csv("~/master/milk/dataflow/03-asv-table-merge/taxonomy.tsv", sep = '\t')
+df_phlycounts_tax$Confidence <- NULL
+colnames(df_phlycounts_tax)[1] <- 'asv_id'
+df_phlycounts_tax$Taxon <- gsub("D_.__", "", df_phlycounts_tax$Taxon)
+
+df_phlycounts_tax <- df_phlycounts_tax %>%
+  separate(Taxon , into = c("domain", "phylum", "class", "order", "family", "genus", "species"), sep = ";")
+
+df_phlycounts_tax$phylum <- as.character(df_phlycounts_tax$phylum)
+df_phlycounts_tax$family <- as.character(df_phlycounts_tax$family)
+df_phlycounts_tax$class<- as.character(df_phlycounts_tax$class)
+df_phlycounts_tax$order <- as.character(df_phlycounts_tax$order)
+df_phlycounts_tax$genus <- as.character(df_phlycounts_tax$genus)
+df_phlycounts_tax$species <- as.character(df_phlycounts_tax$species)
+
+df_phlycounts_tax[is.na(df_phlycounts_tax)] <- "NotAssigned"
+
+df_phlycounts_tax <- df_phlycounts_tax[order(df_phlycounts_tax$asv_id),] 
+
+numsamples2 <- length(df_phlycounts_tax)
+
+taxmat <- as.matrix(df_phlycounts_tax[,2:numsamples2])
+rownames(taxmat) <- as.data.frame(df_phlycounts_tax)[,1]
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library("phyloseq")
+library("ape")
+#library(plyr)
+
+tree = read.tree("~/master/milk/dataflow/04-tree-merge/tree.nwk")
+
+OTU = otu_table(otumat, taxa_are_rows = TRUE)
+TAX = tax_table(taxmat)
+samplesdata <- sample_data(df_phylocounts_meta)
+physeq = phyloseq(OTU, TAX, samplesdata, tree)
+```
+
+### Contamination  
+  
+Blue points in addition to those with a prevelance of over 10 in the negative control were removed (prevelance is the number of samples with an OTU observed)
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=3, fig.width=7}
+library(decontam)
+
+sample_data(physeq)$is.neg <- sample_data(physeq)$SampleOrControl == "Control"
+contam.prev05 <- isContaminant(physeq, method="prevalence", neg="is.neg", threshold=0.6)
+
+List_of_contaminants <- subset(contam.prev05,contam.prev05$contaminant == TRUE)
+List_of_contaminants$asv_id <- rownames(List_of_contaminants)
+taxa <- as.data.frame(taxmat)
+taxa$asv_id <- rownames(taxmat)
+List_of_contaminants <- merge(List_of_contaminants, taxa, by="asv_id")
+
+physeq.neg <- prune_samples(sample_data(physeq)$SampleOrControl == "Control", physeq)
+physeq.neg.presence <- transform_sample_counts(physeq.neg, function(abund) 1*(abund>0))
+
+physeq.pos <- prune_samples(sample_data(physeq)$SampleOrControl == "Sample", physeq)
+physeq.pos.presence <- transform_sample_counts(physeq.pos, function(abund) 1*(abund>0))
+
+df.pres <- data.frame(prevalence.pos=taxa_sums(physeq.pos.presence), prevalence.neg=taxa_sums(physeq.neg.presence),
+                      contam.prev=contam.prev05)
+
+ggplot(data=df.pres, aes(x=prevalence.neg, y=prevalence.pos, color=contam.prev.contaminant)) + geom_jitter() + ggtitle("Contamination - TRUE")
+
+over10 <- rownames(subset(df.pres, prevalence.neg > 10))
+all_taxa = taxa_names(physeq)
+my_contaminants <- c(subset(List_of_contaminants, select = asv_id))
+my_contaminants <- unique(unlist(c(my_contaminants, over10)))
+my_taxa <- all_taxa[!(all_taxa %in% my_contaminants)]
+
+physeq_no_cont = prune_taxa(my_taxa, physeq)
+
+
+physeq_no_cont_trim = prune_samples(sample_sums(physeq_no_cont)>=4000, physeq_no_cont)
+
+physeq_no_cont_trim = filter_taxa(physeq_no_cont_trim, function(x) sum(x > 100) > (0.2*length(x)), TRUE)
+
+physeq_no_cont_trim_rel  = transform_sample_counts(physeq_no_cont_trim, function(x) x / sum(x) )
+
+physeq_no_cont_trim_rel_df <- psmelt(physeq_no_cont_trim_rel)
+
+physeq_no_cont_trim_rel_df <- physeq_no_cont_trim_rel_df[!(grepl("LK", physeq_no_cont_trim_rel_df$Sample)), ]
+```
+
+
+
+
+
+### Prevelant Taxa
+
+Here we are looking at only samples with more than 500 reads remaining and the most prevelant OTUs. 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+physeq_no_cont_trim_rel_df_mean <- physeq_no_cont_trim_rel_df %>%
+  group_by(Time_Injection, Sara, LPS, family) %>%
+  mutate(mean_abundance = mean(Abundance)) %>%
+  ungroup() %>%
+  select(Time_Injection, Sara, LPS, family, mean_abundance) %>%
+  distinct()
+
+
+physeq_no_cont_trim_rel_df_mean$Time_Injection <- factor(physeq_no_cont_trim_rel_df_mean$Time_Injection, levels = c("1-Before", "32-Before", "32-After", "34-After"))
+
+bar_plot <- ggplot() + geom_bar(
+  aes(y = mean_abundance, x = Time_Injection, fill = family),
+  data = physeq_no_cont_trim_rel_df_mean,
+  stat = "identity" ,
+  position = "dodge"
+)  +labs(x="Category" , y= "Percentage (%)")+
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 20),
+        #axis.text.x = element_blank(), 
+        axis.text.y = element_text(size = 20), 
+        strip.text.x = element_text(size = 30),
+        strip.text.y = element_text(size = 30),
+        axis.title.y = element_text(size = 36),
+        axis.title.x = element_text(size = 36)) +
+        #axis.title.x = element_blank()) + 
+     facet_grid(Sara~LPS, scales = 'free_x')+
+  ylab("Mean Percentage of Sample") #+
+  #xlab("Individual Sample") 
+
+
+tmp <- ggplot_gtable(ggplot_build(bar_plot))
+leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+legend <- tmp$grobs[[leg]]
+
+bar_plot <- bar_plot +
+  theme(legend.position = "none") + 
+  ggtitle("FAMILY") + 
+  theme(plot.title = element_text(size=45))
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=20, fig.width=20}
+plot_grid(bar_plot)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=20, fig.width=20}
+plot_grid(legend)
+```
+
+

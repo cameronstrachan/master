@@ -5,7 +5,11 @@ metadata = 'sample-metadata.tsv'
 
 #files = ['feature-table-no-contam-all-feces.txt', 'feature-table-no-contam-all-skin.txt', 'feature-table-no-contam-wild_animals-feces.txt', 'feature-table-no-contam-wild_animals-skin.txt', 'feature-table-no-contam-pet_animals-feces.txt', 'feature-table-no-contam-pet_animals-skin.txt', 'feature-table-no-contam-wild_animals-skin_pack3.txt', 'feature-table-no-contam-wild_animals-feces_pack3.txt', 'feature-table-no-contam-all_animals-skin.txt', 'feature-table-no-contam-all_animals-feces.txt']
 
-files = ['feature-table-no-contam-all_animals-skin.txt', 'feature-table-no-contam-all_animals-feces.txt']
+#files = ['feature-table-no-contam-wild_animals-skin_pack3.txt', 'feature-table-no-contam-wild_animals-feces_pack3.txt']
+#files = ['feature-table-no-contam-wolf_animals-skin_pack3.txt', 'feature-table-no-contam-wolf_animals-feces_pack3.txt']
+#files = ['feature-table-no-contam-pet_animals-feces.txt', 'feature-table-no-contam-pet_animals-skin.txt']
+
+files = ['feature-table-no-contam-wild_animals-feces.txt', 'feature-table-no-contam-wild_animals-skin.txt',  'feature-table-no-contam-humans-feces.txt', 'feature-table-no-contam-humans-skin.txt']
 
 df_meta = pd.read_csv('dataflow/00-meta-merge/sample-metadata.tsv', sep = '\t')
 columns = list(df_meta)
@@ -15,6 +19,9 @@ for file in files:
 	outname = file.split('-')[4] + '-' + file.split('-')[5].split('.')[0]
 	command = './q2-commands-similarity.sh' + ' ' + metadata + ' ' + outname + ' ' + file
 	os.system(command)
+	
+	os.system('mv dataflow/02-qiime-viz-temp/weighted_unifrac_emperor.qzv dataflow/02-qiime-viz-merge/' + ' weighted_unifrac_emperor' + '_outname.qzv')
+	os.system('mv dataflow/02-qiime-viz-temp/unweighted_unifrac_emperor.qzv dataflow/02-qiime-viz-merge/' + ' unweighted_unifrac_emperor' + '_outname.qzv')
 	
 	for cname in columns:
 		output_f = 'dataflow/02-qiime-viz-temp/beta-sig/weighted-unifrac-' + str(cname) + '-' + outname + '-beta-significance.qzv'
