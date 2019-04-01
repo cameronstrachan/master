@@ -67,4 +67,4 @@ outputfilename = "resistance_island_mapping.txt"
 blastdb = "rumen_genomes_resistance_genes.fasta"
 
 file_obj.setOutputName(outputfilename)
-file_obj.runblast(blast='blastn', db=blastdb, dblocation=blastdbdir, max_target_seqs=10, evalue=1e-3, num_threads = 60)
+file_obj.runblast(blast='blastn', db=blastdb, dblocation=blastdbdir, max_target_seqs=10, evalue=1e-3, num_threads = 60, max_hsps = 5)
