@@ -98,9 +98,9 @@ file_obj.runblast(blast='blastn', db=blastdb, dblocation=blastdbdir, max_target_
 genes_df = pd.read_csv('dataflow/00-meta/resistance_blast_hit_cotigs_unique.csv', low_memory=False)
 genes = genes_df['qseqid'].tolist()
 
-file_obj = sc.Fasta(file, indir)
-file_obj.setOutputLocation(indir)
-file_obj.setOutputLocation("resistance_island_blast_hits_concatenated_extractedCONTIGs_3rumen_unique.fasta")
+file_obj = sc.Fasta("resistance_island_blast_hits_concatenated_extractedCONTIGs_3rumen.fasta", 'dataflow/01-nucl/')
+file_obj.setOutputLocation('dataflow/01-nucl/')
+file_obj.setOutputName("resistance_island_blast_hits_concatenated_extractedCONTIGs_3rumen_unique.fasta")
 file_obj.subsetfasta(seqlist = genes, headertag='unique')
 
 file_obj = sc.Fasta('resistance_island_blast_hits_concatenated_extractedCONTIGs_3rumen_unique.fasta', 'dataflow/01-nucl/')
