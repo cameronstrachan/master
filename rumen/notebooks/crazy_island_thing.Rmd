@@ -1,95 +1,262 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 library(tidyverse)
 ```
 
-## Crazy resistance thing
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
-colnames(df_num_genes)[1] <- "file"
-
-resistances <- read.delim("~/master/rumen/dataflow/02-blast/rumen_genomes_card.txt", header=FALSE) 
-aro_categories <- read.delim("~/master/databases/aro_categories_index.csv")
-
-colnames(resistances) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
-
-resistances <- resistances %>%
-  select(-sseq) %>%
-  separate(sseqid, into = c("rm", "Protein.Accession", "ARO.Accession", "gene"), sep = "\\|", remove = FALSE) 
-
-
-resistances$gene <- gsub("_", " ", resistances$gene)
-
-
-resistances <- resistances %>%
-    separate(gene, into = c("gene", "organism"), sep = "\\[", remove = FALSE) 
-
-resistances$organism <- gsub("\\]", " ", resistances$organism)
-
-resistances <- resistances %>%
-  inner_join(aro_categories) %>%
-  rowwise() %>%
-  mutate(file = stri_reverse(stri_split_fixed(stri_reverse(qseqid),"_",n = 3)[[1]][3])) %>%
-  ungroup() %>%
-  filter(pident > 50) %>%
-  filter(length > 50) %>%
-  #filter(bitscore >= 50) %>%
-  filter(Resistance.Mechanism == "antibiotic inactivation") %>%
-  group_by(gene) %>%
-  mutate(gene_occurences = length(file)) %>%
-  ungroup()
-
-resistances_summary <- resistances %>%
-  filter(pident == 100) %>%
-  group_by(file) %>%
-  mutate(nfiles = length(file)) %>%
-  ungroup() %>%
-  filter(nfiles > 1)
-
-unique(resistances_summary$qseqid)
+# colnames(df_num_genes)[1] <- "file"
+# 
+# resistances <- read.delim("~/master/rumen/dataflow/02-blast/rumen_genomes_card.txt", header=FALSE) 
+# aro_categories <- read.delim("~/master/databases/aro_categories_index.csv")
+# 
+# colnames(resistances) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+# 
+# resistances <- resistances %>%
+#   select(-sseq) %>%
+#   separate(sseqid, into = c("rm", "Protein.Accession", "ARO.Accession", "gene"), sep = "\\|", remove = FALSE) 
+# 
+# 
+# resistances$gene <- gsub("_", " ", resistances$gene)
+# 
+# 
+# resistances <- resistances %>%
+#     separate(gene, into = c("gene", "organism"), sep = "\\[", remove = FALSE) 
+# 
+# resistances$organism <- gsub("\\]", " ", resistances$organism)
+# 
+# resistances <- resistances %>%
+#   inner_join(aro_categories) %>%
+#   rowwise() %>%
+#   mutate(file = stri_reverse(stri_split_fixed(stri_reverse(qseqid),"_",n = 3)[[1]][3])) %>%
+#   ungroup() %>%
+#   filter(pident > 50) %>%
+#   filter(length > 50) %>%
+#   #filter(bitscore >= 50) %>%
+#   filter(Resistance.Mechanism == "antibiotic inactivation") %>%
+#   group_by(gene) %>%
+#   mutate(gene_occurences = length(file)) %>%
+#   ungroup()
+# 
+# resistances_summary <- resistances %>%
+#   filter(pident == 100) %>%
+#   group_by(file) %>%
+#   mutate(nfiles = length(file)) %>%
+#   ungroup() %>%
+#   filter(nfiles > 1)
 ```
 
 
-then extracted these 3 contigs in python, blasted them online, took the top 50 hits of each. the next just takes the blast output to get the coordinates and extract the island from all the pathogens. 
-
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
-df_blast_hits <- read.csv("~/master/rumen/dataflow/00-meta/resistance_island_blast.csv")
+# df_blast_hits <- read.csv("~/master/rumen/dataflow/00-meta/resistance_island_blast.csv")
+# 
+# df_blast_hits_CP033865.1 <- df_blast_hits %>%
+#   filter(accession == "CP033865.1") %>%
+#   rowwise() %>%
+#   mutate(duplicate = ifelse(start < 400000, 1, 2)) %>%
+#   ungroup()
+# 
+# df_blast_hits$duplicate <- 1
+# 
+# df_blast_hits <- df_blast_hits %>%
+#   filter(accession != "CP033865.1") 
+# 
+# 
+# df_blast_hits <- bind_rows(df_blast_hits, df_blast_hits_CP033865.1)
+# 
+# df_blast_hits <- df_blast_hits %>%
+#   select(-query, -pident) %>%
+#   group_by(accession, duplicate) %>%
+#   mutate(lowest_start = min(start)) %>%
+#   mutate(highest_start = max(start)) %>%
+#   mutate(lowest_stop = min(stop)) %>%
+#   mutate(highest_stop = max(stop)) %>%
+#   ungroup() %>%
+#   select(-start, -stop) %>%
+#   gather(name, value, -accession, -duplicate) %>%
+#   group_by(accession, duplicate) %>%
+#   mutate(start = min(value)) %>%
+#   mutate(stop = max(value)) %>%
+#   ungroup() %>%
+#   select(-name, -value) %>%
+#   mutate(length = stop - start) %>%
+#   distinct() %>%
+#   unite(ID, c("accession", "duplicate"), sep = "_", remove = FALSE)
+#   
+# df_blast_hits$direction <- "+"
+# 
+# colnames(df_blast_hits)[2] <- "contig"
+# colnames(df_blast_hits)[5] <- "end"
+# 
+# write.csv(df_blast_hits, "~/master/rumen/dataflow/00-meta/resistance_blast_hit_cotigs.csv")
+```
 
-df_blast_hits_CP033865.1 <- df_blast_hits %>%
-  filter(accession == "CP033865.1") %>%
-  rowwise() %>%
-  mutate(duplicate = ifelse(start < 400000, 1, 2)) %>%
-  ungroup()
 
-df_blast_hits$duplicate <- 1
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7}
+island_mapping_ava <- read.delim("~/master/rumen/dataflow/02-blast/resistance_island_mapping_allvall.txt", header=FALSE)
+colnames(island_mapping_ava) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
 
-df_blast_hits <- df_blast_hits %>%
-  filter(accession != "CP033865.1") 
+island_mapping_ava$qseqid <- as.character(island_mapping_ava$qseqid)
+island_mapping_ava$sseqid <- as.character(island_mapping_ava$sseqid)
 
-
-df_blast_hits <- bind_rows(df_blast_hits, df_blast_hits_CP033865.1)
-
-df_blast_hits <- df_blast_hits %>%
-  select(-query, -pident) %>%
-  group_by(accession, duplicate) %>%
-  mutate(lowest_start = min(start)) %>%
-  mutate(highest_start = max(start)) %>%
-  mutate(lowest_stop = min(stop)) %>%
-  mutate(highest_stop = max(stop)) %>%
+island_mapping_ava <- island_mapping_ava %>%
+  mutate(same = if_else(qseqid == sseqid, "yes", "no")) %>%
+  filter(same != "yes") %>%
+  filter(qseqid != "4309689-submission.assembly_79_resistance_genes") %>%
+  filter(qseqid != "4309680-submission.assembly_52_resistance_genes") %>%
+  filter(qseqid != "RUG782_1_resistance_genes") %>%
+  mutate(same_seq = if_else(pident == 100 & qlen == length, "yes", "no")) %>%
+  filter(same_seq == "yes") %>%
+  group_by(qseqid) %>%
+  mutate(group_num = length(unique(sseqid)) + 1) %>%
   ungroup() %>%
-  select(-start, -stop) %>%
-  gather(name, value, -accession, -duplicate) %>%
-  group_by(accession, duplicate) %>%
-  mutate(start = min(value)) %>%
-  mutate(stop = max(value)) %>%
+  select(qseqid, sseqid, group_num) %>%
+  group_by(qseqid) %>%
+  summarize(group_members = list(sort(c(sseqid, unique(qseqid))))) %>%
   ungroup() %>%
-  select(-name, -value) %>%
-  mutate(length = stop - start) %>%
-  distinct() %>%
-  unite(ID, c("accession", "duplicate"), sep = "_", remove = FALSE)
+  select(-qseqid) %>%
+  distinct()
+
+list_groups <- unique(island_mapping_ava$group_members)
+rep_seqs <- c()
+num_in_group <- c()
+
+for (i in 1:length(list_groups)){
+  group_list <- list_groups[[i]]
+  rnum <- sample(1:length(group_list), 1)
+  rep_seqs <- c(rep_seqs, group_list[[rnum]])
+  num_in_group <- c(num_in_group, length(group_list))
   
-df_blast_hits$direction <- "+"
+}
 
-colnames(df_blast_hits)[2] <- "contig"
+df_rep_seqs <- as.data.frame(cbind(rep_seqs, num_in_group))
+colnames(df_rep_seqs)[1] <- "qseqid"
 
-write.csv(df_blast_hits, "~/master/rumen/dataflow/00-meta/resistance_blast_hit_cotigs.csv")
+rem_seqs <- unlist(list_groups)[ !(unlist(list_groups) %in% df_rep_seqs$qseqid)]
+
+island_mapping <- read.delim("~/master/rumen/dataflow/02-blast/resistance_island_mapping.txt", header=FALSE)
+colnames(island_mapping) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+
+df_agsinst_RUG782 <- island_mapping %>%
+  select(qseqid, sseqid, pident, sstart, send, bitscore, length) %>%
+  filter(sseqid == "RUG782_1_resistance_genes") %>%
+  mutate(nstart = if_else(sstart < send, sstart, send)) %>%
+  mutate(nsend = if_else(send > sstart, send, sstart)) %>%
+  ungroup() %>%
+  filter(qseqid != "RUG782_1_resistance_genes") %>%
+  group_by(qseqid) %>%
+  mutate(bitscore_sum = sum(bitscore)) %>%
+  ungroup() %>%
+  filter(bitscore != 45953) 
+
+df_agsinst_RUG782_rumen <- df_agsinst_RUG782 %>%
+  filter(qseqid == "4309689-submission.assembly_79_resistance_genes" | qseqid == "4309680-submission.assembly_52_resistance_genes" | qseqid == "RUG782_1_resistance_genes")
+  
+
+df_agsinst_RUG782 <- df_agsinst_RUG782 %>%
+  full_join(df_rep_seqs) %>%
+  bind_rows(df_agsinst_RUG782_rumen) %>%
+  mutate(remove = qseqid %in% rem_seqs) %>%
+  filter(remove != TRUE) 
+
+df_agsinst_RUG782$newqseqid <- NA
+df_agsinst_RUG782$num_in_group <- as.character(df_agsinst_RUG782$num_in_group)
+df_agsinst_RUG782 <- as.data.frame(df_agsinst_RUG782)
+
+for (j in 1:nrow(df_agsinst_RUG782)) {
+  test <- df_agsinst_RUG782[j, "num_in_group"]
+  if(is.na(test)) {
+    df_agsinst_RUG782[j, "newqseqid"] <- df_agsinst_RUG782[j, "qseqid"]} else {
+      df_agsinst_RUG782[j, "newqseqid"] <- paste(df_agsinst_RUG782[j, "qseqid"], " (", df_agsinst_RUG782[j, "num_in_group"], ")", sep = "")
+    }
+  }
+
+
+
+df_agsinst_RUG782 <- df_agsinst_RUG782 %>%
+  arrange(bitscore_sum)
+  
+
+df_agsinst_RUG782$newqseqid <- gsub("-submission.assembly", "", df_agsinst_RUG782$newqseqid)
+df_agsinst_RUG782$newqseqid <- gsub("_resistance_genes", "", df_agsinst_RUG782$newqseqid)
+
+df_agsinst_RUG782$newqseqid <- factor(df_agsinst_RUG782$newqseqid, levels = unique(as.character(df_agsinst_RUG782$newqseqid)))
+
+
+
+library(ggplot2)
+library(ggalt)
+theme_set(theme_classic())
+
+# gg <- ggplot(df_agsinst_RUG782, aes(x=nstart, xend=nsend, y=newqseqid, group=newqseqid)) + 
+#         geom_dumbbell(size=2, aes(color = pident)) + 
+#         #scale_x_continuous(label=percent) + 
+#         labs(x=NULL, 
+#              y=NULL, 
+#              title="Dumbbell Chart") +
+#         theme(plot.title = element_text(hjust=0.5, face="bold"),
+#               plot.background=element_rect(fill="#f7f7f7"),
+#               panel.background=element_rect(fill="#f7f7f7"),
+#               panel.grid.minor=element_blank(),
+#               panel.grid.major.y=element_blank(),
+#               panel.grid.major.x=element_line(),
+#               axis.ticks=element_blank(),
+#               legend.position="top",
+#               panel.border=element_blank()) 
+
+
+
+
+gg <- ggplot(df_agsinst_RUG782, 
+       aes(y = newqseqid,
+           x = nstart,
+           xend = nsend)) +  
+  geom_dumbbell(size = 1.5,
+                size_x = 1.5, 
+                size_xend = 1.5,
+                colour_x = "red", 
+                colour_xend = "red", aes(colour = pident)) +
+  theme_minimal() + 
+  labs(title = "Resistance island mapping",
+       x = "Mapping to RUG782_1",
+       y = "") +
+    theme(text = element_text(size=12)) 
+  
+
+plot(gg)
+
+df_unique_contigs <- df_agsinst_RUG782 %>%
+  select(qseqid) %>%
+  distinct()
+
+#write.csv(df_unique_contigs, "~/master/rumen/dataflow/00-meta/resistance_blast_hit_cotigs_unique.csv")
+```
+
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=2.5, fig.width=5}
+library(genoPlotR)
+
+xlims <- list(c(-Inf, Inf), c(-Inf, Inf))
+
+df_seg_1 <- dna_seg(read.csv("~/master/rumen/dataflow/00-meta/4309680.csv")) 
+df_seg_2 <- dna_seg(read.csv("~/master/rumen/dataflow/00-meta/CP022905.csv"))
+
+dna_segs <- list(df_seg_1, df_seg_2)
+
+names <- c("4309680", "CP022905")
+names(dna_segs) <- names
+
+comparison1 <- as.comparison(read.csv("~/master/rumen/dataflow/00-meta/2islands_comparison.csv"))
+comparisons <- list(comparison1)
+
+comparisons[[1]]$col <- apply_color_scheme(c(0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6), "grey")
+
+plot_gene_map(dna_segs=dna_segs, comparisons=comparisons, xlims=xlims, main="Comparison between 4309680 and CP022905")
+
+#plot_gene_map(dna_segs=list(df_seg_1, df_seg_2), comparisons=list(comparison1), xlims=xlims, main="BH vs BQ, comparison of the first 50 kb", gene_type="side_blocks", dna_seg_scale=TRUE, scale=FALSE)
 ```
