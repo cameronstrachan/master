@@ -142,7 +142,7 @@ island_mapping <- read.delim("~/master/rumen/dataflow/02-blast/resistance_island
 colnames(island_mapping) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
 
 df_agsinst_RUG782 <- island_mapping %>%
-  select(qseqid, sseqid, pident, sstart, send, bitscore, length) %>%
+  select(qseqid, sseqid, pident, sstart, send, qstart, qend, bitscore, length) %>%
   filter(sseqid == "RUG782_1_resistance_genes") %>%
   mutate(nstart = if_else(sstart < send, sstart, send)) %>%
   mutate(nsend = if_else(send > sstart, send, sstart)) %>%
@@ -185,6 +185,9 @@ df_agsinst_RUG782$newqseqid <- gsub("-submission.assembly", "", df_agsinst_RUG78
 df_agsinst_RUG782$newqseqid <- gsub("_resistance_genes", "", df_agsinst_RUG782$newqseqid)
 
 df_agsinst_RUG782$newqseqid <- factor(df_agsinst_RUG782$newqseqid, levels = unique(as.character(df_agsinst_RUG782$newqseqid)))
+
+df_agsinst_RUG782 <- df_agsinst_RUG782 %>%
+  filter(qseqid != "AJ557257.1_1")
 
 
 
@@ -237,26 +240,57 @@ df_unique_contigs <- df_agsinst_RUG782 %>%
 ```
 
 
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=2.5, fig.width=5}
+df_agsinst_RUG782_frag1 <- df_agsinst_RUG782 %>%
+  filter(nstart == 132252 & nsend == 133739)
+
+df_agsinst_RUG782_frag1$frag <- 1
+
+df_agsinst_RUG782_frag2 <- df_agsinst_RUG782 %>%
+  filter(nstart == 137348 & nsend == 140714)
+
+df_agsinst_RUG782_frag2$frag <- 2
+
+df_agsinst_RUG782_frag3 <- df_agsinst_RUG782 %>%
+  filter(nstart == 141968 & nsend == 143706 )
+
+df_agsinst_RUG782_frag3$frag <- 3
+
+
+df_agsinst_RUG782_frags <- bind_rows(df_agsinst_RUG782_frag1, df_agsinst_RUG782_frag2, df_agsinst_RUG782_frag3) %>%
+  group_by(frag) %>%
+  mutate(avg_pident = mean(pident)) %>%
+  ungroup()
+```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=2.5, fig.width=5}
 library(genoPlotR)
 
-xlims <- list(c(-Inf, Inf), c(-Inf, Inf))
+xlims <- list(c(-Inf, Inf), c(-Inf, Inf), c(-Inf, Inf))
 
-df_seg_1 <- dna_seg(read.csv("~/master/rumen/dataflow/00-meta/4309680.csv")) 
-df_seg_2 <- dna_seg(read.csv("~/master/rumen/dataflow/00-meta/CP022905.csv"))
+df_seg_1 <- dna_seg(read.csv("~/master/rumen/dataflow/00-meta/RUG782.csv"))
+df_seg_2 <- dna_seg(read.csv("~/master/rumen/dataflow/00-meta/4309680.csv")) 
+df_seg_3 <- dna_seg(read.csv("~/master/rumen/dataflow/00-meta/CP022905.csv"))
 
-dna_segs <- list(df_seg_1, df_seg_2)
+dna_segs <- list(df_seg_1, df_seg_2, df_seg_3)
 
-names <- c("4309680", "CP022905")
+names <- c("RUG782", "4309680", "CP022905")
 names(dna_segs) <- names
 
-comparison1 <- as.comparison(read.csv("~/master/rumen/dataflow/00-meta/2islands_comparison.csv"))
-comparisons <- list(comparison1)
+comparison1 <- as.comparison(read.csv("~/master/rumen/dataflow/00-meta/RUG782v4309680.csv"))
+comparison2 <- as.comparison(read.csv("~/master/rumen/dataflow/00-meta/4309680vCP022905.csv"))
 
-comparisons[[1]]$col <- apply_color_scheme(c(0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6), "grey")
+comparisons <- list(comparison1, comparison2)
 
-plot_gene_map(dna_segs=dna_segs, comparisons=comparisons, xlims=xlims, main="Comparison between 4309680 and CP022905")
+comparisons[[1]]$col <- apply_color_scheme(c(0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6), "grey")
+comparisons[[2]]$col <- apply_color_scheme(c(0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6), "grey")
+
+
+annot <- annotation(x1=c(130286, 130621, 139839), x2=c(130344, 131687, 139883), text=c("IR 1", "IR 2", "IR 3"), rot=c(0, 0, 0), col=c("black", "black", "black"))
+
+
+plot_gene_map(dna_segs=dna_segs, comparisons=comparisons, xlims=xlims,  dna_seg_scale=TRUE, scale=FALSE)
+
 
 #plot_gene_map(dna_segs=list(df_seg_1, df_seg_2), comparisons=list(comparison1), xlims=xlims, main="BH vs BQ, comparison of the first 50 kb", gene_type="side_blocks", dna_seg_scale=TRUE, scale=FALSE)
 ```
