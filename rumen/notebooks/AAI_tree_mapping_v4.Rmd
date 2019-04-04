@@ -1,0 +1,429 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(stringi)
+library(ggplot2)
+library(ggdendro)
+library(reshape2)
+library(grid)
+library(ape)
+library(adephylo)
+library(stringr)
+library(distory)
+library(gridExtra)
+library(phangorn)
+library(phylogram)
+library(cowplot)
+library(dendextend)
+library("grid")
+library("ggplotify")
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7.5}
+# this tree was made my selecting a subset of the genomes that had a well aligned hsp70, that was between 500 and 700. I then retrimed the alignment. 
+
+# read in tree
+tree <- read.tree("~/master/rumen/dataflow/03-trees/hsp70_mreB_eftu_dnaA_trimmed_tree_phyML_43genomes.newick") 
+
+group1 <- as.data.frame(tree$tip.label[22:43])
+colnames(group1) <- "file"
+group1$group <- "G1"
+group2 <- as.data.frame(tree$tip.label[1:20])
+colnames(group2) <- "file"
+group2$group <- "G2"
+
+groupings <- rbind(group1, group2)
+
+groupings$file <- as.character(groupings$file)
+
+groupings <- groupings %>%
+  arrange(file)
+
+groupings_genomes <- groupings[1:30,]
+
+write.csv(groupings_genomes, "~/master/rumen/dataflow/00-meta/prevotella_groupings.csv")
+
+# rename tip labels so they are the same as the genome labels
+#tree$tip.label <- gsub("_[^_]+$", "", tree$tip.label)
+#tree$tip.label <- gsub("_[^_]+$", "", tree$tip.label)
+#tree$tip.label <- gsub("_[^_]+$", "", tree$tip.label)
+tree$tip.label <- gsub("RMG", "RMG_", tree$tip.label)
+tree$tip.label <- gsub("submission.assembly", "", tree$tip.label)
+tree$tip.label <- gsub("final.assembly", "", tree$tip.label)
+tree$tip.label <- gsub(".assembly", "", tree$tip.label)
+tree$tip.label <- gsub("-", "", tree$tip.label)
+tree$tip.label <- gsub("_IMGtaxon_2693429877_annotated", "", tree$tip.label)
+tree$tip.label <- gsub("_genomic", "", tree$tip.label)
+tree$tip.label <- gsub("\\.", "", tree$tip.label)
+
+op <- par(mar = c(0.3,0,0.7,0))
+plot.phylo(tree,  align.tip.label = TRUE)# plot the square root function
+par(op)
+recordedplot <- recordPlot()
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+# read in shared AAI
+df_pi <- read.csv("~/master/rumen/dataflow/04-analysis-tables/selected_genomes_sharedPI.csv")
+df_pi$X <- NULL
+
+# rename genomes
+df_pi$file1 <- gsub("_IMGtaxon_2693429877_annotated", "", df_pi$file1)
+df_pi$file2 <- gsub("_IMGtaxon_2693429877_annotated", "", df_pi$file2)
+
+# spread the data frame to fill in the NAs with 100
+df_pi_spread <- df_pi %>%
+  spread(file2, mean_mean_pi)
+
+df_pi_spread [is.na(df_pi_spread )] <- 100
+
+# re melt the dataframe
+df_pi_filled <- melt(df_pi_spread, by = c("mean_mean_pi"))
+colnames(df_pi_filled) <- c("file1", "file2", "mean_mean_pi")
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7.5, fig.width=6}
+# get the ordering from the dendogram 
+order <- tree$tip.label
+
+# remove genomes without a good hsp70 from the alignments, length, trimming 
+df_pi_filled <- df_pi_filled[df_pi_filled$file1 %in% order,]
+df_pi_filled <- df_pi_filled[df_pi_filled$file2 %in% order,]
+
+# order the x and y axis
+df_pi_filled$file1 <- factor(df_pi_filled$file1,
+                               levels = order,
+                               ordered = TRUE)
+
+df_pi_filled$file2 <- factor(df_pi_filled$file2,
+                               levels = order,
+                               ordered = TRUE)
+
+df_pi_filled$dataset <- "AAI"
+
+# plot a heatmap, with the legend seperate
+heatmap.plot <- ggplot(data = df_pi_filled, aes(x = file2, y = file1)) +
+  geom_tile(aes(fill = mean_mean_pi)) +
+      theme(axis.text.x = element_blank(),  
+        axis.text.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.ticks.y = element_blank(), line = element_blank()) +
+  scale_fill_gradient2() +
+    scale_colour_manual(values = c("red","yellow", "green"))+
+    scale_fill_gradient(low = "yellow",  high = "darkgreen") +
+  facet_wrap(. ~ dataset) + scale_fill_distiller(type = "div", palette = 1, direction = 1,
+  aesthetics = "fill") +
+    theme(plot.margin = unit(c(0.7,0.2,0.7,0.2), "cm"))
+
+
+tmp <- ggplot_gtable(ggplot_build(heatmap.plot))
+leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+legend <- tmp$grobs[[leg]]
+
+heatmap.plot <- heatmap.plot +
+  theme(legend.position = "none") 
+
+#heatmap.plot
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=15, fig.width=15}
+# not aligned is the regions between features (not in my gff3), need to think about this when calclating abundance. 
+
+df_gff3 <- read.delim("~/master/rumen/dataflow/01-prot/genes/rumen_prevotella.gff3", header=FALSE, comment.char="#") %>%
+  separate(V9, c("ID"), sep = ";") %>%
+  select(-V2, -V3, -V6, -V8)
+
+df_gff3$ID <- gsub("ID=", "", df_gff3$ID)
+
+colnames(df_gff3)[1:4] <- c("contig", "start", "end", "direction")
+
+df_gff3 <- df_gff3 %>%
+  rowwise() %>%
+  mutate(genome = stri_reverse(stri_split_fixed(stri_reverse(contig),"_",n = 2)[[1]][2])) %>%
+  group_by(genome) %>%
+  mutate(num_genes= length(unique(ID))) %>%
+  ungroup() 
+
+
+file1 <- "~/master/rumen/dataflow/03-sam-counts/sandri2018_rumen_prevotella.txt"
+file2 <- "~/master/rumen/dataflow/03-sam-counts/marre2017_rumen_prevotella.txt"
+file3 <- "~/master/rumen/dataflow/03-sam-counts/mann2018_rumen_prevotella_SARA1.txt"
+file4 <- "~/master/rumen/dataflow/03-sam-counts/mann2018_rumen_prevotella_nonSARA1.txt"
+
+files  <- c(file1, file2, file3, file4)
+names <- c("sandri2018", "marre2017", "mann2018_control", "mann2018_SARA")
+df_list <- list()
+
+j <- 1
+
+for (f in files){
+  
+  df_counts <- read.delim(f, header=FALSE) %>%
+    filter(V3 != 0) 
+  
+  
+  not_aligned <- df_counts %>%
+    filter(V1 == "__not_aligned")
+  
+  not_aligned <- not_aligned$V3
+  
+  ambiguous <- df_counts %>%
+    filter(V1 == "__ambiguous")
+  
+  ambiguous <- ambiguous$V3
+  
+  df_counts <- df_counts %>%
+    filter(V1 != "__not_aligned") %>%
+    filter(V1 != "__too_low_aQual") %>%
+    filter(V1 != "__no_feature") %>%
+    filter(V1 != "__ambiguous") %>%
+    select(-V2)
+  
+  colnames(df_counts) <- c("ID", "count")
+  df_counts$ID <- as.character(df_counts$ID)
+  
+  df_counts$dataset <- names[j]
+  
+  df_counts$notaligned <- not_aligned
+  df_counts$ambig <- ambiguous
+    
+  df <- inner_join(df_counts, df_gff3) 
+  
+  df_genome <- df %>%
+    group_by(genome) %>%
+    mutate(total_counts = sum(count)) %>%
+    ungroup() %>%
+    select(genome, total_counts, num_genes, notaligned, ambig, dataset) %>%
+    distinct() %>%
+    rowwise() %>%
+    mutate(percent_mapped = (total_counts / (notaligned - ambig + total_counts))*100) %>%
+    ungroup()
+
+  df_genome$genome <- gsub("_rename", "", df_genome$genome)
+  df_genome$genome <- gsub("submission.assembly", "", df_genome$genome)
+  df_genome$genome <- gsub("final.assembly", "", df_genome$genome)
+  df_genome$genome <- gsub(".assembly", "", df_genome$genome)
+  df_genome$genome <- gsub("-", "", df_genome$genome)
+  df_genome$genome <- gsub("_IMGtaxon_2693429877_annotated", "", df_genome$genome)
+  df_genome$genome <- gsub("_genomic", "", df_genome$genome)
+  df_genome$genome <- gsub("\\.", "", df_genome$genome)
+
+  df_genome <- df_genome[df_genome$genome %in% order,]
+
+  df_genome$genome <- factor(df_genome$genome,
+                           levels = order, 
+                           ordered = TRUE)
+  
+  
+  df_list[[j]] <- df_genome
+  
+  j <- j + 1
+  
+}
+
+df_genome <- bind_rows(df_list) 
+
+
+
+mapped_reads.plot <- ggplot(data = df_genome, aes(x = genome, y = percent_mapped)) + 
+  geom_bar(stat = "identity", aes(fill = percent_mapped)) + coord_flip() + theme_gray() +
+  theme(axis.title.x = element_blank(), 
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(), 
+        #axis.text.y = element_blank(), 
+        axis.title.y = element_blank(), 
+        axis.ticks.y = element_blank()) +
+  scale_fill_distiller(name = "Value", palette = "Reds", direction = 1)  +
+  facet_wrap(. ~ dataset, scales = "free") + 
+  scale_fill_distiller(type = "seq", palette = 1, direction = 1, aesthetics = "fill") + scale_fill_gradient(low = "#132B43", high = "#56B1F7",
+  space = "Lab", na.value = "grey50", guide = "colourbar",
+  aesthetics = "fill") +
+    theme(plot.margin = unit(c(0.2,0.2,0.5,0.2), "cm"))
+
+mapped_reads.plot
+
+df_genome_gen <- df_genome %>%
+  filter(dataset == "sandri2018") %>%
+  select(genome, percent_mapped) %>%
+  rename(metagenome = percent_mapped)
+
+
+df_genome_tran <- df_genome %>%
+  filter(dataset == "marre2017") %>%
+  select(genome, percent_mapped) %>%
+  rename(metatranscriptome = percent_mapped)
+
+df_genome_same <- inner_join(df_genome_gen, df_genome_tran)
+df_genome_same$dataset <- "Mapping"
+
+mapped_reads.plot <- ggplot(data = df_genome_same, aes(x = genome, y = metagenome)) + 
+  geom_bar(stat = "identity", aes(fill = metatranscriptome)) + coord_flip() + theme_gray() +
+  theme(axis.title.x = element_blank(), 
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(), 
+        axis.text.y = element_blank(), 
+        axis.title.y = element_blank(), 
+        axis.ticks.y = element_blank()) +
+  scale_fill_distiller(name = "Value", palette = "Reds", direction = 1)  +
+  facet_wrap(. ~ dataset, scales = "free") + 
+  scale_fill_distiller(type = "seq", palette = 1, direction = 1, aesthetics = "fill") + scale_fill_gradient(low = "#132B43", high = "#56B1F7",
+  space = "Lab", na.value = "grey50", guide = "colourbar",
+  aesthetics = "fill") +
+    theme(plot.margin = unit(c(0.4,0.2,0.7,0.2), "cm"))
+
+#mapped_reads.plot
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=10, fig.width=12}
+plot_grid(recordedplot, heatmap.plot, mapped_reads.plot, align = 'h', ncol = 3)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+df_file2species <- read.csv("~/master/rumen/dataflow/00-meta/seshadri2018_prevotella.csv")
+
+df_groupings <- read.csv("~/master/rumen/dataflow/00-meta/prevotella_groupings.csv")
+df_groupings$X <- NULL
+
+df_meta <- read.csv("~/master/rumen/dataflow/00-meta/seshadri2018_files_fasta.csv")
+df_meta$X <- NULL
+df_meta$X.1 <- NULL
+
+df_meta$family.order <- gsub(" ", "", df_meta$family.order)
+df_meta$file <- gsub(".fasta", "", df_meta$file)
+
+df_meta <- df_meta %>%
+  filter(family.order == "Prevotellaceae") %>%
+  select(genome, strain.id,  strain.name, file, collection, genus.species, country, origin)
+
+df_meta <- inner_join(df_meta, df_groupings) %>%
+  inner_join(df_file2species)
+
+df_pathways <- read.csv("~/master/rumen/dataflow/00-meta/Seshradi2015_pathways2.csv") 
+df_pathways$Family.Order <- gsub(" ", "", df_pathways$Family.Order)
+
+df_pathways <- df_pathways %>%
+  filter(Family.Order == "Prevotellaceae") %>%
+  distinct() %>%
+  rename(strain.id = Strain)
+
+df_pathways$strain.id <- gsub(" ", "", df_pathways$strain.id)
+df_meta$strain.id <- gsub(" ", "", df_meta$strain.id)
+
+df_meta <- inner_join(df_pathways, df_meta) %>%
+  select(-C_Cellulose, -C_Lactate, -C_Succinate, -C_Lipids, -P_Butyrate, -P_Formate, -P_Lactate)
+```
+
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=15, fig.width=7}
+# group by the category opf resistance and then make sure there is more than 1, plot there genes
+
+df_num_genes <- df_gff3 %>%
+  select(genome, num_genes) %>%
+  distinct()
+
+colnames(df_num_genes)[1] <- "file"
+
+resistances <- read.delim("~/master/rumen/dataflow/02-blast/rumen_prevotella_card.txt", header=FALSE) 
+aro_categories <- read.delim("~/master/databases/aro_categories_index.csv")
+
+colnames(resistances) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+
+resistances <- resistances %>%
+  select(-sseq) %>%
+  separate(sseqid, into = c("rm", "Protein.Accession", "ARO.Accession", "gene"), sep = "\\|", remove = FALSE) 
+
+
+resistances$gene <- gsub("_", " ", resistances$gene)
+
+
+resistances <- resistances %>%
+    separate(gene, into = c("gene", "organism"), sep = "\\[", remove = FALSE) 
+
+resistances$organism <- gsub("\\]", " ", resistances$organism)
+
+resistances <- resistances %>%
+  inner_join(aro_categories) %>%
+  rowwise() %>%
+  mutate(file = stri_reverse(stri_split_fixed(stri_reverse(qseqid),"_",n = 3)[[1]][3])) %>%
+  ungroup() %>%
+  inner_join(groupings) %>%
+  inner_join(df_num_genes) %>%
+  group_by(group) %>%
+  mutate(total_genes_group = sum(num_genes)) %>%
+  ungroup() %>%
+  filter(pident > 50) %>%
+  filter(length > 50) %>%
+  filter(Resistance.Mechanism == "antibiotic inactivation") %>%
+  group_by(gene) %>%
+  mutate(gene_occurences = length(file)) %>%
+  ungroup()
+
+resistances$gene <- gsub("Agrobacterium fabrum chloramphenicol acetyltransferase", "cat", resistances$gene)
+
+resistances$AMR.Gene.Family <- as.character(resistances$AMR.Gene.Family)
+
+resistances_summary <- resistances %>%
+  select(file, gene) %>%
+  distinct() %>%
+  spread(gene, -file)
+
+resistances_summary$file <- gsub("_rename", "", resistances_summary$file)
+resistances_summary$file <- gsub("submission.assembly", "", resistances_summary$file)
+resistances_summary$file <- gsub("final.assembly", "", resistances_summary$file)
+resistances_summary$file <- gsub(".assembly", "", resistances_summary$file)
+resistances_summary$file <- gsub("-", "", resistances_summary$file)
+resistances_summary$file <- gsub("_IMGtaxon_2693429877_annotated", "", resistances_summary$file)
+resistances_summary$file <- gsub("_genomic", "", resistances_summary$file)
+resistances_summary$file <- gsub("\\.", "", resistances_summary$file)
+
+df_all_files <- df_pi_filled %>%
+  select(file1) %>%
+  distinct() %>%
+  rename(file = file1)
+  
+resistances_summary <- full_join(resistances_summary, df_all_files)
+
+check <- inner_join(df_meta, resistances)
+
+resistances_summary <- resistances_summary %>%
+  gather(resistance, presence, -file)
+
+resistances_summary$presence[!(is.na(resistances_summary$presence))]<-1
+resistances_summary$presence[is.na(resistances_summary$presence)]<-0
+
+
+resistances_summary <- resistances_summary[resistances_summary$file %in% order,]
+
+resistances_summary$file <- factor(resistances_summary$file,
+                           levels = order, 
+                           ordered = TRUE)
+
+
+resistance_plot <- ggplot(data = resistances_summary, aes(x = resistance, y = file)) +
+  geom_tile(aes(fill = presence)) +
+    theme(plot.margin = unit(c(0.7,0.2,0.7,0.2), "cm"))+
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_text(angle = 90, hjust = 1),
+        #axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(), 
+        #axis.text.y = element_blank(), 
+        axis.title.y = element_blank(), 
+        axis.ticks.y = element_blank())
+
+resistance_plot
+
+#plot_grid(heatmap.plot, resistance_plot, align = 'h', ncol = 2)
+#Virginiamycin
+```
+
+
