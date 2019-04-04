@@ -69,4 +69,17 @@ file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
 outputfilename = file.split(".f")[0] + '_extractedCONTIGs_all_rumen' + '.fasta'
 file_obj.setOutputName(outputfilename)
 file_obj.setOutputLocation('dataflow/01-nucl/')
-file_obj.extractORFs_gff3(gff3_table_loc = 'dataflow/00-meta/resistance_blast_hit_cotigs_all_rumen.csv')
+#file_obj.extractORFs_gff3(gff3_table_loc = 'dataflow/00-meta/resistance_blast_hit_cotigs_all_rumen.csv')
+
+file = "rumen_genomes_extractedCONTIGs_all_rumen.fasta"
+indir = 'dataflow/01-nucl/'
+blastdir = 'dataflow/02-blast/'
+
+file_obj = sc.Fasta(file, indir)
+file_obj.setOutputLocation(blastdir)
+
+outputfilename = "resistance_island_mapping2.txt"
+blastdb = "rumen_genomes_resistance_genes.fasta"
+
+file_obj.setOutputName(outputfilename)
+file_obj.runblast(blast='blastn', db=blastdb, dblocation=blastdbdir, max_target_seqs=10, evalue=1e-3, num_threads = 60, max_hsps = 5)
