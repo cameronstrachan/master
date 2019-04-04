@@ -118,3 +118,11 @@ blastdb = "resistance_island_blast_hits_concatenated_extractedCONTIGs_3rumen.fas
 
 file_obj.setOutputName(outputfilename)
 file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=100, evalue=1e-3, num_threads = 60, max_hsps = 1)
+
+file_obj = sc.Fasta(file, 'dataflow/01-prot/')
+file_obj.setOutputName(file)
+file_obj.setOutputLocation('dataflow/02-headers/')
+headers = file_obj.fasta2headermap()
+df = pd.DataFrame.from_dict(headers, orient="index")
+df['file'] = file
+df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
