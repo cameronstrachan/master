@@ -152,7 +152,7 @@ file_obj.runmakeblastdb(dbtype='prot')
 
 blastdir = 'dataflow/02-blast/'
 
-file_obj = sc.Fasta("ecoli_ribD", 'dataflow/01-prot/')
+file_obj = sc.Fasta("ecoli_ribD.fasta", 'dataflow/01-prot/')
 file_obj.setOutputLocation(blastdir)
 
 outputfilename = "genomes_4_ribD.txt"
