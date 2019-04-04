@@ -99,7 +99,7 @@ file_obj.setOutputName(file)
 file_obj.setOutputLocation('dataflow/01-prot/')
 file_obj.runprodigal()
 
-file = "rumen_genomes_resistance_genes.fasta"
+file = "resistance_island_blast_hits_concatenated_extractedCONTIGs_3rumen.fasta"
 indir = 'dataflow/01-nucl/'
 blastdbdir = 'dataflow/02-blast-db/'
 
