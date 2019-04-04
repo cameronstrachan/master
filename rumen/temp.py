@@ -114,7 +114,7 @@ file_obj = sc.Fasta(file, 'dataflow/01-prot/')
 file_obj.setOutputLocation(blastdir)
 
 outputfilename = "resistance_island_all_v_all_prot.txt"
-blastdb = "rumen_genomes_resistance_genes.fasta"
+blastdb = "resistance_island_blast_hits_concatenated_extractedCONTIGs_3rumen.fasta"
 
 file_obj.setOutputName(outputfilename)
 file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=100, evalue=1e-3, num_threads = 60, max_hsps = 1)
