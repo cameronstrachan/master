@@ -73,7 +73,7 @@ file_obj.setOutputLocation('dataflow/01-nucl/')
 
 files = ["resistance_island_blast_hits_concatenated_extractedCONTIGs_3rumen.fasta", "rumen_genomes_extractedCONTIGs_all_rumen.fasta"]
 
-sg.concat(inputfolder='dataflow/01-nucl/', outputpath='dataflow/01-nucl/rumen_genomes_extractedCONTIGs_all.fasta', filenames=files)
+#sg.concat(inputfolder='dataflow/01-nucl/', outputpath='dataflow/01-nucl/rumen_genomes_extractedCONTIGs_all.fasta', filenames=files)
 
 
 file = "rumen_genomes_extractedCONTIGs_all.fasta"
@@ -117,7 +117,7 @@ outputfilename = "resistance_island_all_v_all_prot.txt"
 blastdb = "resistance_island_blast_hits_concatenated_extractedCONTIGs_3rumen.fasta"
 
 file_obj.setOutputName(outputfilename)
-file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=100, evalue=1e-3, num_threads = 60, max_hsps = 1)
+#file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=100, evalue=1e-3, num_threads = 60, max_hsps = 1)
 
 headerfile = 'dataflow/02-headers/'
 
@@ -128,3 +128,26 @@ headers = file_obj.fasta2headermap()
 df = pd.DataFrame.from_dict(headers, orient="index")
 df['file'] = file
 df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
+
+# RibD comparison, is the rib D in the island more related to the duplicated gene
+# in the rumen metagenomes as compared to those in the pathogens
+
+files = ['4309689-submission.assembly_rename.fasta', '4309680-submission.assembly_rename.fasta', 'RUG782_rename.fasta', "resistance_island_blast_hits_concatenated.fasta"]
+
+sg.concat(inputfolder='dataflow/01-nucl/', outputpath='dataflow/01-nucl/genomes_4_ribD.fasta', filenames=files)
+
+file_obj = sc.Fasta('genomes_4_ribD.fasta', 'dataflow/01-nucl/')
+file_obj.setOutputName('genomes_4_ribD.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.runprodigal()
+
+os.system("hmmpress dataflow/02-hmm/RibD_C.hmm")
+os.system("hmmscan --tblout dataflow/02-hmm/island_ribD.txt -T 200 --cpu 60 dataflow/02-hmm/RibD_C.hmm dataflow/01-prot/genomes_4_ribD.fasta")
+
+eftu_df = pd.read_csv('dataflow/02-hmm/island_ribD.txt', comment='#', header=None, delim_whitespace=True)
+eftu_genes = eftu_df.iloc[:,2].tolist()
+
+file_obj = sc.Fasta('genomes_4_ribD.fasta', 'dataflow/01-prot/')
+file_obj.setOutputName('genomes_4_ribD_hmm.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.subsetfasta(seqlist = eftu_genes, headertag='none')
