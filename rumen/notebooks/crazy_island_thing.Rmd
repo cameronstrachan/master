@@ -1,6 +1,7 @@
 ---
 output:
   pdf_document: default
+  word_document: default
   html_document: default
 ---
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
@@ -97,6 +98,7 @@ library(tidyverse)
 
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7}
+set.seed(1)
 island_mapping_ava <- read.delim("~/master/rumen/dataflow/02-blast/resistance_island_mapping_allvall.txt", header=FALSE)
 colnames(island_mapping_ava) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
 
@@ -178,7 +180,7 @@ for (j in 1:nrow(df_agsinst_RUG782)) {
 
 
 df_agsinst_RUG782 <- df_agsinst_RUG782 %>%
-  arrange(bitscore_sum)
+  arrange(desc(bitscore_sum))
   
 
 df_agsinst_RUG782$newqseqid <- gsub("-submission.assembly", "", df_agsinst_RUG782$newqseqid)
@@ -186,10 +188,16 @@ df_agsinst_RUG782$newqseqid <- gsub("_resistance_genes", "", df_agsinst_RUG782$n
 
 df_agsinst_RUG782$newqseqid <- factor(df_agsinst_RUG782$newqseqid, levels = unique(as.character(df_agsinst_RUG782$newqseqid)))
 
+df_seq_species_type <- read.csv("~/master/rumen/dataflow/00-meta/resistance_island_seq_origins.csv")
+df_seq_species_type$accession <- as.character(df_seq_species_type$accession)
+
 df_agsinst_RUG782 <- df_agsinst_RUG782 %>%
-  filter(qseqid != "AJ557257.1_1")
+  filter(qseqid != "AJ557257.1_1") %>%
+  separate(qseqid, into = c("accession", "rm"), remove = FALSE, sep = "_") %>%
+  inner_join(df_seq_species_type, by = c("accession")) %>%
+  unite(newqseqid2, c("species", "type", "newqseqid"), sep = " | ", remove = FALSE)
 
-
+df_agsinst_RUG782$newqseqid2 <- factor(df_agsinst_RUG782$newqseqid2, levels = unique(as.character(df_agsinst_RUG782$newqseqid2)))
 
 library(ggplot2)
 library(ggalt)
@@ -215,7 +223,7 @@ theme_set(theme_classic())
 
 
 gg <- ggplot(df_agsinst_RUG782, 
-       aes(y = newqseqid,
+       aes(y = newqseqid2,
            x = nstart,
            xend = nsend)) +  
   geom_dumbbell(size = 1.5,
@@ -224,10 +232,9 @@ gg <- ggplot(df_agsinst_RUG782,
                 colour_x = "red", 
                 colour_xend = "red", aes(colour = pident)) +
   theme_minimal() + 
-  labs(title = "Resistance island mapping",
-       x = "Mapping to RUG782_1",
+  labs(x = "Mapping to RUG782_1",
        y = "") +
-    theme(text = element_text(size=12)) 
+    theme(text = element_text(size=8)) 
   
 
 plot(gg)
@@ -263,30 +270,73 @@ df_agsinst_RUG782_frags <- bind_rows(df_agsinst_RUG782_frag1, df_agsinst_RUG782_
   ungroup()
 ```
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=2.5, fig.width=5}
+\newpage
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(printr)
+
+df_group_list <- list()
+j <- 1
+
+for (i in 1:length(list_groups)){
+  
+  df_group <- as.data.frame(list_groups[[i]])
+  colnames(df_group) <- "qseqid"
+  df_group$group <- i
+  df_group_list[[j]] <- df_group
+  j <- j + 1
+  
+}
+
+df_group <- bind_rows(df_group_list)
+
+df_seq_origin <- read.csv("~/master/rumen/dataflow/00-meta/resistance_island_sequences.csv")
+
+df_group_seq_origin <- island_mapping %>%
+  select(qseqid) %>%
+  distinct() %>%
+  separate(qseqid, c("accession", "contig_num"), sep = "_", remove = FALSE) %>%
+  filter(qseqid != "4309689-submission.assembly_79_resistance_genes") %>%
+  filter(qseqid != "4309680-submission.assembly_52_resistance_genes") %>%
+  filter(qseqid != "RUG782_1_resistance_genes") %>%
+  full_join(df_seq_origin) %>%
+  full_join(df_group) %>%
+  arrange(group)
+
+#df_group_seq_origin %>%
+#  select(qseqid, group, seq)
+
+
+```
+
+\newpage
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=3.5, fig.width=10}
 library(genoPlotR)
 
-xlims <- list(c(-Inf, Inf), c(-Inf, Inf), c(-Inf, Inf))
+xlims <- list(c(-Inf, Inf), c(-Inf, Inf), c(-Inf, Inf),  c(45000, 0))
 
 df_seg_1 <- dna_seg(read.csv("~/master/rumen/dataflow/00-meta/RUG782.csv"))
 df_seg_2 <- dna_seg(read.csv("~/master/rumen/dataflow/00-meta/4309680.csv")) 
 df_seg_3 <- dna_seg(read.csv("~/master/rumen/dataflow/00-meta/CP022905.csv"))
+df_seg_4 <- dna_seg(read.csv("~/master/rumen/dataflow/00-meta/KP339868.1_1.csv"))
 
-dna_segs <- list(df_seg_1, df_seg_2, df_seg_3)
+dna_segs <- list(df_seg_1, df_seg_2, df_seg_3, df_seg_4)
 
-names <- c("RUG782", "4309680", "CP022905")
+names <- c("RUG782", "4309680", "CP022905", "KP339868.1_1")
 names(dna_segs) <- names
 
 comparison1 <- as.comparison(read.csv("~/master/rumen/dataflow/00-meta/RUG782v4309680.csv"))
 comparison2 <- as.comparison(read.csv("~/master/rumen/dataflow/00-meta/4309680vCP022905.csv"))
+comparison3 <- as.comparison(read.csv("~/master/rumen/dataflow/00-meta/CP022905vKP339868.1_1.csv"))
 
-comparisons <- list(comparison1, comparison2)
+comparisons <- list(comparison1, comparison2, comparison3)
 
 comparisons[[1]]$col <- apply_color_scheme(c(0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6), "grey")
 comparisons[[2]]$col <- apply_color_scheme(c(0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6), "grey")
+comparisons[[3]]$col <- apply_color_scheme(c(0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6), "grey")
 
-
-annot <- annotation(x1=c(130286, 130621, 139839), x2=c(130344, 131687, 139883), text=c("IR 1", "IR 2", "IR 3"), rot=c(0, 0, 0), col=c("black", "black", "black"))
+#annot <- annotation(x1=c(130286, 130621, 139839), x2=c(130344, 131687, 139883), text=c("IR 1", "IR 2", "IR 3"), rot=c(0, 0, 0), col=c("black", "black", "black"))
 
 
 plot_gene_map(dna_segs=dna_segs, comparisons=comparisons, xlims=xlims,  dna_seg_scale=TRUE, scale=FALSE)
@@ -294,3 +344,197 @@ plot_gene_map(dna_segs=dna_segs, comparisons=comparisons, xlims=xlims,  dna_seg_
 
 #plot_gene_map(dna_segs=list(df_seg_1, df_seg_2), comparisons=list(comparison1), xlims=xlims, main="BH vs BQ, comparison of the first 50 kb", gene_type="side_blocks", dna_seg_scale=TRUE, scale=FALSE)
 ```
+
+\newpage
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=3.5, fig.width=10}
+library(genoPlotR)
+
+xlims <- list(c(0, 45000), c(Inf, -Inf), c(Inf, -Inf),  c(Inf, -Inf))
+
+df_seg_1 <- dna_seg(read.csv("~/master/rumen/dataflow/00-meta/RUG782.csv"))
+df_seg_2 <- dna_seg(read.csv("~/master/rumen/dataflow/00-meta/4309680.csv")) 
+df_seg_3 <- dna_seg(read.csv("~/master/rumen/dataflow/00-meta/CP022905.csv"))
+df_seg_4 <- dna_seg(read.csv("~/master/rumen/dataflow/00-meta/KP339868.1_1.csv"))
+
+dna_segs <- list(df_seg_4, df_seg_3, df_seg_2, df_seg_1)
+
+names <- c("KP339868.1_1", "CP022905", "4309680", "RUG782")
+
+names(dna_segs) <- names
+
+comparison1 <- as.comparison(read.csv("~/master/rumen/dataflow/00-meta/KP339868.1_1vCP022905.csv"))
+comparison2 <- as.comparison(read.csv("~/master/rumen/dataflow/00-meta/CP022905v4309680.csv"))
+comparison3 <- as.comparison(read.csv("~/master/rumen/dataflow/00-meta/4309680vRUG782.csv"))
+
+comparisons <- list(comparison1, comparison2, comparison3)
+
+comparisons[[3]]$col <- apply_color_scheme(c(0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6), "grey")
+comparisons[[2]]$col <- apply_color_scheme(c(0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6), "grey")
+comparisons[[1]]$col <- apply_color_scheme(c(0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6), "grey")
+
+#annot <- annotation(x1=c(130286, 130621, 139839), x2=c(130344, 131687, 139883), text=c("IR 1", "IR 2", "IR 3"), rot=c(0, 0, 0), col=c("black", "black", "black"))
+
+
+plot_gene_map(dna_segs=dna_segs, comparisons=comparisons, xlims=xlims,  dna_seg_scale=TRUE, scale=FALSE)
+
+
+#plot_gene_map(dna_segs=list(df_seg_1, df_seg_2), comparisons=list(comparison1), xlims=xlims, main="BH vs BQ, comparison of the first 50 kb", gene_type="side_blocks", dna_seg_scale=TRUE, scale=FALSE)
+```
+
+
+\newpage
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7}
+island_mapping_ava <- read.delim("~/master/rumen/dataflow/02-blast/resistance_island_mapping_allvall.txt", header=FALSE)
+colnames(island_mapping_ava) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+
+island_mapping_ava$qseqid <- as.character(island_mapping_ava$qseqid)
+island_mapping_ava$sseqid <- as.character(island_mapping_ava$sseqid)
+
+island_mapping_ava <- island_mapping_ava %>%
+  mutate(same = if_else(qseqid == sseqid, "yes", "no")) %>%
+  filter(same != "yes") %>%
+  filter(qseqid != "4309689-submission.assembly_79_resistance_genes") %>%
+  filter(qseqid != "4309680-submission.assembly_52_resistance_genes") %>%
+  filter(qseqid != "RUG782_1_resistance_genes") %>%
+  mutate(same_seq = if_else(pident == 100 & qlen == length, "yes", "no")) %>%
+  filter(same_seq == "yes") %>%
+  group_by(qseqid) %>%
+  mutate(group_num = length(unique(sseqid)) + 1) %>%
+  ungroup() %>%
+  select(qseqid, sseqid, group_num) %>%
+  group_by(qseqid) %>%
+  summarize(group_members = list(sort(c(sseqid, unique(qseqid))))) %>%
+  ungroup() %>%
+  select(-qseqid) %>%
+  distinct()
+
+list_groups <- unique(island_mapping_ava$group_members)
+rep_seqs <- c()
+num_in_group <- c()
+
+for (i in 1:length(list_groups)){
+  group_list <- list_groups[[i]]
+  rnum <- sample(1:length(group_list), 1)
+  rep_seqs <- c(rep_seqs, group_list[[rnum]])
+  num_in_group <- c(num_in_group, length(group_list))
+  
+}
+
+df_rep_seqs <- as.data.frame(cbind(rep_seqs, num_in_group))
+colnames(df_rep_seqs)[1] <- "qseqid"
+
+rem_seqs <- unlist(list_groups)[ !(unlist(list_groups) %in% df_rep_seqs$qseqid)]
+
+island_mapping <- read.delim("~/master/rumen/dataflow/02-blast/resistance_island_mapping_allvall_V2.txt", header=FALSE)
+colnames(island_mapping) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+
+df_agsinst_RUG782 <- island_mapping %>%
+  select(qseqid, sseqid, pident, sstart, send, qstart, qend, bitscore, length) %>%
+  filter(sseqid == "KP339868.1_1") %>%
+  mutate(nstart = if_else(sstart < send, sstart, send)) %>%
+  mutate(nsend = if_else(send > sstart, send, sstart)) %>%
+  ungroup() %>%
+  filter(qseqid != "KP339868.1_1") %>%
+  group_by(qseqid) %>%
+  mutate(bitscore_sum = sum(bitscore)) %>%
+  ungroup() %>%
+  filter(bitscore != 45953) 
+
+df_agsinst_RUG782_rumen <- df_agsinst_RUG782 %>%
+  filter(qseqid == "4309689-submission.assembly_79_resistance_genes" | qseqid == "4309680-submission.assembly_52_resistance_genes" | qseqid == "RUG782_1_resistance_genes")
+  
+
+df_agsinst_RUG782 <- df_agsinst_RUG782 %>%
+  full_join(df_rep_seqs) %>%
+  bind_rows(df_agsinst_RUG782_rumen) %>%
+  mutate(remove = qseqid %in% rem_seqs) %>%
+  filter(remove != TRUE) 
+
+df_agsinst_RUG782$newqseqid <- NA
+df_agsinst_RUG782$num_in_group <- as.character(df_agsinst_RUG782$num_in_group)
+df_agsinst_RUG782 <- as.data.frame(df_agsinst_RUG782)
+
+for (j in 1:nrow(df_agsinst_RUG782)) {
+  test <- df_agsinst_RUG782[j, "num_in_group"]
+  if(is.na(test)) {
+    df_agsinst_RUG782[j, "newqseqid"] <- df_agsinst_RUG782[j, "qseqid"]} else {
+      df_agsinst_RUG782[j, "newqseqid"] <- paste(df_agsinst_RUG782[j, "qseqid"], " (", df_agsinst_RUG782[j, "num_in_group"], ")", sep = "")
+    }
+  }
+
+
+
+df_agsinst_RUG782 <- df_agsinst_RUG782 %>%
+  arrange(desc(bitscore_sum))
+  
+
+df_agsinst_RUG782$newqseqid <- gsub("-submission.assembly", "", df_agsinst_RUG782$newqseqid)
+df_agsinst_RUG782$newqseqid <- gsub("_resistance_genes", "", df_agsinst_RUG782$newqseqid)
+
+df_agsinst_RUG782$newqseqid <- factor(df_agsinst_RUG782$newqseqid, levels = unique(as.character(df_agsinst_RUG782$newqseqid)))
+
+df_seq_species_type <- read.csv("~/master/rumen/dataflow/00-meta/resistance_island_seq_origins.csv")
+df_seq_species_type$accession <- as.character(df_seq_species_type$accession)
+
+df_agsinst_RUG782 <- df_agsinst_RUG782 %>%
+  filter(qseqid != "AJ557257.1_1") %>%
+  separate(qseqid, into = c("accession", "rm"), remove = FALSE, sep = "_") %>%
+  inner_join(df_seq_species_type, by = c("accession")) %>%
+  unite(newqseqid2, c("species", "type", "newqseqid"), sep = " | ", remove = FALSE)
+
+df_agsinst_RUG782$newqseqid2 <- factor(df_agsinst_RUG782$newqseqid2, levels = unique(as.character(df_agsinst_RUG782$newqseqid2)))
+
+
+
+library(ggplot2)
+library(ggalt)
+theme_set(theme_classic())
+
+# gg <- ggplot(df_agsinst_RUG782, aes(x=nstart, xend=nsend, y=newqseqid, group=newqseqid)) + 
+#         geom_dumbbell(size=2, aes(color = pident)) + 
+#         #scale_x_continuous(label=percent) + 
+#         labs(x=NULL, 
+#              y=NULL, 
+#              title="Dumbbell Chart") +
+#         theme(plot.title = element_text(hjust=0.5, face="bold"),
+#               plot.background=element_rect(fill="#f7f7f7"),
+#               panel.background=element_rect(fill="#f7f7f7"),
+#               panel.grid.minor=element_blank(),
+#               panel.grid.major.y=element_blank(),
+#               panel.grid.major.x=element_line(),
+#               axis.ticks=element_blank(),
+#               legend.position="top",
+#               panel.border=element_blank()) 
+
+
+
+
+gg <- ggplot(df_agsinst_RUG782, 
+       aes(y = newqseqid2,
+           x = nstart,
+           xend = nsend)) +  
+  geom_dumbbell(size = 1.5,
+                size_x = 1.5, 
+                size_xend = 1.5,
+                colour_x = "red", 
+                colour_xend = "red", aes(colour = pident)) +
+  theme_minimal() + 
+  labs(x = "Mapping to KP339868.1_1",
+       y = "") +
+    theme(text = element_text(size=8)) 
+  
+
+plot(gg)
+
+df_unique_contigs <- df_agsinst_RUG782 %>%
+  select(qseqid) %>%
+  distinct()
+
+#write.csv(df_unique_contigs, "~/master/rumen/dataflow/00-meta/resistance_blast_hit_cotigs_unique.csv")
+```
+
+
+
+
