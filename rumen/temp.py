@@ -139,15 +139,24 @@ sg.concat(inputfolder='dataflow/01-nucl/', outputpath='dataflow/01-nucl/genomes_
 file_obj = sc.Fasta('genomes_4_ribD.fasta', 'dataflow/01-nucl/')
 file_obj.setOutputName('genomes_4_ribD.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
-file_obj.runprodigal()
+#file_obj.runprodigal()
 
-os.system("hmmpress dataflow/02-hmm/RibD_C.hmm")
-os.system("hmmscan --tblout dataflow/02-hmm/island_ribD.txt -T 200 --cpu 60 dataflow/02-hmm/RibD_C.hmm dataflow/01-prot/genomes_4_ribD.fasta")
+file = "genomes_4_ribD.fasta"
+indir = 'dataflow/01-nucl/'
+blastdbdir = 'dataflow/02-blast-db/'
 
-eftu_df = pd.read_csv('dataflow/02-hmm/island_ribD.txt', comment='#', header=None, delim_whitespace=True)
-eftu_genes = eftu_df.iloc[:,2].tolist()
+file_obj = sc.Fasta(file, 'dataflow/01-prot/')
+file_obj.setOutputName(file)
+file_obj.setOutputLocation(blastdbdir)
+file_obj.runmakeblastdb(dbtype='prot')
 
-file_obj = sc.Fasta('genomes_4_ribD.fasta', 'dataflow/01-prot/')
-file_obj.setOutputName('genomes_4_ribD_hmm.fasta')
-file_obj.setOutputLocation('dataflow/01-prot/')
-file_obj.subsetfasta(seqlist = eftu_genes, headertag='none')
+blastdir = 'dataflow/02-blast/'
+
+file_obj = sc.Fasta("ecoli_ribD", 'dataflow/01-prot/')
+file_obj.setOutputLocation(blastdir)
+
+outputfilename = "genomes_4_ribD.txt"
+blastdb = "genomes_4_ribD.fasta"
+
+file_obj.setOutputName(outputfilename)
+file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=5000, evalue=1e-3, num_threads = 60, max_hsps = 1)

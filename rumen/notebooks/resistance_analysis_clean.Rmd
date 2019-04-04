@@ -2,7 +2,9 @@
 title: "Genomic Island Analysis Clean"
 author: "Cameron Strachan"
 date: '2019-04-04'
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
@@ -181,7 +183,7 @@ df_group_seq_origin <- island_mapping %>%
   arrange(group)
 ```
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=2, fig.width=7}
 library(ggplot2)
 library(ggalt)
 theme_set(theme_classic())
@@ -190,15 +192,14 @@ gg <- ggplot(df_agsinst_RUG782,
        aes(y = newqseqid2,
            x = nstart,
            xend = nsend)) +  
-  geom_dumbbell(size = 1.5,
-                size_x = 1.5, 
-                size_xend = 1.5,
-                colour_x = "red", 
-                colour_xend = "red", aes(colour = pident, colour_x = pident, colour_xend = pident)) +
+  geom_dumbbell(size = 0.5,
+                size_x = 0.6, 
+                size_xend = 0.6,
+ aes(colour = pident, colour_x = pident, colour_xend = pident)) +
   theme_minimal() + 
   labs(x = "Mapping to RUG782_1",
        y = "") +
-    theme(text = element_text(size=8)) 
+    theme(text = element_text(size=5)) 
   
 
 plot(gg)
@@ -234,9 +235,52 @@ comparisons[[1]]$col <- apply_color_scheme(c(0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6, 
 comparisons[[2]]$col <- apply_color_scheme(c(0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6), "grey")
 comparisons[[3]]$col <- apply_color_scheme(c(0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6, 0.4, 0.5, 0.6), "grey")
 
-#annot <- annotation(x1=c(130286, 130621, 139839), x2=c(130344, 131687, 139883), text=c("IR 1", "IR 2", "IR 3"), rot=c(0, 0, 0), col=c("black", "black", "black"))
-
-
 plot_gene_map(dna_segs=dna_segs, comparisons=comparisons, xlims=xlims,  dna_seg_scale=TRUE, scale=FALSE)
+
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+df_ava <- read.delim("~/master/rumen/dataflow/02-blast/resistance_island_all_v_all_prot.txt", header=FALSE)
+colnames(df_ava) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+
+
+df_header <- read.csv("~/master/rumen/dataflow/02-headers/resistance_island_blast_hits_concatenated_extractedCONTIGs_3rumen.csv")
+
+df_header$file <- NULL
+
+colnames(df_header) <- c("qseqid", "header")
+
+
+df_header <- df_header %>%
+  separate(header, into = c("rm", "start", "stop", "strand"), sep  = "#") %>%
+  select(-rm)
+
+df_header <- df_header[grepl("RUG782_1_resistance_genes", df_header$qseqid),]
+
+df_header$start <- gsub(" ", "", df_header$start)
+df_header$stop <- gsub(" ", "", df_header$stop)
+
+df_header$start <- as.numeric(df_header$start)
+df_header$stop <- as.numeric(df_header$stop)
+
+df_ava <- df_ava[grepl("RUG782_1_resistance_genes", df_ava$qseqid),]
+df_ava <- df_ava[!(grepl("RUG782_1_resistance_genes", df_ava$sseqid)),]
+
+
+
+df_header$qseqid <- as.character(df_header$qseqid)
+df_ava$qseqid <- as.character(df_ava$qseqid)
+
+df_ava <- df_ava %>%
+  filter(qlen == length) %>%
+  inner_join(df_header) %>%
+  filter(start > 110000) %>%
+  filter(qseqid == "RUG782_1_resistance_genes_125" | qseqid == "RUG782_1_resistance_genes_126" | qseqid == "RUG782_1_resistance_genes_127" | qseqid == "RUG782_1_resistance_genes_128" | qseqid == "RUG782_1_resistance_genes_129" | qseqid == "RUG782_1_resistance_genes_130" | qseqid == "RUG782_1_resistance_genes_131" | qseqid == "RUG782_1_resistance_genes_132" | qseqid == "RUG782_1_resistance_genes_133" | qseqid == "RUG782_1_resistance_genes_134" | qseqid == "RUG782_1_resistance_genes_135" | qseqid == "RUG782_1_resistance_genes_136" | qseqid == "RUG782_1_resistance_genes_137" | qseqid == "RUG782_1_resistance_genes_138" | qseqid == "RUG782_1_resistance_genes_139") %>%
+  group_by(qseqid) %>%
+  mutate(mean_pident = mean(pident)) %>%
+  mutate(coverage = length(unique(sseqid)))%>%
+  ungroup() %>%
+  select(qseqid, mean_pident, coverage) %>%
+  distinct()
 
 ```
