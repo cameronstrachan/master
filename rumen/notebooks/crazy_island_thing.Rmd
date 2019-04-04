@@ -97,6 +97,50 @@ library(tidyverse)
 ```
 
 
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+# island_mapping_all <- read.delim("~/master/rumen/dataflow/02-blast/resistance_island_blast_hits_concatenated_extractedCONTIGs_3rumen_all_genomes.txt", header=FALSE)
+# colnames(island_mapping_all) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+# 
+# 
+# island_mapping_all <- island_mapping_all %>%
+#   filter(sseqid != "4309680-submission.assembly_52") %>%
+#   filter(sseqid != "4309689-submission.assembly_79") %>%
+#   filter(sseqid != "RUG782_1") %>%
+#   filter(pident > 80) %>%
+#   group_by(qseqid, sseqid) %>%
+#   mutate(sum_length = sum(length)) %>%
+#   ungroup() %>%
+#   filter(sum_length > 4000)
+# 
+# island_mapping_all_contigs <- island_mapping_all %>%
+#   select(sseqid, sstart, send) %>%
+#   group_by(sseqid) %>%
+#   mutate(lowest_start = min(sstart)) %>%
+#   mutate(highest_start = max(sstart)) %>%
+#   mutate(lowest_stop = min(send)) %>%
+#   mutate(highest_stop = max(send)) %>%
+#   ungroup() %>%
+#   select(-sstart, -send) %>%
+#   gather(name, value, -sseqid) %>%
+#   group_by(sseqid) %>%
+#   mutate(start = min(value)) %>%
+#   mutate(stop = max(value)) %>%
+#   ungroup() %>%
+#   select(-name, -value) %>%
+#   mutate(length = stop - start) %>%
+#   distinct()
+# 
+# island_mapping_all_contigs$direction <- "+"
+# 
+# colnames(island_mapping_all_contigs)[1] <- "contig"
+# colnames(island_mapping_all_contigs)[3] <- "end"
+# 
+# island_mapping_all_contigs$ID <- island_mapping_all_contigs$contig
+# 
+# write.csv(island_mapping_all_contigs, "~/master/rumen/dataflow/00-meta/resistance_blast_hit_cotigs_all_rumen.csv")
+
+```
+
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7}
 set.seed(1)
 island_mapping_ava <- read.delim("~/master/rumen/dataflow/02-blast/resistance_island_mapping_allvall.txt", header=FALSE)
@@ -140,7 +184,7 @@ colnames(df_rep_seqs)[1] <- "qseqid"
 
 rem_seqs <- unlist(list_groups)[ !(unlist(list_groups) %in% df_rep_seqs$qseqid)]
 
-island_mapping <- read.delim("~/master/rumen/dataflow/02-blast/resistance_island_mapping.txt", header=FALSE)
+island_mapping <- read.delim("~/master/rumen/dataflow/02-blast/resistance_island_mapping2.txt", header=FALSE)
 colnames(island_mapping) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
 
 df_agsinst_RUG782 <- island_mapping %>%
@@ -153,10 +197,17 @@ df_agsinst_RUG782 <- island_mapping %>%
   group_by(qseqid) %>%
   mutate(bitscore_sum = sum(bitscore)) %>%
   ungroup() %>%
-  filter(bitscore != 45953) 
+  filter(sstart > 110000) %>%
+  group_by(qseqid, sseqid) %>%
+  mutate(length_sum = sum(length)) %>%
+  ungroup() %>%
+  filter(length_sum > 4000) %>%
+  filter(pident > 80)
+
+# 4000 bp only cuts off a single clone, so I could say top blast hits with that minimum length? could also have a PI of 80%. 
 
 df_agsinst_RUG782_rumen <- df_agsinst_RUG782 %>%
-  filter(qseqid == "4309689-submission.assembly_79_resistance_genes" | qseqid == "4309680-submission.assembly_52_resistance_genes" | qseqid == "RUG782_1_resistance_genes")
+  filter(qseqid == "4309689-submission.assembly_79_resistance_genes" | qseqid == "4309680-submission.assembly_52_resistance_genes" | qseqid == "RUG782_1_resistance_genes" | qseqid == "4309680-submission.assembly_14" | qseqid == "4309689-submission.assembly_8" |qseqid == "RUG457_28" |qseqid == "RUG457_82" |qseqid == "RUG457_79" |qseqid == "RMG_164_291" | qseqid == "RUG459_26" | qseqid == "RMG_238_348" | qseqid == "RMG_238_348" | qseqid == "RUG459_38" | qseqid == "RUG459_38" | qseqid == "RMG_164_121")
   
 
 df_agsinst_RUG782 <- df_agsinst_RUG782 %>%
@@ -230,7 +281,7 @@ gg <- ggplot(df_agsinst_RUG782,
                 size_x = 1.5, 
                 size_xend = 1.5,
                 colour_x = "red", 
-                colour_xend = "red", aes(colour = pident)) +
+                colour_xend = "red", aes(colour = pident, colour_x = pident, colour_xend = pident)) +
   theme_minimal() + 
   labs(x = "Mapping to RUG782_1",
        y = "") +
@@ -303,8 +354,8 @@ df_group_seq_origin <- island_mapping %>%
   full_join(df_group) %>%
   arrange(group)
 
-#df_group_seq_origin %>%
-#  select(qseqid, group, seq)
+df_group_seq_origin %>%
+  select(qseqid, group, seq)
 
 
 ```
@@ -440,7 +491,12 @@ df_agsinst_RUG782 <- island_mapping %>%
   group_by(qseqid) %>%
   mutate(bitscore_sum = sum(bitscore)) %>%
   ungroup() %>%
-  filter(bitscore != 45953) 
+  filter(bitscore != 45953) %>%
+  group_by(qseqid, sseqid) %>%
+  mutate(length_sum = sum(length)) %>%
+  ungroup() %>%
+  filter(length_sum > 4000) %>%
+  filter(pident > 80)
 
 df_agsinst_RUG782_rumen <- df_agsinst_RUG782 %>%
   filter(qseqid == "4309689-submission.assembly_79_resistance_genes" | qseqid == "4309680-submission.assembly_52_resistance_genes" | qseqid == "RUG782_1_resistance_genes")

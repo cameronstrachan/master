@@ -87,4 +87,34 @@ outputfilename = "resistance_island_mapping2.txt"
 blastdb = "rumen_genomes_resistance_genes.fasta"
 
 file_obj.setOutputName(outputfilename)
-file_obj.runblast(blast='blastn', db=blastdb, dblocation=blastdbdir, max_target_seqs=10, evalue=1e-3, num_threads = 60, max_hsps = 5)
+#file_obj.runblast(blast='blastn', db=blastdb, dblocation=blastdbdir, max_target_seqs=10, evalue=1e-3, num_threads = 60, max_hsps = 5)
+
+
+# all prots against all prots from island
+
+file = "resistance_island_blast_hits_concatenated_extractedCONTIGs_3rumen.fasta"
+
+file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
+file_obj.setOutputName(file)
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.runprodigal()
+
+file = "rumen_genomes_resistance_genes.fasta"
+indir = 'dataflow/01-nucl/'
+blastdbdir = 'dataflow/02-blast-db/'
+
+file_obj = sc.Fasta(file, 'dataflow/01-prot/')
+file_obj.setOutputName(file)
+file_obj.setOutputLocation(blastdbdir)
+file_obj.runmakeblastdb(dbtype='prot')
+
+blastdir = 'dataflow/02-blast/'
+
+file_obj = sc.Fasta(file, 'dataflow/01-prot/')
+file_obj.setOutputLocation(blastdir)
+
+outputfilename = "resistance_island_all_v_all_prot.txt"
+blastdb = "rumen_genomes_resistance_genes.fasta"
+
+file_obj.setOutputName(outputfilename)
+file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=100, evalue=1e-3, num_threads = 60, max_hsps = 1)
