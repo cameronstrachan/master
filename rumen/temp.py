@@ -262,3 +262,25 @@ runcommand = input("\n" + "Run FastTree on full 16s seqs? (y or n):")
 
 if runcommand == 'y':
 	os.system("../bin/FastTree dataflow/03-alignments/island_pathogens_rumen_ref_seq_ribD.afa > dataflow/03-trees/island_pathogens_rumen_ref_seq_ribD.afa.newick")
+
+file = "rumen_genomes.fasta"
+headerfile = 'dataflow/02-headers/'
+
+file_obj = sc.Fasta(file, 'dataflow/01-prot/')
+file_obj.setOutputName(file)
+file_obj.setOutputLocation(headerfile)
+headers = file_obj.fasta2headermap()
+df = pd.DataFrame.from_dict(headers, orient="index")
+df['file'] = file
+df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
+
+file = 'resistance_island_blast_hits_concatenated.fasta'
+headerfile = 'dataflow/02-headers/'
+
+file_obj = sc.Fasta(file, 'dataflow/01-prot/')
+file_obj.setOutputName(file)
+file_obj.setOutputLocation(headerfile)
+headers = file_obj.fasta2headermap()
+df = pd.DataFrame.from_dict(headers, orient="index")
+df['file'] = file
+df.to_csv(headerfile + file.split('.fa')[0] + '.csv')

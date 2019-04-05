@@ -354,8 +354,8 @@ df_group_seq_origin <- island_mapping %>%
   full_join(df_group) %>%
   arrange(group)
 
-df_group_seq_origin %>%
-  select(qseqid, group, seq)
+#df_group_seq_origin %>%
+#  select(qseqid, group, seq)
 
 
 ```
