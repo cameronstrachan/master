@@ -219,7 +219,7 @@ blastdbdir = 'dataflow/02-blast-db/'
 file_obj = sc.Fasta(file, 'dataflow/01-prot/')
 file_obj.setOutputName(file)
 file_obj.setOutputLocation(blastdbdir)
-file_obj.runmakeblastdb(dbtype='prot')
+#file_obj.runmakeblastdb(dbtype='prot')
 
 blastdir = 'dataflow/02-blast/'
 
@@ -230,16 +230,16 @@ outputfilename = "rumen_genomes_4_ribD.txt"
 blastdb = "rumen_genomes.fasta"
 
 file_obj.setOutputName(outputfilename)
-file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=5000, evalue=1e-3, num_threads = 60, max_hsps = 1)
+#file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=5000, evalue=1e-3, num_threads = 60, max_hsps = 1)
 
 
-#genes_df = pd.read_csv('dataflow/00-meta/ribd_comparison_ref.csv', low_memory=False)
-#genes = genes_df['sseqid'].tolist()
+genes_df = pd.read_csv('dataflow/00-meta/ribd_comparison_rumen_genomes.csv', low_memory=False)
+genes = genes_df['sseqid'].tolist()
 
-#file_obj = sc.Fasta('reference_genomes_prot.fasta', 'dataflow/01-prot/')
-#file_obj.setOutputName('reference_genomes_ribD_seqs.fasta')
-#file_obj.setOutputLocation('dataflow/01-prot/')
-#file_obj.subsetfasta(seqlist = genes, headertag='ribD')
+file_obj = sc.Fasta('rumen_genomes.fasta', 'dataflow/01-prot/')
+file_obj.setOutputName('rumen_genomes_ribD_seqs.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.subsetfasta(seqlist = genes, headertag='ribD')
 
 #headerfile = 'dataflow/02-headers/'
 
