@@ -192,10 +192,10 @@ file_obj.setOutputName(outputfilename)
 file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=5000, evalue=1e-3, num_threads = 60, max_hsps = 1)
 
 
-#genes_df = pd.read_csv('dataflow/00-meta/ribd_comparison.csv', low_memory=False)
-#genes = genes_df['sseqid'].tolist()
+genes_df = pd.read_csv('dataflow/00-meta/ribd_comparison_ref.csv', low_memory=False)
+genes = genes_df['sseqid'].tolist()
 
-#file_obj = sc.Fasta('genomes_4_ribD.fasta', 'dataflow/01-prot/')
-#file_obj.setOutputName('genomes_4_ribD_seqs.fasta')
-#file_obj.setOutputLocation('dataflow/01-prot/')
-#file_obj.subsetfasta(seqlist = genes, headertag='ribD')
+file_obj = sc.Fasta('reference_genomes_prot.fasta', 'dataflow/01-prot/')
+file_obj.setOutputName('reference_genomes_ribD_seqs.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.subsetfasta(seqlist = genes, headertag='ribD')
