@@ -261,4 +261,4 @@ if runcommand == 'y':
 runcommand = input("\n" + "Run FastTree on full 16s seqs? (y or n):")
 
 if runcommand == 'y':
-	os.system("../bin/FastTree -gtr -nt dataflow/03-alignments/island_pathogens_rumen_ref_seq_ribD.afa > dataflow/03-trees/island_pathogens_rumen_ref_seq_ribD.afa.newick")
+	os.system("../bin/FastTree dataflow/03-alignments/island_pathogens_rumen_ref_seq_ribD.afa > dataflow/03-trees/island_pathogens_rumen_ref_seq_ribD.afa.newick")
