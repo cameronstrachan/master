@@ -239,7 +239,7 @@ genes = genes_df['sseqid'].tolist()
 file_obj = sc.Fasta('rumen_genomes.fasta', 'dataflow/01-prot/')
 file_obj.setOutputName('rumen_genomes_ribD_seqs.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
-file_obj.subsetfasta(seqlist = genes, headertag='ribD')
+#file_obj.subsetfasta(seqlist = genes, headertag='ribD')
 
 #headerfile = 'dataflow/02-headers/'
 
@@ -250,3 +250,20 @@ file_obj.subsetfasta(seqlist = genes, headertag='ribD')
 #df = pd.DataFrame.from_dict(headers, orient="index")
 #df['file'] = file
 #df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
+
+#
+
+runcommand = input("\n" + "Run muscle on riD? (y or n):")
+
+if runcommand == 'y':
+	os.system("../bin/muscle -in dataflow/01-prot/island_pathogens_rumen_ref_seq_ribD.fasta -out dataflow/03-alignments/island_pathogens_rumen_ref_seq_ribD.afa")
+
+runcommand = input("\n" + "Run Gblocks on full 16s seqs? (y or n):")
+
+if runcommand == 'y':
+	os.system("../bin/Gblocks dataflow/03-alignments/island_pathogens_rumen_ref_seq_ribD.afa -t=d -b6=n")
+
+runcommand = input("\n" + "Run FastTree on full 16s seqs? (y or n):")
+
+if runcommand == 'y':
+	os.system("../bin/FastTree -gtr -nt dataflow/03-alignments/island_pathogens_rumen_ref_seq_ribD.afa-gb > dataflow/03-trees/island_pathogens_rumen_ref_seq_ribD.afa.newick")
