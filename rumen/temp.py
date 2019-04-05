@@ -241,15 +241,7 @@ file_obj.setOutputName('rumen_genomes_ribD_seqs.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
 #file_obj.subsetfasta(seqlist = genes, headertag='ribD')
 
-#headerfile = 'dataflow/02-headers/'
 
-#file_obj = sc.Fasta('reference_genomes_prot.fasta', 'dataflow/01-prot/')
-#file_obj.setOutputName('reference_genomes_prot.fasta')
-#file_obj.setOutputLocation(headerfile)
-#headers = file_obj.fasta2headermap()
-#df = pd.DataFrame.from_dict(headers, orient="index")
-#df['file'] = file
-#df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
 
 #
 
@@ -263,24 +255,32 @@ runcommand = input("\n" + "Run FastTree on full 16s seqs? (y or n):")
 if runcommand == 'y':
 	os.system("../bin/FastTree dataflow/03-alignments/island_pathogens_rumen_ref_seq_ribD.afa > dataflow/03-trees/island_pathogens_rumen_ref_seq_ribD.afa.newick")
 
-file = "rumen_genomes.fasta"
-headerfile = 'dataflow/02-headers/'
+# file = "rumen_genomes.fasta"
+# headerfile = 'dataflow/02-headers/'
+#
+# file_obj = sc.Fasta(file, 'dataflow/01-prot/')
+# file_obj.setOutputName(file)
+# file_obj.setOutputLocation(headerfile)
+# headers = file_obj.fasta2headermap()
+# df = pd.DataFrame.from_dict(headers, orient="index")
+# df['file'] = file
+# df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
+#
+# file = 'genomes_4_ribD.fasta'
+# headerfile = 'dataflow/02-headers/'
+#
+# file_obj = sc.Fasta(file, 'dataflow/01-prot/')
+# file_obj.setOutputName(file)
+# file_obj.setOutputLocation(headerfile)
+# headers = file_obj.fasta2headermap()
+# df = pd.DataFrame.from_dict(headers, orient="index")
+# df['file'] = file
+# df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
 
-file_obj = sc.Fasta(file, 'dataflow/01-prot/')
-file_obj.setOutputName(file)
-file_obj.setOutputLocation(headerfile)
-headers = file_obj.fasta2headermap()
-df = pd.DataFrame.from_dict(headers, orient="index")
-df['file'] = file
-df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
 
-file = 'genomes_4_ribD.fasta'
-headerfile = 'dataflow/02-headers/'
+genes <- ["4309680-submission-assembly_35_14", "4309680-submission.assembly_35_15", "4309680-submission.assembly_35_16", "4309680-submission.assembly_35_17", "4309680-submission.assembly_35_18", "4309680-submission.assembly_35_19", "4309680-submission.assembly_35_20", "4309680-submission.assembly_35_21", "4309680-submission.assembly_35_22", "4309680-submission.assembly_35_23", "4309680-submission.assembly_35_24", "4309680-submission.assembly_35_215", "CP022905.1_1129", "CP022905.1_1130", "CP022905.1_1131", "CP022905.1_1132", "CP022905.1_1133", "CP022905.1_1134", "CP022905.1_1135", "CP022905.1_1136", "CP022905.1_1137", "CP022905.1_1138", "CP022905.1_1139", "CP022905.1_1140"]
 
-file_obj = sc.Fasta(file, 'dataflow/01-prot/')
-file_obj.setOutputName(file)
-file_obj.setOutputLocation(headerfile)
-headers = file_obj.fasta2headermap()
-df = pd.DataFrame.from_dict(headers, orient="index")
-df['file'] = file
-df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
+file_obj = sc.Fasta('genomes_4_ribD.fasta', 'dataflow/01-prot/')
+file_obj.setOutputName('genomes_4_ribD_seqs_4figure.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.subsetfasta(seqlist = genes, headertag='ribD')
