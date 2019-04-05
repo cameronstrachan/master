@@ -278,7 +278,7 @@ if runcommand == 'y':
 # df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
 
 
-genes <- ["4309680-submission-assembly_35_14", "4309680-submission.assembly_35_15", "4309680-submission.assembly_35_16", "4309680-submission.assembly_35_17", "4309680-submission.assembly_35_18", "4309680-submission.assembly_35_19", "4309680-submission.assembly_35_20", "4309680-submission.assembly_35_21", "4309680-submission.assembly_35_22", "4309680-submission.assembly_35_23", "4309680-submission.assembly_35_24", "4309680-submission.assembly_35_215", "CP022905.1_1129", "CP022905.1_1130", "CP022905.1_1131", "CP022905.1_1132", "CP022905.1_1133", "CP022905.1_1134", "CP022905.1_1135", "CP022905.1_1136", "CP022905.1_1137", "CP022905.1_1138", "CP022905.1_1139", "CP022905.1_1140"]
+genes = ["4309680-submission-assembly_35_14", "4309680-submission.assembly_35_15", "4309680-submission.assembly_35_16", "4309680-submission.assembly_35_17", "4309680-submission.assembly_35_18", "4309680-submission.assembly_35_19", "4309680-submission.assembly_35_20", "4309680-submission.assembly_35_21", "4309680-submission.assembly_35_22", "4309680-submission.assembly_35_23", "4309680-submission.assembly_35_24", "4309680-submission.assembly_35_215", "CP022905.1_1129", "CP022905.1_1130", "CP022905.1_1131", "CP022905.1_1132", "CP022905.1_1133", "CP022905.1_1134", "CP022905.1_1135", "CP022905.1_1136", "CP022905.1_1137", "CP022905.1_1138", "CP022905.1_1139", "CP022905.1_1140"]
 
 file_obj = sc.Fasta('genomes_4_ribD.fasta', 'dataflow/01-prot/')
 file_obj.setOutputName('genomes_4_ribD_seqs_4figure.fasta')
