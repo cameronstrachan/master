@@ -199,3 +199,13 @@ file_obj = sc.Fasta('reference_genomes_prot.fasta', 'dataflow/01-prot/')
 file_obj.setOutputName('reference_genomes_ribD_seqs.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
 file_obj.subsetfasta(seqlist = genes, headertag='ribD')
+
+headerfile = 'dataflow/02-headers/'
+
+file_obj = sc.Fasta('reference_genomes_prot.fasta', 'dataflow/01-prot/')
+file_obj.setOutputName('reference_genomes_prot.fasta')
+file_obj.setOutputLocation(headerfile)
+headers = file_obj.fasta2headermap()
+df = pd.DataFrame.from_dict(headers, orient="index")
+df['file'] = file
+df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
