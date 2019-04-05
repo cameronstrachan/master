@@ -178,7 +178,7 @@ blastdbdir = 'dataflow/02-blast-db/'
 file_obj = sc.Fasta(file, 'dataflow/01-prot/')
 file_obj.setOutputName(file)
 file_obj.setOutputLocation(blastdbdir)
-file_obj.runmakeblastdb(dbtype='prot')
+#file_obj.runmakeblastdb(dbtype='prot')
 
 blastdir = 'dataflow/02-blast/'
 
@@ -189,7 +189,7 @@ outputfilename = "ref_seq_genomes_4_ribD.txt"
 blastdb = "reference_genomes_prot.fasta"
 
 file_obj.setOutputName(outputfilename)
-file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=5000, evalue=1e-3, num_threads = 60, max_hsps = 1)
+#file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=5000, evalue=1e-3, num_threads = 60, max_hsps = 1)
 
 
 genes_df = pd.read_csv('dataflow/00-meta/ribd_comparison_ref.csv', low_memory=False)
@@ -209,3 +209,44 @@ headers = file_obj.fasta2headermap()
 df = pd.DataFrame.from_dict(headers, orient="index")
 df['file'] = file
 df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
+
+
+# get rumen genomes ribD
+
+file = "rumen_genomes.fasta"
+blastdbdir = 'dataflow/02-blast-db/'
+
+file_obj = sc.Fasta(file, 'dataflow/01-prot/')
+file_obj.setOutputName(file)
+file_obj.setOutputLocation(blastdbdir)
+file_obj.runmakeblastdb(dbtype='prot')
+
+blastdir = 'dataflow/02-blast/'
+
+file_obj = sc.Fasta("ecoli_ribD.fasta", 'dataflow/01-prot/')
+file_obj.setOutputLocation(blastdir)
+
+outputfilename = "rumen_genomes_4_ribD.txt"
+blastdb = "rumen_genomes.fasta"
+
+file_obj.setOutputName(outputfilename)
+file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=5000, evalue=1e-3, num_threads = 60, max_hsps = 1)
+
+
+#genes_df = pd.read_csv('dataflow/00-meta/ribd_comparison_ref.csv', low_memory=False)
+#genes = genes_df['sseqid'].tolist()
+
+#file_obj = sc.Fasta('reference_genomes_prot.fasta', 'dataflow/01-prot/')
+#file_obj.setOutputName('reference_genomes_ribD_seqs.fasta')
+#file_obj.setOutputLocation('dataflow/01-prot/')
+#file_obj.subsetfasta(seqlist = genes, headertag='ribD')
+
+#headerfile = 'dataflow/02-headers/'
+
+#file_obj = sc.Fasta('reference_genomes_prot.fasta', 'dataflow/01-prot/')
+#file_obj.setOutputName('reference_genomes_prot.fasta')
+#file_obj.setOutputLocation(headerfile)
+#headers = file_obj.fasta2headermap()
+#df = pd.DataFrame.from_dict(headers, orient="index")
+#df['file'] = file
+#df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
