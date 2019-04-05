@@ -258,12 +258,7 @@ runcommand = input("\n" + "Run muscle on riD? (y or n):")
 if runcommand == 'y':
 	os.system("../bin/muscle -in dataflow/01-prot/island_pathogens_rumen_ref_seq_ribD.fasta -out dataflow/03-alignments/island_pathogens_rumen_ref_seq_ribD.afa")
 
-runcommand = input("\n" + "Run Gblocks on full 16s seqs? (y or n):")
-
-if runcommand == 'y':
-	os.system("../bin/Gblocks dataflow/03-alignments/island_pathogens_rumen_ref_seq_ribD.afa -t=d -b6=n")
-
 runcommand = input("\n" + "Run FastTree on full 16s seqs? (y or n):")
 
 if runcommand == 'y':
-	os.system("../bin/FastTree -gtr -nt dataflow/03-alignments/island_pathogens_rumen_ref_seq_ribD.afa-gb > dataflow/03-trees/island_pathogens_rumen_ref_seq_ribD.afa.newick")
+	os.system("../bin/FastTree -gtr -nt dataflow/03-alignments/island_pathogens_rumen_ref_seq_ribD.afa > dataflow/03-trees/island_pathogens_rumen_ref_seq_ribD.afa.newick")
