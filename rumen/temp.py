@@ -274,7 +274,7 @@ df = pd.DataFrame.from_dict(headers, orient="index")
 df['file'] = file
 df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
 
-file = 'resistance_island_blast_hits_concatenated.fasta'
+file = 'genomes_4_ribD.fasta'
 headerfile = 'dataflow/02-headers/'
 
 file_obj = sc.Fasta(file, 'dataflow/01-prot/')
