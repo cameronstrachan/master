@@ -239,7 +239,7 @@ genes = genes_df['sseqid'].tolist()
 file_obj = sc.Fasta('rumen_genomes.fasta', 'dataflow/01-prot/')
 file_obj.setOutputName('rumen_genomes_ribD_seqs.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
-#file_obj.subsetfasta(seqlist = genes, headertag='ribD')
+file_obj.subsetfasta(seqlist = genes, headertag='ribD')
 
 
 
