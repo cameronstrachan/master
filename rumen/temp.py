@@ -239,7 +239,7 @@ genes = genes_df['sseqid'].tolist()
 file_obj = sc.Fasta('rumen_genomes.fasta', 'dataflow/01-prot/')
 file_obj.setOutputName('rumen_genomes_ribD_seqs.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
-file_obj.subsetfasta(seqlist = genes, headertag='ribD')
+#file_obj.subsetfasta(seqlist = genes, headertag='ribD')
 
 
 
@@ -283,4 +283,19 @@ genes = ["4309680-submission.assembly_35_14", "4309680-submission.assembly_35_15
 file_obj = sc.Fasta('genomes_4_ribD.fasta', 'dataflow/01-prot/')
 file_obj.setOutputName('genomes_4_ribD_seqs_4figure.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
-file_obj.subsetfasta(seqlist = genes, headertag='ribD')
+#file_obj.subsetfasta(seqlist = genes, headertag='ribD')
+
+
+file = "3_resistance_genes.fasta"
+blastdbdir = 'dataflow/02-blast-db/'
+indir = 'dataflow/01-prot/'
+
+
+file_obj = sc.Fasta(file, indir)
+file_obj.setOutputLocation(blastdir)
+
+outputfilename = "3_resistance_genes.txt"
+blastdb = "rumen_genomes.fasta"
+
+file_obj.setOutputName(outputfilename)
+file_obj.runblast(blast='blastn', db=blastdb, dblocation=blastdbdir, max_target_seqs=10000, evalue=1e-3, num_threads = 60, max_hsps = 1)

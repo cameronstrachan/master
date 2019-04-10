@@ -646,6 +646,7 @@ colnames(df_ribd) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart",
 
 df_ribd <- df_ribd  %>%
   filter(length > 180) %>%
+  filter(bitscore > 100) %>%
   select(qseqid, sseqid) %>%
   distinct()
 
@@ -656,6 +657,7 @@ colnames(df_ribd) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart",
 
 df_ribd <- df_ribd  %>%
   filter(length > 180) %>%
+  filter(bitscore > 100) %>%
   select(qseqid, sseqid) %>%
   distinct()
 
@@ -666,6 +668,7 @@ colnames(df_ribd) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart",
 
 df_ribd <- df_ribd  %>%
   filter(length > 180) %>%
+  filter(bitscore > 100) %>%
   select(qseqid, sseqid) %>%
   distinct()
 
@@ -777,6 +780,8 @@ k <- 1
 
 for (j in 1:nrow(df)){
       
+      if (runif(1, 0, 1) < 0.5 ){
+      
       if (df[j, 3] > 300){
       df_select_list[[k]] <- paste(">REF",j, "_LONG", sep ="")
       k <- k + 1 } else {
@@ -786,7 +791,9 @@ for (j in 1:nrow(df)){
       
       df_select_list[[k]] <- df[j, 2]
       k <- k + 1
-}
+
+      } else {}
+  }
 
 
 
@@ -796,6 +803,9 @@ selected_long <- as.matrix(unlist(rbind(df_select_list)))
 selected_long <- gsub("\"", "", selected_long)
 write.table(selected_long, paste(dir_out, "reference_genomes_ribD_seqs_unique.fasta"), row.names = FALSE, 
     col.names = FALSE, quote = FALSE)
+
+
+
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
@@ -839,7 +849,10 @@ df_select_list <- list()
 k <- 1
 
 for (j in 1:nrow(df)){
+  
       
+  if (runif(1, 0, 1) < 0.1 ){    
+  
       if (df[j, 3] > 300){
       df_select_list[[k]] <- paste(">RUMEN", j, "_LONG", sep ="")
       k <- k + 1 } else {
@@ -848,7 +861,10 @@ for (j in 1:nrow(df)){
       }
       
       df_select_list[[k]] <- df[j, 2]
+ 
       k <- k + 1
+      
+      } else {}
 }
 
 
@@ -909,6 +925,6 @@ df_CP022905 <- df_path[df_path$gene %in% pathogen1, ]
 
 ```
 
-
+trimming and then remove seqs that don't fall in a clear cluster
 
 
