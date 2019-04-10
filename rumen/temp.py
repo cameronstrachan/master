@@ -312,6 +312,6 @@ genes_df = pd.read_csv('dataflow/00-meta/APH3_rumen.csv', low_memory=False)
 genes = genes_df['sseqid'].tolist()
 
 file_obj = sc.Fasta('rumen_genomes.fasta', 'dataflow/01-prot/')
-file_obj.setOutputName('rumen_genomes.fasta')
+file_obj.setOutputName('APH3_rumen.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
 file_obj.subsetfasta(seqlist = genes, headertag='RUMEN')
