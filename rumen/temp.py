@@ -286,8 +286,15 @@ file_obj.setOutputLocation('dataflow/01-prot/')
 #file_obj.subsetfasta(seqlist = genes, headertag='ribD')
 
 
-file = "3_resistance_genes.fasta"
+file = "rumen_genomes.fasta"
 blastdbdir = 'dataflow/02-blast-db/'
+
+file_obj = sc.Fasta(file, 'dataflow/01-prot/')
+file_obj.setOutputName(file)
+file_obj.setOutputLocation(blastdbdir)
+file_obj.runmakeblastdb(dbtype='prot')
+
+file = "3_resistance_genes.fasta"
 indir = 'dataflow/01-prot/'
 
 
@@ -298,4 +305,4 @@ outputfilename = "3_resistance_genes.txt"
 blastdb = "rumen_genomes.fasta"
 
 file_obj.setOutputName(outputfilename)
-file_obj.runblast(blast='blastn', db=blastdb, dblocation=blastdbdir, max_target_seqs=10000, evalue=1e-3, num_threads = 60, max_hsps = 1)
+file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=10000, evalue=1e-3, num_threads = 60, max_hsps = 1)
