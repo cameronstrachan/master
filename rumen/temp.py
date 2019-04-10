@@ -308,7 +308,7 @@ file_obj.setOutputName(outputfilename)
 #file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=10000, evalue=1e-3, num_threads = 60, max_hsps = 1)
 
 
-genes_df = pd.read_csv('dataflow/00-meta/dataflow/00-meta/APH3_rumen.csv', low_memory=False)
+genes_df = pd.read_csv('dataflow/00-meta/APH3_rumen.csv', low_memory=False)
 genes = genes_df['sseqid'].tolist()
 
 file_obj = sc.Fasta('rumen_genomes.fasta', 'dataflow/01-prot/')
