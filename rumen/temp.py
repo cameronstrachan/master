@@ -316,8 +316,23 @@ file_obj.setOutputName('ANT6_rumen.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
 file_obj.subsetfasta(seqlist = genes, headertag='RUMEN')
 
+genes_df = pd.read_csv('dataflow/00-meta/APH3_rumen.csv', low_memory=False)
+genes = genes_df['sseqid'].tolist()
 
-#../bin/muscle -in dataflow/01-prot/aph3_rumen_ncbi.fasta -out dataflow/03-alignments/aph3_rumen_ncbi.afa -maxiters 1 -diags -sv -distance1 kbit20_3
+file_obj = sc.Fasta('rumen_genomes.fasta', 'dataflow/01-prot/')
+file_obj.setOutputName('APH3_rumen.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.subsetfasta(seqlist = genes, headertag='RUMEN')
+
+genes_df = pd.read_csv('dataflow/00-meta/SAT4_rumen.csv', low_memory=False)
+genes = genes_df['sseqid'].tolist()
+
+file_obj = sc.Fasta('rumen_genomes.fasta', 'dataflow/01-prot/')
+file_obj.setOutputName('SAT4_rumen.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.subsetfasta(seqlist = genes, headertag='RUMEN')
+
+#../bin/muscle -in dataflow/01-prot/ANT6_ncbi_rumen_250_350.fasta -out dataflow/03-alignments/ANT6_ncbi_rumen_250_350.afa -maxiters 3 -diags -sv -distance1 kbit20_3
 
 
-#../bin/FastTree dataflow/03-alignments/aph3_rumen_ncbi.afa > dataflow/03-trees/aph3_rumen_ncbi.afa.newick
+#../bin/FastTree dataflow/03-alignments/ANT6_ncbi_rumen_250_350.afa > dataflow/03-trees/ANT6_ncbi_rumen_250_350.afa.newick

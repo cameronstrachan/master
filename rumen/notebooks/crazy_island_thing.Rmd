@@ -999,4 +999,35 @@ df_CP022905 <- df_path[df_path$gene %in% pathogen1, ]
 
 trimming and then remove seqs that don't fall in a clear cluster
 
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+df_ant6 <- read.delim("~/master/rumen/dataflow/02-blast/3_resistance_genes.txt", header=FALSE)
+colnames(df_ant6) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
 
+
+df_ant6 <- df_ant6 %>%
+  filter(qseqid == "4309680-submission.assembly_52_ANT6")
+
+write.csv(df_ant6, "~/master/rumen/dataflow/00-meta/ANT6_rumen.csv")  
+
+#
+
+df_aph3 <- read.delim("~/master/rumen/dataflow/02-blast/3_resistance_genes.txt", header=FALSE)
+colnames(df_aph3) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+
+
+df_aph3 <- df_aph3 %>%
+  filter(qseqid == "4309680-submission.assembly_52_APH3")
+
+write.csv(df_aph3, "~/master/rumen/dataflow/00-meta/APH3_rumen.csv")  
+
+#
+
+df_sat4 <- read.delim("~/master/rumen/dataflow/02-blast/3_resistance_genes.txt", header=FALSE)
+colnames(df_sat4) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+
+
+df_sat4 <- df_sat4 %>%
+  filter(qseqid == "4309680-submission.assembly_52_sat4")  
+
+write.csv(df_sat4, "~/master/rumen/dataflow/00-meta/SAT4_rumen.csv")  
+```
