@@ -177,11 +177,13 @@ class Fasta(File):
         if not self.outputexists():
             fastadic = self.fasta2dict()
             outputfile = self.openwritefile()
+            j = 1
             for k,v in fastadic.items():
                 header = k.rstrip()
                 seq = v.rstrip()
-                outputfile.write(">" + k + '\n')
+                outputfile.write(">" + k + '_' + str(j) + '\n')
                 outputfile.write(v + '\n')
+                j = j + 1
         else:
             print("\n" + 'File exists: ' + self.outputlocation + self.outputname)
 
