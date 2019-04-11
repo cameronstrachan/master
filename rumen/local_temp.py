@@ -18,3 +18,13 @@ file_obj = sc.Fasta('aph3_ncbi_250.fasta', 'dataflow/01-prot/')
 file_obj.setOutputName('aph3_ncbi_250_350.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
 file_obj.lengthcutoff(replaceheaders = True, length = 350, direction = 'below')
+
+file_obj = sc.Fasta('APH3_rumen.fasta', 'dataflow/01-prot/')
+file_obj.setOutputName('APH3_rumen_250.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.lengthcutoff(replaceheaders = True, length = 250, direction = 'above')
+
+file_obj = sc.Fasta('APH3_rumen_250.fasta', 'dataflow/01-prot/')
+file_obj.setOutputName('APH3_rumen_250_350.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.lengthcutoff(replaceheaders = True, length = 350, direction = 'below')

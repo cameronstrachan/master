@@ -877,6 +877,78 @@ write.table(selected_long, paste(dir_out, "rumen_genomes_ribD_seqs_unique.fasta"
     col.names = FALSE, quote = FALSE)
 ```
 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+file <- "~/master/rumen/dataflow/01-prot/rumen_genomes_ribD_seqs.fasta"
+
+df <- read.csv(paste(file, sep = ""), sep = ",", header = FALSE)
+
+df$V1 <- as.character(df$V1)
+
+headers <- df$V1[grepl(">", df$V1)]
+seqs <- df$V1[!(grepl(">", df$V1))]
+
+df <- as.data.frame(cbind(headers, seqs))
+
+df$seqs <- gsub(" ", "", df$seqs)
+
+df <- df %>%
+  arrange(seqs) %>%
+  rowwise() %>%
+  mutate(len = nchar(seqs)) %>%
+  distinct() %>%
+  filter(len < 250)
+
+df <- as.data.frame(df)
+
+df$headers <- gsub("_ribD", "", df$headers)
+
+for (j in 1:nrow(df)){
+  if (j <= nrow(df) - 1) {
+  seq_down <- j + 1
+  if (df[j,2] == df[seq_down,2]){
+    df <- df[-j,]
+  }
+  }
+}
+
+df$headers <- as.character(df$headers)
+
+df <- df[!(df$headers %in% ids),]
+
+df_select_list <- list()
+k <- 1
+
+for (j in 1:nrow(df)){
+  
+      
+  if (runif(1, 0, 1) < 0.1 ){    
+  
+      if (df[j, 3] > 300){
+      df_select_list[[k]] <- paste(">RUMEN", j, "_LONG", sep ="")
+      k <- k + 1 } else {
+      df_select_list[[k]] <- paste(">RUMEN", j, "_SHORT", sep ="")
+      k <- k + 1 
+      }
+      
+      df_select_list[[k]] <- df[j, 2]
+ 
+      k <- k + 1
+      
+      } else {}
+}
+
+
+
+dir_out <- "~/master/rumen/dataflow/01-prot/"
+
+selected_long <- as.matrix(unlist(rbind(df_select_list)))
+selected_long <- gsub("\"", "", selected_long)
+write.table(selected_long, paste(dir_out, "rumen_genomes_ribD_seqs_unique_short.fasta"), row.names = FALSE, 
+    col.names = FALSE, quote = FALSE)
+```
+
+
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 df_path <- read.csv("~/master/rumen/dataflow/02-headers/genomes_4_ribD.csv")
 df_path$file <- NULL
