@@ -308,10 +308,16 @@ file_obj.setOutputName(outputfilename)
 #file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=10000, evalue=1e-3, num_threads = 60, max_hsps = 1)
 
 
-genes_df = pd.read_csv('dataflow/00-meta/APH3_rumen.csv', low_memory=False)
+genes_df = pd.read_csv('dataflow/00-meta/ANT6_rumen.csv', low_memory=False)
 genes = genes_df['sseqid'].tolist()
 
 file_obj = sc.Fasta('rumen_genomes.fasta', 'dataflow/01-prot/')
-file_obj.setOutputName('APH3_rumen.fasta')
+file_obj.setOutputName('ANT6_rumen.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
 file_obj.subsetfasta(seqlist = genes, headertag='RUMEN')
+
+
+#../bin/muscle -in dataflow/01-prot/aph3_rumen_ncbi.fasta -out dataflow/03-alignments/aph3_rumen_ncbi.afa -maxiters 1 -diags -sv -distance1 kbit20_3
+
+
+#../bin/FastTree dataflow/03-alignments/aph3_rumen_ncbi.afa > dataflow/03-trees/aph3_rumen_ncbi.afa.newick
