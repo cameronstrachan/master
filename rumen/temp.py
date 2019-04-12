@@ -352,3 +352,13 @@ file_obj.saveonelinefasta()
 
 
 #../bin/FastTree dataflow/03-alignments/ANT6_ncbi_rumen_250_350.afa > dataflow/03-trees/ANT6_ncbi_rumen_250_350.afa.newick
+
+
+
+genes_df = pd.read_csv('dataflow/00-meta/ANT6_clade1.csv', low_memory=False)
+genes = genes_df['sseqid'].tolist()
+
+file_obj = sc.Fasta('ANT6_ncbi_rumen_250_350_rename.fasta', 'dataflow/01-prot/')
+file_obj.setOutputName('ANT6_ncbi_rumen_250_350_clade1.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.subsetfasta(seqlist = genes, headertag='clade1')
