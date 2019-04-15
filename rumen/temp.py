@@ -391,3 +391,13 @@ file_obj = sc.Fasta('subclade_island.fasta', 'dataflow/01-nucl/')
 file_obj.setOutputName('subclade_island.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
 file_obj.runprodigal()
+
+headerfile = 'dataflow/02-headers/'
+
+file_obj = sc.Fasta('subclade_island.fasta', 'dataflow/01-prot/')
+file_obj.setOutputName('subclade_island.fasta')
+file_obj.setOutputLocation(headerfile)
+headers = file_obj.fasta2headermap()
+df = pd.DataFrame.from_dict(headers, orient="index")
+df['file'] = file
+df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
