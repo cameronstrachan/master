@@ -353,7 +353,7 @@ file_obj.setOutputLocation('dataflow/01-prot/')
 #file_obj.subsetfasta(seqlist = genes, headertag='clade1')
 
 
-genes = ['4309680-submission.assembly_59']
+genes = ['4309680-submission.assembly_59', '3964017-submission.assembly_7', '3643350-assembly_6', '3394949-submission.assembly_17', 'RUG117_52']
 
 file_obj = sc.Fasta('rumen_genomes.fasta', 'dataflow/01-nucl/')
 file_obj.setOutputName('4309680_59.fasta')
