@@ -244,17 +244,6 @@ file_obj.setOutputLocation('dataflow/01-prot/')
 
 
 #
-
-runcommand = input("\n" + "Run muscle on riD? (y or n):")
-
-if runcommand == 'y':
-	os.system("../bin/muscle -in dataflow/01-prot/island_pathogens_rumen_ref_seq_ribD.fasta -out dataflow/03-alignments/island_pathogens_rumen_ref_seq_ribD.afa")
-
-runcommand = input("\n" + "Run FastTree on full 16s seqs? (y or n):")
-
-if runcommand == 'y':
-	os.system("../bin/FastTree dataflow/03-alignments/island_pathogens_rumen_ref_seq_ribD.afa > dataflow/03-trees/island_pathogens_rumen_ref_seq_ribD.afa.newick")
-
 # file = "rumen_genomes.fasta"
 # headerfile = 'dataflow/02-headers/'
 #
@@ -361,4 +350,12 @@ genes = genes_df['id'].tolist()
 file_obj = sc.Fasta('ANT6_ncbi_rumen_250_350_rename.fasta', 'dataflow/01-prot/')
 file_obj.setOutputName('ANT6_ncbi_rumen_250_350_clade1.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
-file_obj.subsetfasta(seqlist = genes, headertag='clade1')
+#file_obj.subsetfasta(seqlist = genes, headertag='clade1')
+
+
+genes = ['4309680-submission.assembly_59']
+
+file_obj = sc.Fasta('rumen_genomes.fasta', 'dataflow/01-nucl/')
+file_obj.setOutputName('4309680_59.fasta')
+file_obj.setOutputLocation('dataflow/01-nucl/')
+file_obj.subsetfasta(seqlist = genes, headertag='none')
