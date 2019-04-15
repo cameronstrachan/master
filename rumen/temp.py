@@ -364,7 +364,7 @@ files = ['island2_pathogens.fasta', 'subclade_island.fasta']
 sg.concat(inputfolder='dataflow/01-nucl/', outputpath='dataflow/01-nucl/rumen_genomes_island2_pathogens.fasta', filenames=files)
 
 
-file = "4309680_59.fasta"
+file = "subclade_island.fasta"
 indir = 'dataflow/01-nucl/'
 blastdir = 'dataflow/02-blast/'
 blastdbdir = 'dataflow/02-blast-db/'
@@ -382,7 +382,7 @@ file_obj.setOutputLocation(blastdir)
 outputfilename = "second_island_single_gene_mapping.txt"
 file_obj.setOutputName(outputfilename)
 
-blastdb = "rumen_genomes_island2_pathogens.fasta"
+blastdb = "subclade_island.fasta"
 
 file_obj.runblast(blast='blastn', db=blastdb, dblocation=blastdbdir, max_target_seqs=10, evalue=1e-3, num_threads = 60, max_hsps = 5)
 
