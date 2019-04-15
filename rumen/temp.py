@@ -359,3 +359,29 @@ file_obj = sc.Fasta('rumen_genomes.fasta', 'dataflow/01-nucl/')
 file_obj.setOutputName('subclade_island.fasta')
 file_obj.setOutputLocation('dataflow/01-nucl/')
 file_obj.subsetfasta(seqlist = genes, headertag='none')
+
+files = ['island2_pathogens.fasta', 'rumen_genomes.fasta']
+sg.concat(inputfolder='dataflow/01-nucl/', outputpath='dataflow/01-nucl/rumen_genomes_island2_pathogens.fasta', filenames=files)
+
+
+file = "rumen_genomes_island2_pathogens.fasta"
+indir = 'dataflow/01-nucl/'
+blastdir = 'dataflow/02-blast/'
+blastdbdir = 'dataflow/02-blast-db/'
+
+file_obj = sc.Fasta(file, indir)
+file_obj.setOutputName(file)
+file_obj.setOutputLocation(blastdbdir)
+file_obj.runmakeblastdb(dbtype='nucl')
+
+file = "4309680_59.fasta"
+
+file_obj = sc.Fasta(file, indir)
+file_obj.setOutputName(file)
+file_obj.setOutputLocation(blastdbdir)
+outputfilename = "second_island_single_gene_mapping.txt"
+file_obj.setOutputName(outputfilename)
+
+blastdb = "rumen_genomes_island2_pathogens.fasta"
+
+file_obj.runblast(blast='blastn', db=blastdb, dblocation=blastdbdir, max_target_seqs=10, evalue=1e-3, num_threads = 60, max_hsps = 5)
