@@ -374,8 +374,6 @@ file_obj.setOutputName(file)
 file_obj.setOutputLocation(blastdbdir)
 file_obj.runmakeblastdb(dbtype='nucl')
 
-file = "4309680_59.fasta"
-
 file_obj = sc.Fasta(file, indir)
 file_obj.setOutputName(file)
 file_obj.setOutputLocation(blastdir)
