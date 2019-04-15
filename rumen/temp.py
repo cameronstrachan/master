@@ -399,5 +399,5 @@ file_obj.setOutputName('subclade_island.fasta')
 file_obj.setOutputLocation(headerfile)
 headers = file_obj.fasta2headermap()
 df = pd.DataFrame.from_dict(headers, orient="index")
-df['file'] = file
+df['file'] = 'subclade_island.fasta'
 df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
