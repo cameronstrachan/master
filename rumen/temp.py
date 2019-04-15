@@ -402,3 +402,15 @@ headers = file_obj.fasta2headermap()
 df = pd.DataFrame.from_dict(headers, orient="index")
 df['file'] = 'subclade_island.fasta'
 df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
+
+
+headerfile = 'dataflow/02-headers/'
+file = 'rumen_genomes_island2_pathogens.fasta'
+
+file_obj = sc.Fasta('rumen_genomes_island2_pathogens.fasta', 'dataflow/01-prot/')
+file_obj.setOutputName('rumen_genomes_island2_pathogens.fasta')
+file_obj.setOutputLocation(headerfile)
+headers = file_obj.fasta2headermap()
+df = pd.DataFrame.from_dict(headers, orient="index")
+df['file'] = 'rumen_genomes_island2_pathogens.fasta'
+df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
