@@ -404,6 +404,12 @@ df['file'] = 'subclade_island.fasta'
 df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
 
 
+file_obj = sc.Fasta('rumen_genomes_island2_pathogens.fasta', 'dataflow/01-nucl/')
+file_obj.setOutputName('rumen_genomes_island2_pathogens.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.runprodigal()
+
+
 headerfile = 'dataflow/02-headers/'
 file = 'rumen_genomes_island2_pathogens.fasta'
 
