@@ -360,7 +360,7 @@ file_obj.setOutputName('subclade_island.fasta')
 file_obj.setOutputLocation('dataflow/01-nucl/')
 file_obj.subsetfasta(seqlist = genes, headertag='none')
 
-files = ['island2_pathogens.fasta', 'rumen_genomes.fasta']
+files = ['island2_pathogens.fasta', 'subclade_island.fasta']
 sg.concat(inputfolder='dataflow/01-nucl/', outputpath='dataflow/01-nucl/rumen_genomes_island2_pathogens.fasta', filenames=files)
 
 
