@@ -393,6 +393,7 @@ file_obj.setOutputLocation('dataflow/01-prot/')
 file_obj.runprodigal()
 
 headerfile = 'dataflow/02-headers/'
+file = 'subclade_island.fasta'
 
 file_obj = sc.Fasta('subclade_island.fasta', 'dataflow/01-prot/')
 file_obj.setOutputName('subclade_island.fasta')
