@@ -420,3 +420,14 @@ headers = file_obj.fasta2headermap()
 df = pd.DataFrame.from_dict(headers, orient="index")
 df['file'] = 'rumen_genomes_island2_pathogens.fasta'
 df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
+
+
+
+
+genes_df = pd.read_csv('dataflow/00-meta/3new_selected.csv', low_memory=False)
+genes = genes_df['name'].tolist()
+
+file_obj = sc.Fasta('rumen_genomes_island2_pathogens.fasta', 'dataflow/01-prot/')
+file_obj.setOutputName('rumen_genomes_island2_pathogens_3selected.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.subsetfasta(seqlist = genes, headertag='3selected')
