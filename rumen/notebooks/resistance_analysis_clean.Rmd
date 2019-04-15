@@ -199,7 +199,10 @@ gg <- ggplot(df_agsinst_RUG782,
   theme_minimal() + 
   labs(x = "Mapping to RUG782_1",
        y = "") +
-    theme(text = element_text(size=5)) 
+    theme(text = element_text(size=5)) + 
+  scale_colour_gradient(low = "#CC6142", high = "#6395CC",
+  space = "Lab", na.value = "grey50", guide = "colourbar",
+  aesthetics = "colour")
   
 
 plot(gg)
