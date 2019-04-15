@@ -378,7 +378,7 @@ file = "4309680_59.fasta"
 
 file_obj = sc.Fasta(file, indir)
 file_obj.setOutputName(file)
-file_obj.setOutputLocation(blastdbdir)
+file_obj.setOutputLocation(blastdir)
 outputfilename = "second_island_single_gene_mapping.txt"
 file_obj.setOutputName(outputfilename)
 
