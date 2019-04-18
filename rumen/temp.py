@@ -430,4 +430,12 @@ genes = genes_df['name'].tolist()
 file_obj = sc.Fasta('rumen_genomes_island2_pathogens.fasta', 'dataflow/01-prot/')
 file_obj.setOutputName('rumen_genomes_island2_pathogens_3selected.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
-file_obj.subsetfasta(seqlist = genes, headertag='3selected')
+#file_obj.subsetfasta(seqlist = genes, headertag='3selected')
+
+genes_df = pd.read_csv('dataflow/00-meta/ANT6_clade1_c15.csv', low_memory=False)
+genes = genes_df['id'].tolist()
+
+file_obj = sc.Fasta('ANT6_ncbi_rumen_250_350_rename.fasta', 'dataflow/01-prot/')
+file_obj.setOutputName('ANT6_ncbi_rumen_250_350_c15.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.subsetfasta(seqlist = genes, headertag='_c15')
