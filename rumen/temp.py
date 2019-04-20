@@ -439,3 +439,22 @@ file_obj = sc.Fasta('ANT6_ncbi_rumen_250_350_rename.fasta', 'dataflow/01-prot/')
 file_obj.setOutputName('ANT6_ncbi_rumen_250_350_c15.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
 file_obj.subsetfasta(seqlist = genes, headertag='_c15')
+
+
+
+# making tree
+
+#../bin/muscle -in dataflow/01-prot/ANT6_ncbi_rumen_250_350.fasta -out dataflow/03-alignments/ANT6_ncbi_rumen_250_350.afa -maxiters 3 -diags -sv -distance1 kbit20_3
+# then open in genious remove Staphylococcus_aureus_SJOS6001_114 because its longer then everything else
+# inspected and trimmed alignment from from base 64 to 609
+# refine alignment MUSCLE, 50 iterations
+#../bin/FastTree dataflow/03-alignments/ANT6_ncbi_rumen_250_350_trim_refined.fasta > dataflow/03-trees/ANT6_ncbi_rumen_250_350_trim_refined.afa.newick
+#collapse to 1.5
+
+genes_df = pd.read_csv('dataflow/00-meta/ANT_refined_c7.csv', low_memory=False)
+genes = genes_df['id'].tolist()
+
+file_obj = sc.Fasta('ANT6_ncbi_rumen_250_350_rename.fasta', 'dataflow/01-prot/')
+file_obj.setOutputName('ANT6_ncbi_rumen_250_350_refined_c7.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.subsetfasta(seqlist = genes, headertag='refined_c7')
