@@ -438,7 +438,7 @@ genes = genes_df['id'].tolist()
 file_obj = sc.Fasta('ANT6_ncbi_rumen_250_350_rename.fasta', 'dataflow/01-prot/')
 file_obj.setOutputName('ANT6_ncbi_rumen_250_350_c15.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
-file_obj.subsetfasta(seqlist = genes, headertag='_c15')
+#file_obj.subsetfasta(seqlist = genes, headertag='_c15')
 
 
 
