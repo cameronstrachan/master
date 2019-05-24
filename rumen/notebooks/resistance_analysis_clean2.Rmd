@@ -498,3 +498,334 @@ df_print <- df_final %>%
 
 as.data.frame(df_print)
 ```
+
+\newpage
+
+# clade 7
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+df <- read.csv("~/master/rumen/dataflow/00-meta/clade_meta_data_refined.csv")
+
+df$rumen <- grepl("RUMEN", df$Sequence)
+
+df <- df %>%
+  group_by(Clade_num) %>%
+  mutate(total = length(unique(Sequence))) %>%
+  mutate(nrumen = sum(rumen)) %>%
+  ungroup()
+
+df_sum <- df %>%
+  select(Clade_num, total, nrumen) %>%
+  distinct()
+
+
+df_sum
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=10, fig.width=10}
+library(tidyverse)
+
+df <- read.csv("~/master/rumen/dataflow/00-meta/clade_meta_data_refined.csv")
+
+df$rumen <- grepl("RUMEN", df$Sequence)
+
+df <- df %>%
+  group_by(Clade_num) %>%
+  mutate(total = length(unique(Sequence))) %>%
+  mutate(nrumen = sum(rumen)) %>%
+  ungroup() %>%
+  separate(Sequence, into = c("Genus"), sep = " ") %>%
+  arrange(Genus) %>%
+  filter(Genus != "prf||1405331A") 
+
+df_hun_gen <- read.csv("~/master/rumen/dataflow/00-meta/rumen_genome_genus.csv")
+
+df_hun_gen$file <- as.character(df_hun_gen$file)
+df_hun_gen$genome <- as.character(df_hun_gen$genome)
+
+df_hun_gen$file <- gsub(".fasta", "", df_hun_gen$file) 
+
+df_hun_gen <- df_hun_gen%>%
+  separate(genome, into = c("Genus", "rm"), sep = " ") %>%
+  select(-rm)
+
+df_hun <- df[1:75,] 
+
+colnames(df_hun)[1:2] <- c("file", "Clade")
+
+
+df_hun <- df_hun %>%
+  inner_join(df_hun_gen) %>%
+  select(-file)
+
+df <- df[76:1347,]
+
+df <- df[!(grepl("^RUG", df$Genus)), ]
+df <- df[!(grepl("hRUG", df$Genus)), ]
+df <- df[!(grepl("^RMG", df$Genus)), ]
+df <- df[!(grepl("^ATCC", df$Genus)), ]
+df <- df[!(grepl("^GCF", df$Genus)), ]
+df <- df[!(grepl("^Candidatus", df$Genus)), ]
+df <- df[!(grepl("^candidate", df$Genus)), ]
+df <- df[!(grepl("^uncultured", df$Genus)), ]
+df <- df[!(grepl("^unclassified", df$Genus)), ]
+df <- df[!(grepl("^bacterium", df$Genus)), ]
+
+df <- bind_rows(df, df_hun)
+
+df_summary <- as.data.frame(table(df$Genus, df$Clade_num)) %>%
+  filter(Freq != 0) %>%
+  group_by(Var2) %>%
+  mutate(total = sum(Freq)) %>%
+  ungroup() %>%
+  mutate(Per = Freq / total)
+
+colnames(df_summary) <- c("genus", "Clade", "Freq", "Total", "Percent")
+
+df_summary$original <- df_summary$genus
+
+df_taxa <- read.csv("~/master/rumen/dataflow/00-meta/taxa_mapping.csv") %>%
+  filter(level == "genus") %>%
+  separate(names, c("domain", "phylum", "class", "order", "family", "genus"), sep = ";") %>%
+  select(-level)
+
+df_genus_merge <- inner_join(df_summary, df_taxa)
+
+#
+
+df_taxa <- df_taxa %>%
+  select(-genus) %>%
+  distinct()
+
+colnames(df_summary)[1] <- c("family")
+
+df_family_merge <- inner_join(df_summary, df_taxa)
+
+#
+
+df_taxa <- df_taxa %>%
+  select(-family) %>%
+  distinct()
+
+colnames(df_summary)[1] <- c("order")
+
+df_order_merge <- inner_join(df_summary, df_taxa)
+
+#
+
+df_taxa <- df_taxa %>%
+  select(-order) %>%
+  distinct()
+
+colnames(df_summary)[1] <- c("class")
+
+df_class_merge <- inner_join(df_summary, df_taxa)
+
+#
+
+df_taxa <- df_taxa %>%
+  select(-class) %>%
+  distinct()
+
+colnames(df_summary)[1] <- c("phylum")
+
+df_pyhlum_merge <- inner_join(df_summary, df_taxa)
+
+#
+
+df_taxa <- bind_rows(df_genus_merge, df_family_merge, df_order_merge, df_class_merge, df_pyhlum_merge)
+
+#
+
+df_summary$phylum <- NULL
+
+df_final <- full_join(df_summary, df_taxa)
+
+df_hand <- read.csv("~/master/rumen/dataflow/00-meta/hand_annotated.csv")
+
+df_hand$original <- gsub(" ", "", df_hand$original)
+df_hand$phylum <- gsub(" ", "", df_hand$phylum)
+df_hand$class <- gsub(" ", "", df_hand$class)
+df_hand$order <- gsub(" ", "", df_hand$order)
+
+df_hand_annotate <- df_final[is.na(df_final$domain),] %>%
+  select(Clade, Freq, Total, Percent, original) %>%
+  inner_join(df_hand)
+
+df_final <- df_final[!(is.na(df_final$domain)),] %>%
+  select(Clade, Freq, Total, Percent, original, phylum, class, order) 
+
+df_final <- bind_rows(df_final, df_hand_annotate)
+
+df_final_phylum <- df_final %>%
+  select(Clade, Freq, phylum, Total) %>%
+  group_by(Clade, phylum) %>% 
+  mutate(phy_sum = sum(Freq)) %>%
+  ungroup() %>%
+  mutate(per = phy_sum / Total) %>%
+  select(-Freq, -Total) %>%
+  distinct() 
+
+
+
+blank_theme <- theme_minimal()+
+  theme(
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    panel.border = element_blank(),
+    panel.grid=element_blank(),
+    axis.ticks = element_blank(),
+    plot.title=element_text(size=14, face="bold")
+  )
+
+colours <- c("#d97b76",
+"#63b94d",
+"#dd4970",
+"#63c89e",
+"#d5433c",
+"#32917c",
+"#c65b27",
+"#478c49",
+"#a1464f",
+"#b4b137",
+"#dc986a",
+"#677629",
+"#dc9636",
+"#aeaf69",
+"#91692c")
+
+pie <- ggplot(df_final_phylum, aes(x="", y=per, fill=phylum))  + geom_bar(stat="identity", width=1) + coord_polar("y", start=0) + 
+  facet_wrap(. ~ Clade)  + blank_theme +
+  theme(axis.text.x=element_blank()) + scale_fill_manual(values=colours) 
+
+pie
+
+df_check <- df_taxa %>%
+  select(original, Freq) %>%
+  group_by(original) %>%
+  mutate(sum = sum(Freq)) %>%
+  ungroup() %>%
+  select(-Freq) %>%
+  filter(sum > 20) %>%
+  distinct()
+
+df_check1 <- df_taxa %>%
+  filter(Clade == 1) %>%
+  select(original, Freq) %>%
+  group_by(original) %>%
+  mutate(sum = sum(Freq)) %>%
+  ungroup() %>%
+  select(-Freq) %>%
+  filter(sum > 20) %>%
+  distinct()
+
+df_check2 <- df_taxa %>%
+  filter(Clade == 1) %>%
+  select(original, Freq) %>%
+  group_by(original) %>%
+  mutate(sum = sum(Freq)) %>%
+  ungroup() %>%
+  select(-Freq) %>%
+  filter(sum > 20) %>%
+  distinct()
+```
+
+\newpage
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=11, fig.width=5}
+df <- read.csv("~/master/rumen/dataflow/02-blast/sub_clade_blast_against_4309680.csv")
+
+df$order <- as.integer(as.character(df$order2))
+
+df <- df %>%
+  arrange(desc(order))
+
+df$sseqid <- as.character(df$sseqid)
+
+df$sseqid <- factor(df$sseqid, levels = as.character(df$sseqid))
+
+library(ggplot2)
+
+
+gg <- ggplot(data = df, aes(x=qseqid, y=sseqid, fill=pident)) + 
+  geom_tile() +  
+  scale_fill_gradient(low = "#CC6142", high = "#6395CC",
+                      space = "Lab", na.value = "grey50", guide = "colourbar",
+                      aesthetics = "fill")
+
+
+
+gg
+```
+
+\newpage
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=11, fig.width=5}
+df <- read.csv("~/master/rumen/dataflow/02-blast/sub_clade_blast_against_4309680.csv")
+
+df$order <- as.integer(as.character(df$order3))
+
+df <- df[!(is.na(df$order3)), ]
+
+df <- df %>%
+  arrange(desc(order))
+
+df$sseqid <- as.character(df$sseqid)
+
+df$sseqid <- factor(df$sseqid, levels = as.character(df$sseqid))
+
+library(ggplot2)
+
+
+gg <- ggplot(data = df, aes(x=qseqid, y=sseqid, fill=pident)) + 
+  geom_tile() +  
+  scale_fill_gradient(low = "#CC6142", high = "#6395CC",
+                      space = "Lab", na.value = "grey50", guide = "colourbar",
+                      aesthetics = "fill")
+
+
+
+gg
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+df_seq <- read.table("~/master/rumen/dataflow/03-alignments/ANT6_ncbi_rumen_250_350 extraction - refined.fasta", quote="\"", comment.char="")
+
+df_seq$V1 <- as.character(df_seq$V1)
+
+seq_list <- c()
+
+for (i in 1:nrow(df_seq)){
+  if (substr(df_seq[i,1], 1, 1) == ">"){
+    seq_idx <- i + 1
+    if (substr(df_seq[seq_idx ,1], 354, 354) == "A" && substr(df_seq[seq_idx ,1], 357, 357) == "H" && substr(df_seq[seq_idx ,1], 352, 352) == "L"){
+      seq_list <- c(seq_list, df_seq[i,1])
+    } else {}
+    
+  } else {}
+  
+}
+
+df <- read.csv("~/master/rumen/dataflow/00-meta/clade_meta_data_refined.csv")
+
+df$rumen <- grepl("RUMEN", df$Sequence)
+
+df <- df %>%
+  group_by(Clade_num) %>%
+  mutate(total = length(unique(Sequence))) %>%
+  mutate(nrumen = sum(rumen)) %>%
+  ungroup()
+
+seq_list <- gsub(">", "", seq_list)
+seq_list <- gsub("_", " ", seq_list)
+
+df_seq <- as.data.frame(seq_list)
+colnames(df_seq)[1] <- "Sequence"
+
+df_final <- inner_join(df, df_seq) %>%
+  group_by(Clade_num) %>%
+  mutate(nas = length(unique(Sequence))) %>%
+  ungroup() %>%
+  mutate(per_nas = nas / total)
+```
