@@ -445,7 +445,6 @@ file_obj.setOutputLocation('dataflow/01-prot/')
 # making tree
 
 #../bin/muscle -in dataflow/01-prot/ANT6_ncbi_rumen_250_350.fasta -out dataflow/03-alignments/ANT6_ncbi_rumen_250_350.afa -maxiters 3 -diags -sv -distance1 kbit20_3
-# then open in genious remove Staphylococcus_aureus_SJOS6001_114 because its longer then everything else
 # inspected and trimmed alignment from from base 64 to 609
 # refine alignment MUSCLE, 50 iterations
 #../bin/FastTree dataflow/03-alignments/ANT6_ncbi_rumen_250_350_trim_refined.fasta > dataflow/03-trees/ANT6_ncbi_rumen_250_350_trim_refined.afa.newick
@@ -458,3 +457,12 @@ file_obj = sc.Fasta('ANT6_ncbi_rumen_250_350_rename.fasta', 'dataflow/01-prot/')
 file_obj.setOutputName('ANT6_ncbi_rumen_250_350_refined_c7.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
 file_obj.subsetfasta(seqlist = genes, headertag='refined_c7')
+
+# smaller tree
+# clade 7 plus added single outlier Caryophanon_latum_988
+# then open in genious remove Staphylococcus_aureus_SJOS6001_114 because its longer then everything else
+# trim 24 to 310
+# refine alignment
+# export as .meg file
+# didnt use this tree - all sites, 100 bootstraps JTT
+# instead got one with 500 bootstraps, 80% coverage (ANT6_ncbi_rumen_250_350_refined_tree_80_500.mts)

@@ -17,3 +17,6 @@ rsync -e ssh -avzP --append
 # Renaming
 
 for f in *.fastq.gz; do mv -- "$f" "$\{f//-/x\}"; done
+
+
+2PBE_A_Chain_A

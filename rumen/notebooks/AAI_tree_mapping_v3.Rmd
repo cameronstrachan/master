@@ -132,6 +132,8 @@ heatmap.plot <- heatmap.plot +
   theme(legend.position = "none") 
 
 #heatmap.plot
+
+plot(legend)
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=15, fig.width=15}
@@ -236,8 +238,8 @@ df_genome <- bind_rows(df_list)
 mapped_reads.plot <- ggplot(data = df_genome, aes(x = genome, y = percent_mapped)) + 
   geom_bar(stat = "identity", aes(fill = percent_mapped)) + coord_flip() + theme_gray() +
   theme(axis.title.x = element_blank(), 
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(), 
+        #axis.text.x = element_blank(),
+        #axis.ticks.x = element_blank(), 
         #axis.text.y = element_blank(), 
         axis.title.y = element_blank(), 
         axis.ticks.y = element_blank()) +

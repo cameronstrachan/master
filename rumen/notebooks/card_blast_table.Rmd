@@ -1,0 +1,49 @@
+---
+title: "Untitled"
+author: "Cameron Strachan"
+date: '2019-04-29'
+output: html_document
+---
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(stringi)
+
+resistances <- read.delim("~/master/rumen/dataflow/02-blast/rumen_genomes_card.txt", header=FALSE)
+aro_categories <- read.delim("~/master/databases/aro_categories_index.csv")
+
+colnames(resistances) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+
+resistances <- resistances %>%
+  select(-sseq) %>%
+  separate(sseqid, into = c("rm", "Protein.Accession", "ARO.Accession", "gene"), sep = "\\|", remove = FALSE)
+
+
+resistances$gene <- gsub("_", " ", resistances$gene)
+
+
+resistances <- resistances %>%
+    separate(gene, into = c("gene", "organism"), sep = "\\[", remove = FALSE)
+
+resistances$organism <- gsub("\\]", " ", resistances$organism)
+
+resistances <- resistances %>%
+  inner_join(aro_categories) %>%
+  rowwise() %>%
+  mutate(file = stri_reverse(stri_split_fixed(stri_reverse(qseqid),"_",n = 3)[[1]][3])) %>%
+  ungroup() %>%
+  filter(pident > 50) %>%
+  filter(length > 50) %>%
+  #filter(bitscore >= 50) %>%
+  filter(Resistance.Mechanism == "antibiotic inactivation") %>%
+  group_by(gene) %>%
+  mutate(gene_occurences = length(file)) %>%
+  ungroup() %>%
+  arrange(desc(pident))
+
+test <- resistances %>% 
+  select(qseqid, Protein.Accession, ARO.Accession, pident, gene, organism, sstart, send, qstart, qend, evalue, bitscore, Drug.Class) %>%
+  distinct()
+
+write.csv(test, "~/master/rumen/dataflow/00-meta/CARD_blast_table.csv")
+```
