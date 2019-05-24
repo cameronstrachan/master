@@ -31,7 +31,7 @@ file_obj.setOutputName(outputfilename)
 
 blastdb = "JQ655275.1.fasta"
 
-#file_obj.runblast(blast='blastn', db=blastdb, dblocation=blastdbdir, max_target_seqs=100, evalue=1e-3, num_threads = 60, max_hsps = 5)
+file_obj.runblast(blast='blastn', db=blastdb, dblocation=blastdbdir, max_target_seqs=100, evalue=1e-3, num_threads = 60, max_hsps = 5)
 
 file = "JQ655275.1.fasta"
 
