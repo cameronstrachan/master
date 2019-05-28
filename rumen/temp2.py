@@ -52,7 +52,7 @@ file_obj.setOutputLocation(blastdbdir)
 file_obj.runmakeblastdb(dbtype='prot')
 
 
-indir = 'dataflow/01-nucl/'
+indir = 'dataflow/01-prot/'
 blastdir = 'dataflow/02-blast/'
 file = "orfs_fig1_fig2_rename.fasta"
 
