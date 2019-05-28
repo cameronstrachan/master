@@ -1,0 +1,112 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+set.seed(1)
+
+island_mapping <- read.delim("~/master/rumen/dataflow/02-blast/JQ655275_rumen_mapping.txt", header=FALSE)
+colnames(island_mapping) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+
+df_agsinst_RUG782 <- island_mapping %>%
+  select(qseqid, sseqid, pident, sstart, send, qstart, qend, bitscore, length) %>%
+  mutate(nstart = if_else(sstart < send, sstart, send)) %>%
+  mutate(nsend = if_else(send > sstart, send, sstart)) %>%
+  ungroup() %>%
+  group_by(qseqid) %>%
+  mutate(bitscore_sum = sum(bitscore)) %>%
+  ungroup() %>%
+  group_by(qseqid, sseqid) %>%
+  mutate(length_sum = sum(length)) %>%
+  ungroup() %>%
+  filter(length_sum > 1000) %>%
+  filter(pident > 80) %>%
+  filter(sseqid == "JQ655275.1_figure")
+
+df_agsinst_RUG782 <- df_agsinst_RUG782 %>%
+  arrange(desc(bitscore_sum))
+
+df_agsinst_RUG782$qseqid <- factor(df_agsinst_RUG782$qseqid, levels = unique(as.character(df_agsinst_RUG782$qseqid)))
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=1.5, fig.width=7}
+library(ggplot2)
+library(ggalt)
+theme_set(theme_classic())
+
+gg <- ggplot(df_agsinst_RUG782, 
+       aes(y = qseqid,
+           x = nstart,
+           xend = nsend)) +  
+  geom_dumbbell(size = 0.5,
+                size_x = 0.6, 
+                size_xend = 0.6,
+ aes(colour = pident, colour_x = pident, colour_xend = pident)) +
+  theme_minimal() + 
+  labs(x = "Mapping to RUG782_1",
+       y = "") +
+    theme(text = element_text(size=5)) + 
+  scale_colour_gradient(low = "#CC6142", high = "#6395CC",
+  space = "Lab", na.value = "grey50", guide = "colourbar",
+  aesthetics = "colour") + 
+  xlim(0, 9598)
+  
+
+plot(gg)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+set.seed(1)
+
+island_mapping <- read.delim("~/master/rumen/dataflow/02-blast/JQ655275_rumen_mapping.txt", header=FALSE)
+colnames(island_mapping) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+
+df_agsinst_RUG782 <- island_mapping %>%
+  select(qseqid, sseqid, pident, sstart, send, qstart, qend, bitscore, length) %>%
+  mutate(nstart = if_else(sstart < send, sstart, send)) %>%
+  mutate(nsend = if_else(send > sstart, send, sstart)) %>%
+  ungroup() %>%
+  group_by(qseqid) %>%
+  mutate(bitscore_sum = sum(bitscore)) %>%
+  ungroup() %>%
+  group_by(qseqid, sseqid) %>%
+  mutate(length_sum = sum(length)) %>%
+  ungroup() %>%
+  filter(length_sum > 1000) %>%
+  filter(pident > 80) %>%
+  filter(sseqid == "4309680-submission.assembly_52_resistance_genes")
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=3.5, fig.width=7}
+library(ggplot2)
+library(ggalt)
+theme_set(theme_classic())
+
+gg <- ggplot(df_agsinst_RUG782, 
+       aes(y = qseqid,
+           x = nstart,
+           xend = nsend)) +  
+  geom_dumbbell(size = 0.5,
+                size_x = 0.6, 
+                size_xend = 0.6,
+ aes(colour = pident, colour_x = pident, colour_xend = pident)) +
+  theme_minimal() + 
+  labs(x = "Mapping to RUG782_1",
+       y = "") +
+    theme(text = element_text(size=12)) + 
+  scale_colour_gradient(low = "#CC6142", high = "#6395CC",
+  space = "Lab", na.value = "grey50", guide = "colourbar",
+  aesthetics = "colour")
+  
+
+plot(gg)
+```
