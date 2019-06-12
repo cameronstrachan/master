@@ -97,7 +97,7 @@ blastdbdir = 'dataflow/02-blast-db/'
 file_obj = sc.Fasta(file, 'dataflow/01-prot/')
 file_obj.setOutputName(file)
 file_obj.setOutputLocation(blastdbdir)
-file_obj.runmakeblastdb(dbtype='prot')
+#file_obj.runmakeblastdb(dbtype='prot')
 
 indir = 'dataflow/01-prot/'
 blastdir = 'dataflow/02-blast/'
@@ -111,7 +111,7 @@ file_obj.setOutputName(outputfilename)
 
 blastdb = "pathogens_rumen.fasta"
 
-file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=2000, evalue=1e-3, num_threads = 40, max_hsps = 1)
+#file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=2000, evalue=1e-3, num_threads = 40, max_hsps = 1)
 
 headerfile = 'dataflow/02-headers/'
 file = "pathogens_rumen.fasta"
