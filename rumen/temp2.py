@@ -112,3 +112,14 @@ file_obj.setOutputName(outputfilename)
 blastdb = "pathogens_rumen.fasta"
 
 file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=2000, evalue=1e-3, num_threads = 40, max_hsps = 1)
+
+headerfile = 'dataflow/02-headers/'
+file = "pathogens_rumen.fasta"
+
+file_obj = sc.Fasta(file, 'dataflow/01-prot/')
+file_obj.setOutputName(file)
+file_obj.setOutputLocation(headerfile)
+headers = file_obj.fasta2headermap()
+df = pd.DataFrame.from_dict(headers, orient="index")
+df['file'] = file
+df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
