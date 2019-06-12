@@ -109,6 +109,6 @@ file_obj.setOutputLocation(blastdir)
 outputfilename = "V1_V2_pathogens_rumen.txt"
 file_obj.setOutputName(outputfilename)
 
-blastdb = "pathogens_rumen.fasta.fasta"
+blastdb = "pathogens_rumen.fasta"
 
 file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=2000, evalue=1e-3, num_threads = 40, max_hsps = 1)
