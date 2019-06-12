@@ -16,7 +16,7 @@ blastdbdir = 'dataflow/02-blast-db/'
 file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
 file_obj.setOutputName(file)
 file_obj.setOutputLocation(blastdbdir)
-file_obj.runmakeblastdb(dbtype='nucl')
+#file_obj.runmakeblastdb(dbtype='nucl')
 
 
 indir = 'dataflow/01-nucl/'
@@ -49,7 +49,7 @@ blastdbdir = 'dataflow/02-blast-db/'
 file_obj = sc.Fasta(file, 'dataflow/01-prot/')
 file_obj.setOutputName(file)
 file_obj.setOutputLocation(blastdbdir)
-file_obj.runmakeblastdb(dbtype='prot')
+#file_obj.runmakeblastdb(dbtype='prot')
 
 
 indir = 'dataflow/01-prot/'
@@ -73,4 +73,42 @@ file = "JQ655275.1.fasta"
 file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
 file_obj.setOutputName(file)
 file_obj.setOutputLocation('dataflow/01-prot/')
+#file_obj.runprodigal()
+
+
+
+#### new tree using 2 versions of ANT6
+####
+
+file = "fig1_fig3_ncbi_nucl_hits.fasta"
+
+file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
+file_obj.setOutputName(file)
+file_obj.setOutputLocation('dataflow/01-prot/')
 file_obj.runprodigal()
+
+seqs_concatn = ['rumen_genomes.fasta', 'fig1_fig3_ncbi_nucl_hits.fasta']
+
+sg.concat(inputfolder='dataflow/01-prot/', outputpath='dataflow/01-prot/pathogens_rumen.fasta', seqs_concatn):
+
+file = "pathogens_rumen.fasta"
+blastdbdir = 'dataflow/02-blast-db/'
+
+file_obj = sc.Fasta(file, 'dataflow/01-prot/')
+file_obj.setOutputName(file)
+file_obj.setOutputLocation(blastdbdir)
+file_obj.runmakeblastdb(dbtype='prot')
+
+indir = 'dataflow/01-prot/'
+blastdir = 'dataflow/02-blast/'
+file = "v1_v2_4309680.fasta"
+
+file_obj = sc.Fasta(file, indir)
+file_obj.setOutputName(file)
+file_obj.setOutputLocation(blastdir)
+outputfilename = "V1_V2_pathogens_rumen.txt"
+file_obj.setOutputName(outputfilename)
+
+blastdb = "pathogens_rumen.fasta.fasta"
+
+file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=2000, evalue=1e-3, num_threads = 40, max_hsps = 1)
