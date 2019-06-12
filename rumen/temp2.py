@@ -89,7 +89,7 @@ file_obj.runprodigal()
 
 seqs_concatn = ['rumen_genomes.fasta', 'fig1_fig3_ncbi_nucl_hits.fasta']
 
-sg.concat(inputfolder='dataflow/01-prot/', outputpath='dataflow/01-prot/pathogens_rumen.fasta', seqs_concatn):
+sg.concat(inputfolder='dataflow/01-prot/', outputpath='dataflow/01-prot/pathogens_rumen.fasta', seqs_concatn)
 
 file = "pathogens_rumen.fasta"
 blastdbdir = 'dataflow/02-blast-db/'
