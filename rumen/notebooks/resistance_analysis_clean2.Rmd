@@ -829,3 +829,81 @@ df_final <- inner_join(df, df_seq) %>%
   ungroup() %>%
   mutate(per_nas = nas / total)
 ```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+# clean annotation table
+
+library(stringi)
+
+df <- read.delim("~/master/rumen/dataflow/02-blast/orf_fig1_fig3_fig4_parsed.txt", header=FALSE, comment.char="#")
+df$V2 <- NA
+
+for (i in 1:nrow(df)){
+  if (grepl("Query=", df[i,1])){
+    head <- as.character(df[i,1])
+  } else {
+    df[i,2] <- head}
+  
+}
+
+df <- df[complete.cases(df),]
+
+df$V2 <- gsub("Query= ", "", df$V2)
+
+df$V1 <- as.character(df$V1)
+df$V2 <- as.character(df$V2)
+
+
+df$orf_id <- NA
+df$orf_num <- NA
+df$pident <- NA
+df$e_val <- NA
+df$score <- NA
+df$annotation <- NA
+
+df$V1 <- gsub("  ", " ", df$V1)
+df$V1 <- gsub("  ", " ", df$V1)
+df$V1 <- gsub("  ", " ", df$V1)
+df$V1 <- gsub("  ", " ", df$V1)
+df$V1 <- gsub("  ", " ", df$V1)
+df$V1 <- gsub("  ", " ", df$V1)
+df$V1 <- gsub("  ", " ", df$V1)
+df$V1 <- gsub("  ", " ", df$V1)
+df$V1 <- gsub("  ", " ", df$V1)
+df$V1 <- gsub("  ", " ", df$V1)
+df$V1 <- gsub("  ", " ", df$V1)
+df$V1 <- gsub("  ", " ", df$V1)
+df$V1 <- gsub("  ", " ", df$V1)
+df$V1 <- gsub("  ", " ", df$V1)
+df$V1 <- gsub("  ", " ", df$V1)
+df$V1 <- gsub("  ", " ", df$V1)
+
+
+
+for (i in 1:nrow(df)){
+  df[i,"orf_num"] <- stri_reverse(str_split_fixed(stri_reverse(df[i,"V2"]), "_", 2)[[1]])
+  df[i,"orf_id"] <- stri_reverse(str_split_fixed(stri_reverse(df[i,"V2"]), "_", 2)[[2]])
+  df[i,"pident"] <- stri_reverse(str_split_fixed(stri_reverse(df[i,"V1"]), " ", 5)[[2]])
+  df[i,"e_val"] <- stri_reverse(str_split_fixed(stri_reverse(df[i,"V1"]), " ", 5)[[3]])
+  df[i,"score"] <- stri_reverse(str_split_fixed(stri_reverse(df[i,"V1"]), " ", 5)[[4]])
+  df[i,"annotation"] <- stri_reverse(str_split_fixed(stri_reverse(df[i,"V1"]), " ", 5)[[5]])
+  df[i,"orf_id2"] <- stri_reverse(str_split_fixed(stri_reverse(df[i,"orf_id"]), "_", 2)[[2]])
+  
+}
+
+rownames(df) <- NULL
+
+df[879:1478, "orf_id2"] <- df[879:1478, "orf_id"]
+
+df <- df %>%
+  select(orf_id2, orf_num, annotation, pident, e_val, score) %>%
+  separate(annotation, into = c("annotation", "rm"), sep = "\\[") %>%
+  select(-rm) 
+
+colnames(df) <- c("Contig Name", "Figure ORF Number", "Annotation", "Percent Identity", "E-value", "Bit Score")
+
+
+
+write.csv(df, "~/master/rumen/dataflow/02-blast/orf_fig1_fig3_fig4_parsed.csv", row.names = FALSE)
+```

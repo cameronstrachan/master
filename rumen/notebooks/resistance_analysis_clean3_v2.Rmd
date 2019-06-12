@@ -15,20 +15,19 @@ set.seed(1)
 island_mapping <- read.delim("~/master/rumen/dataflow/02-blast/JQ655275_rumen_mapping.txt", header=FALSE)
 colnames(island_mapping) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
 
+island_mapping$qseqid <- as.character(island_mapping$qseqid)
+
 df_agsinst_RUG782 <- island_mapping %>%
   select(qseqid, sseqid, pident, sstart, send, qstart, qend, bitscore, length) %>%
   mutate(nstart = if_else(sstart < send, sstart, send)) %>%
   mutate(nsend = if_else(send > sstart, send, sstart)) %>%
   ungroup() %>%
+  filter(sseqid == "JQ655275.1_figure") %>%
   group_by(qseqid) %>%
   mutate(bitscore_sum = sum(bitscore)) %>%
-  ungroup() %>%
-  group_by(qseqid, sseqid) %>%
   mutate(length_sum = sum(length)) %>%
   ungroup() %>%
-  filter(length_sum > 1000) %>%
-  filter(pident > 80) %>%
-  filter(sseqid == "JQ655275.1_figure")
+  filter(length_sum > 1000) 
 
 df_agsinst_RUG782 <- df_agsinst_RUG782 %>%
   arrange(desc(bitscore_sum))
@@ -69,24 +68,28 @@ set.seed(1)
 island_mapping <- read.delim("~/master/rumen/dataflow/02-blast/JQ655275_rumen_mapping.txt", header=FALSE)
 colnames(island_mapping) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
 
+island_mapping$qseqid <- as.character(island_mapping$qseqid)
+
 df_agsinst_RUG782 <- island_mapping %>%
+  filter(sseqid == "KP339868.1") %>%
   select(qseqid, sseqid, pident, sstart, send, qstart, qend, bitscore, length) %>%
   mutate(nstart = if_else(sstart < send, sstart, send)) %>%
   mutate(nsend = if_else(send > sstart, send, sstart)) %>%
   ungroup() %>%
   group_by(qseqid) %>%
   mutate(bitscore_sum = sum(bitscore)) %>%
-  ungroup() %>%
-  group_by(qseqid, sseqid) %>%
   mutate(length_sum = sum(length)) %>%
   ungroup() %>%
-  filter(length_sum > 1000) %>%
-  filter(pident > 80) %>%
-  filter(sseqid == "4309680-submission.assembly_52_resistance_genes")
+  filter(length_sum > 1000) 
+
+df_agsinst_RUG782 <- df_agsinst_RUG782 %>%
+  arrange(desc(bitscore_sum))
+
+df_agsinst_RUG782$qseqid <- factor(df_agsinst_RUG782$qseqid, levels = unique(as.character(df_agsinst_RUG782$qseqid)))
 ```
 
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=3.5, fig.width=7}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=1.5, fig.width=7}
 library(ggplot2)
 library(ggalt)
 theme_set(theme_classic())
@@ -102,11 +105,33 @@ gg <- ggplot(df_agsinst_RUG782,
   theme_minimal() + 
   labs(x = "Mapping to RUG782_1",
        y = "") +
-    theme(text = element_text(size=12)) + 
+    theme(text = element_text(size=6)) + 
   scale_colour_gradient(low = "#CC6142", high = "#6395CC",
   space = "Lab", na.value = "grey50", guide = "colourbar",
-  aesthetics = "colour")
+  aesthetics = "colour") + 
+  xlim(0, 37000)
   
 
 plot(gg)
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=2.5, fig.width=10}
+library(genoPlotR)
+
+xlims <- list(c(-Inf, Inf), c(-Inf, Inf))
+
+gene_diags <- read.csv("~/master/rumen/dataflow/00-meta/kp339868.csv")
+
+df_4309680 <- gene_diags[1:43,]
+
+
+df_seg_1 <- dna_seg(df_4309680, df_4309680)
+
+dna_segs <- list(df_seg_1, df_seg_1)
+
+names <- c("KP339868", "KP339868")
+names(dna_segs) <- names
+
+plot_gene_map(dna_segs=dna_segs, xlims=xlims,  dna_seg_scale=TRUE, scale=FALSE)
 ```
