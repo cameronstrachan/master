@@ -125,7 +125,7 @@ df['file'] = file
 df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
 
 genes_df = pd.read_csv('dataflow/00-meta/genomes_with_ant6_duplication.csv', low_memory=False)
-genes = genes_df['Accession'].tolist()
+genes = genes_df['sseqid'].tolist()
 
 file_obj = sc.Fasta('pathogens_rumen.fasta', 'dataflow/01-prot/')
 file_obj.setOutputName('pathogens_duplicates.fasta')
