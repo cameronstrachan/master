@@ -89,7 +89,7 @@ file_obj.runprodigal()
 
 seqs_concatn = ['rumen_genomes.fasta', 'fig1_fig3_ncbi_nucl_hits.fasta']
 
-sg.concat(inputfolder='dataflow/01-prot/', outputpath='dataflow/01-prot/pathogens_rumen.fasta', filenames=seqs_concatn)
+#sg.concat(inputfolder='dataflow/01-prot/', outputpath='dataflow/01-prot/pathogens_rumen.fasta', filenames=seqs_concatn)
 
 file = "pathogens_rumen.fasta"
 blastdbdir = 'dataflow/02-blast-db/'
@@ -123,3 +123,11 @@ headers = file_obj.fasta2headermap()
 df = pd.DataFrame.from_dict(headers, orient="index")
 df['file'] = file
 df.to_csv(headerfile + file.split('.fa')[0] + '.csv')
+
+genes_df = pd.read_csv('dataflow/00-meta/genomes_with_ant6_duplication.csv', low_memory=False)
+genes = genes_df['Accession'].tolist()
+
+file_obj = sc.Fasta('pathogens_rumen.fasta', 'dataflow/01-prot/')
+file_obj.setOutputName('pathogens_duplicates.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.subsetfasta(seqlist = genes, headertag='_duplicate')
