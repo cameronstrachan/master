@@ -138,4 +138,11 @@ genes = genes_df['Accession'].tolist()
 file_obj = sc.Fasta('fig1_fig3_ncbi_nucl_hits.fasta', 'dataflow/01-nucl/')
 file_obj.setOutputName('pathogens_duplicates.fasta')
 file_obj.setOutputLocation('dataflow/01-nucl/')
-file_obj.subsetfasta(seqlist = genes, headertag='_duplicate')
+#file_obj.subsetfasta(seqlist = genes, headertag='_duplicate')
+
+file = "duplicate_gene_diagrams_trimmed.fasta"
+
+file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
+file_obj.setOutputName(file)
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.runprodigal()
