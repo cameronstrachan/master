@@ -131,3 +131,11 @@ file_obj = sc.Fasta('pathogens_rumen.fasta', 'dataflow/01-prot/')
 file_obj.setOutputName('pathogens_duplicates.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
 file_obj.subsetfasta(seqlist = genes, headertag='_duplicate')
+
+genes_df = pd.read_csv('dataflow/00-meta/genomes_with_ant6_duplication.csv', low_memory=False)
+genes = genes_df['Accession'].tolist()
+
+file_obj = sc.Fasta('pathogens_rumen.fasta', 'dataflow/01-nucl/')
+file_obj.setOutputName('pathogens_duplicates.fasta')
+file_obj.setOutputLocation('dataflow/01-nucl/')
+file_obj.subsetfasta(seqlist = genes, headertag='_duplicate')
