@@ -44,8 +44,47 @@ df2 <- read.csv("~/master/rumen/dataflow/00-meta/tableS2.csv")
 
 df2$Accession <- as.character(df2$Accession)
 
+df3 <- read_csv("~/master/rumen/dataflow/02-headers/pathogens_rumen.csv")
+
+colnames(df3) <- c("sseqid", "header", "rm")
+
 df <- inner_join(df1, df2) %>%
-  select(norfs_genome, Accession, Figure, Description.of.blast.hit..NCBI.,Host, Note) %>%
+  select(qseqid, sseqid, pident, norfs_genome, Accession, Figure, Description.of.blast.hit..NCBI.,Host, Note) %>%
+  distinct() %>%
+  inner_join(df3) %>%
+  select(-rm)
+
+rm(list=setdiff(ls(), "df"))
+
+df <- df %>%
+  separate(header, into = c("rm", "start", "stop", "strand"), sep = "#") 
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+#df <- df %>%
+#  select(-rm, -qseqid, -pident, -Figure) %>%
+#  distinct()
+
+#write.csv(df, "~/master/rumen/dataflow/00-meta/genomes_with_ant6_duplication.csv")
+
+df <- read.csv("~/master/rumen/dataflow/00-meta/genomes_with_ant6_duplication.csv")
+df$Accession <- as.character(df$Accession)
+
+df$trim <- startsWith(df$Accession, "CP0")
+
+df_to_trim <- df %>%
+  filter(trim == TRUE) %>%
+  gather(key = "start_stop", value = "position", start, stop) %>%
+  group_by(Accession, region) %>%
+  mutate(min = min(position)) %>%
+  mutate(max = max(position)) %>%
+  ungroup() %>%
+  mutate(min_breath = min - 10000) %>%
+  mutate(max_breath = max + 10000) %>%
+  mutate(total_length = max_breath - min_breath) %>%
+  select(Accession, min_breath, max_breath) %>%
   distinct()
+
+
 
 ```

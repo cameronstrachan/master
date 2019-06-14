@@ -145,4 +145,28 @@ file = "duplicate_gene_diagrams_trimmed.fasta"
 file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
 file_obj.setOutputName(file)
 file_obj.setOutputLocation('dataflow/01-prot/')
-file_obj.runprodigal()
+#file_obj.runprodigal()
+
+
+
+file = "duplicate_gene_diagrams_trimmed.fasta"
+blastdbdir = 'dataflow/02-blast-db/'
+
+file_obj = sc.Fasta(file, 'dataflow/01-prot/')
+file_obj.setOutputName(file)
+file_obj.setOutputLocation(blastdbdir)
+file_obj.runmakeblastdb(dbtype='prot')
+
+indir = 'dataflow/01-prot/'
+blastdir = 'dataflow/02-blast/'
+file = "duplicate_gene_diagrams_trimmed.fasta"
+
+file_obj = sc.Fasta(file, indir)
+file_obj.setOutputName(file)
+file_obj.setOutputLocation(blastdir)
+outputfilename = "duplicate_gene_diagrams_trimmed.txt"
+file_obj.setOutputName(outputfilename)
+
+blastdb = "duplicate_gene_diagrams_trimmed.fasta"
+
+file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=5000, evalue=1e-3, num_threads = 40, max_hsps = 1)
