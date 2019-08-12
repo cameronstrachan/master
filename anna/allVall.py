@@ -11,10 +11,10 @@ from modules import seq_gen_lin as sg
 ### RUN PREVOTELLA ALL AGAINST ALL
 ### Environment: source activate qiime2-2018.11
 
-runrename = input("\n" + "Rename Nitrospinae genomes? (y or n):")
-
 nucl_dir = 'dataflow/01-nucl/'
 prot_dir = 'dataflow/01-prot/'
+
+runrename = input("\n" + "Rename Nitrospinae genomes? (y or n):")
 
 if runrename == 'y':
 
@@ -22,13 +22,13 @@ if runrename == 'y':
 
 	for file in files:
 
-			file_obj = sc.Fasta(file, "dataflow/01-nucl/")
+		file_obj = sc.Fasta(file, "dataflow/01-nucl/")
 
-			outfilename = file.split('.f')[0] + '_rename.fasta'
+		outfilename = file.split('.f')[0] + '_rename.fasta'
 
-			file_obj.setOutputName(outfilename)
-			file_obj.setOutputLocation("dataflow/01-nucl/")
-			file_obj.headerrename()
+		file_obj.setOutputName(outfilename)
+		file_obj.setOutputLocation("dataflow/01-nucl/")
+		file_obj.headerrename()
 
 
 runprodigal = input("\n" + "Run prodigal Nitrospinae genomes? (y or n):")
