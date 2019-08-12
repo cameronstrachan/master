@@ -18,8 +18,7 @@ runrename = input("\n" + "Rename Nitrospinae genomes? (y or n):")
 
 if runrename == 'y':
 
-	files = [f for f in os.listdir(nucl_dir) if f.endswith(".fasta")]
-	print(files)
+	files = [f for f in os.listdir(nucl_dir) if f.endswith(".fna")]
 
 	for file in files:
 
@@ -36,7 +35,7 @@ runprodigal = input("\n" + "Run prodigal Nitrospinae genomes? (y or n):")
 
 if runprodigal == 'y':
 
-	files = [f for f in os.listdir(nucl_dir) if f.endswith("_rename.fasta")]
+	files = [f for f in os.listdir(nucl_dir) if f.endswith("_rename.fna")]
 
 	for file in files:
 		# contruct object
@@ -54,7 +53,7 @@ runallvallblast = input("\n" + "Run all against all blast with Nitrospinae genom
 
 if runallvallblast == 'y':
 
-	files = [f for f in os.listdir(prot_dir) if f.endswith("_rename.fasta")]
+	files = [f for f in os.listdir(prot_dir) if f.endswith("_rename.fna")]
 
 	# these are the directories we are working with
 	blastdbdir = 'dataflow/02-blast-db/'
