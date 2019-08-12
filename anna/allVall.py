@@ -50,7 +50,6 @@ if runprodigal == 'y':
 		file_obj.runprodigal()
 
 runallvallblast = input("\n" + "Run all against all blast with Nitrospinae genomes? (y or n):")
-#runallvallblast = 'y'
 
 if runallvallblast == 'y':
 
