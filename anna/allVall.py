@@ -19,6 +19,7 @@ runrename = input("\n" + "Rename Nitrospinae genomes? (y or n):")
 if runrename == 'y':
 
 	files = [f for f in os.listdir(nucl_dir) if f.endswith(".fasta")]
+	print(files)
 
 	for file in files:
 
