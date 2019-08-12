@@ -42,7 +42,7 @@ if runprodigal == 'y':
 		file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
 
 		# set output name, location
-		outputfilename = file.split(".f")[0] + '.fasta'
+		outputfilename = file.split(".f")[0] + '.fna'
 		file_obj.setOutputName(outputfilename)
 		file_obj.setOutputLocation('dataflow/01-prot/')
 
