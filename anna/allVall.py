@@ -24,7 +24,7 @@ if runrename == 'y':
 
 		file_obj = sc.Fasta(file, "dataflow/01-nucl/")
 
-		outfilename = file.split('.f')[0] + '_rename.fasta'
+		outfilename = file.split('.f')[0] + '_rename.fna'
 
 		file_obj.setOutputName(outfilename)
 		file_obj.setOutputLocation("dataflow/01-nucl/")
