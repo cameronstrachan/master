@@ -1,0 +1,435 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(stringi)
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=10, fig.width=10}
+
+#rumens_seqs <- c( "4309680-submission.assembly_52_resistance_genes_14", "4309680-submission.assembly_59_3")
+
+
+rumen_seq <- "4309680-submission.assembly_52_resistance_genes_14"
+
+df <- read.delim("~/master/rumen/dataflow/02-blast/duplicate_gene_diagrams_trimmed.txt", header=FALSE)
+colnames(df) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+
+df <- df %>%
+  select(-sseq) %>%
+  rowwise() %>%
+  mutate(remove = if_else(qseqid == sseqid, "Y", "N")) %>%
+  ungroup() %>%
+  filter(remove != "Y") %>%
+  filter(pident > 50)
+
+df_res_annotated <- read.csv("~/master/rumen/dataflow/00-meta/duplcates_resistance_prots_annotated.csv")
+
+colnames(df_res_annotated) <- c("Contig", "ORF", "Annotation", "Resistance", "Enzyme")
+
+
+df_res_annotated <- df_res_annotated %>%
+  unite(qseqid, c("Contig", "ORF"), sep = "_") %>%
+  select(-Annotation)
+
+df$rumen <- grepl(rumen_seq, df$qseqid)
+
+df_rumen <- df %>%
+  filter(rumen == TRUE)
+
+df_rumen$qseqid <- as.character(df_rumen$qseqid)
+df_rumen$sseqid <- as.character(df_rumen$sseqid)
+
+df$qseqid <- as.character(df$qseqid)
+df$sseqid <- as.character(df$sseqid)
+
+df <- df %>%
+  inner_join(df_res_annotated)
+
+df_enzyme <- df %>%
+  select(qseqid, Enzyme) %>%
+  distinct() %>%
+  rename(name = qseqid)
+
+for (i in 1:nrow(df)){
+  df[i,"qseqid_group"] <- stri_reverse(str_split_fixed(stri_reverse(df[i,"qseqid"]), "_", 2)[[2]])
+  df[i,"sseqid_group"] <- stri_reverse(str_split_fixed(stri_reverse(df[i,"sseqid"]), "_", 2)[[2]])
+}
+
+df$qseqid_group <- gsub("extraction1", "", df$qseqid_group)
+df$qseqid_group <- gsub("extraction2", "", df$qseqid_group)
+
+df$sseqid_group <- gsub("extraction1", "", df$sseqid_group)
+df$sseqid_group <- gsub("extraction2", "", df$sseqid_group)
+
+df$same_group <- df$qseqid_group == df$sseqid_group
+
+df <- df %>%
+  mutate(select = if_else(rumen == TRUE | same_group == TRUE, "Y", "N")) %>%
+  mutate(pident = if_else(select == "Y", pident, 0)) 
+
+# Libraries
+library(ggraph)
+library(igraph)
+library(RColorBrewer)
+
+df_connect <- df %>%
+  select(qseqid, sseqid, pident)
+
+colnames(df_connect) <- c("from", "to", "value")
+
+df_df1 <- df %>%
+  select(qseqid) %>%
+  distinct()
+
+df_df1$qseqid <- as.character(df_df1$qseqid)
+
+for (i in 1:nrow(df_df1)){
+  df_df1[i,"group"] <- stri_reverse(str_split_fixed(stri_reverse(df_df1[i,"qseqid"]), "_", 2)[[2]])
+}
+
+df_df1 <- df_df1 %>%
+  arrange(qseqid)
+
+df1 <- df_df1 %>%
+  select(group) %>%
+  distinct()
+
+df1$from <- "origin"
+
+colnames(df1)[1] <- "to"
+
+colnames(df_df1) <- c("to", "from")
+
+hierarchy <- rbind(df1, df_df1) %>%
+  select(from, to)
+
+connect1 <- df_connect %>%
+  filter(value != 0) %>%
+  arrange(from) %>%
+  mutate(cat = if_else(value >= 95, "high", 
+                       if_else(value <= 95 & value >=90, "high2",
+                               if_else(value <= 85 & value >= 80, "medium", 
+                                       if_else(value <= 65 & value >= 60, "low", "NA"))))) %>%
+  select(-value) %>%
+  rename(value = cat) %>%
+  filter(value == "high")
+
+
+connect2 <- df_connect %>%
+  filter(value != 0) %>%
+  arrange(from) %>%
+  mutate(cat = if_else(value >= 95, "high", 
+                       if_else(value <= 95 & value >=90, "high2",
+                               if_else(value <= 85 & value >= 80, "medium", 
+                                       if_else(value <= 65 & value >= 60, "low", "NA"))))) %>%
+  select(-value) %>%
+  rename(value = cat) %>%
+  filter(value == "high2")
+
+connect3 <- df_connect %>%
+  filter(value != 0) %>%
+  arrange(from) %>%
+  mutate(cat = if_else(value >= 95, "high", 
+                       if_else(value <= 95 & value >=90, "high2",
+                               if_else(value <= 85 & value >= 80, "medium", 
+                                       if_else(value <= 65 & value >= 60, "low", "NA"))))) %>%
+  select(-value) %>%
+  rename(value = cat) %>%
+  filter(value == "medium")
+
+connect4 <- df_connect %>%
+  filter(value != 0) %>%
+  arrange(from) %>%
+  mutate(cat = if_else(value >= 95, "high", 
+                       if_else(value <= 95 & value >=90, "high2",
+                               if_else(value <= 85 & value >= 80, "medium", 
+                                       if_else(value <= 65 & value >= 60, "low", "NA"))))) %>%
+  select(-value) %>%
+  rename(value = cat) %>%
+  filter(value == "low")
+
+
+# create a vertices data.frame. One line per object of our hierarchy
+vertices = data.frame(
+  name = unique(c(as.character(hierarchy$from), as.character(hierarchy$to))) , 
+  value = runif(112) 
+) 
+# Let's add a column with the group of each name. It will be useful later to color points
+vertices$group = hierarchy$from[ match( vertices$name, hierarchy$to ) ]
+
+colnames(vertices)[2] <- "value1"
+
+vertices <- vertices %>%
+  left_join(df_enzyme)
+
+
+# Create a graph object
+mygraph <- graph_from_data_frame( hierarchy, vertices=vertices )
+ 
+# The connection object must refer to the ids of the leaves:
+from1 = match( connect1$from, vertices$name)
+to1 = match( connect1$to, vertices$name)
+
+from2 = match( connect2$from, vertices$name)
+to2 = match( connect2$to, vertices$name)
+
+from3 = match( connect3$from, vertices$name)
+to3 = match( connect3$to, vertices$name)
+
+from4 = match( connect4$from, vertices$name)
+to4 = match( connect4$to, vertices$name)
+
+library(RColorBrewer)
+# Define the number of colors you want
+nb.cols <- 18
+mycolors <- colorRampPalette(brewer.pal(9, "Set1"))(nb.cols)
+#
+
+# Basic usual argument
+p=ggraph(mygraph, layout = 'dendrogram', circular = TRUE) +
+  geom_conn_bundle(data = get_con(from = from4, to = to4, value=connect4$value), width=2, edge_colour = "#74C476") +
+  geom_conn_bundle(data = get_con(from = from3, to = to3, value=connect3$value), width=2, edge_colour = "#6BAED6") +
+  geom_conn_bundle(data = get_con(from = from2, to = to2, value=connect2$value), width=2, edge_colour = "#3182BD") +
+  geom_conn_bundle(data = get_con(from = from1, to = to1, value=connect1$value), width=2, edge_colour = "#08519C") + 
+   geom_node_point(aes(filter = leaf, x = x*1.05, y=y*1.05, colour=group),  size=6)+
+  scale_colour_manual(values=mycolors)+
+  geom_node_text(aes(x = x*1.1, y=y*1.1, filter=leaf, 
+                     angle = -((-node_angle(x, y)+90)%%180)+90, label = Enzyme), 
+                 size=6, hjust='outward')  +
+  theme_void() +
+  theme(
+    legend.position="none",
+    plot.margin=unit(c(0,0,0,0),"cm")
+  ) +
+  expand_limits(x = c(-1.5, 1.5), y = c(-1.5, 1.5))
+
+plot(p)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=10, fig.width=10}
+
+#rumens_seqs <- c( "4309680-submission.assembly_52_resistance_genes_14", "4309680-submission.assembly_59_3")
+
+
+rumen_seq <- "4309680-submission.assembly_59_3"
+
+df <- read.delim("~/master/rumen/dataflow/02-blast/duplicate_gene_diagrams_trimmed.txt", header=FALSE)
+colnames(df) <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+
+df <- df %>%
+  select(-sseq) %>%
+  rowwise() %>%
+  mutate(remove = if_else(qseqid == sseqid, "Y", "N")) %>%
+  ungroup() %>%
+  filter(remove != "Y") %>%
+  filter(pident > 50)
+
+df_res_annotated <- read.csv("~/master/rumen/dataflow/00-meta/duplcates_resistance_prots_annotated.csv")
+
+colnames(df_res_annotated) <- c("Contig", "ORF", "Annotation", "Resistance", "Enzyme")
+
+
+df_res_annotated <- df_res_annotated %>%
+  unite(qseqid, c("Contig", "ORF"), sep = "_") %>%
+  select(-Annotation)
+
+df$rumen <- grepl(rumen_seq, df$qseqid)
+
+df_rumen <- df %>%
+  filter(rumen == TRUE)
+
+df_rumen$qseqid <- as.character(df_rumen$qseqid)
+df_rumen$sseqid <- as.character(df_rumen$sseqid)
+
+df$qseqid <- as.character(df$qseqid)
+df$sseqid <- as.character(df$sseqid)
+
+df <- df %>%
+  inner_join(df_res_annotated)
+
+df_enzyme <- df %>%
+  select(qseqid, Enzyme) %>%
+  distinct() %>%
+  rename(name = qseqid)
+
+for (i in 1:nrow(df)){
+  df[i,"qseqid_group"] <- stri_reverse(str_split_fixed(stri_reverse(df[i,"qseqid"]), "_", 2)[[2]])
+  df[i,"sseqid_group"] <- stri_reverse(str_split_fixed(stri_reverse(df[i,"sseqid"]), "_", 2)[[2]])
+}
+
+df$qseqid_group <- gsub("extraction1", "", df$qseqid_group)
+df$qseqid_group <- gsub("extraction2", "", df$qseqid_group)
+
+df$sseqid_group <- gsub("extraction1", "", df$sseqid_group)
+df$sseqid_group <- gsub("extraction2", "", df$sseqid_group)
+
+df$same_group <- df$qseqid_group == df$sseqid_group
+
+df <- df %>%
+  mutate(select = if_else(rumen == TRUE | same_group == TRUE, "Y", "N")) %>%
+  mutate(pident = if_else(select == "Y", pident, 0)) 
+
+# Libraries
+library(ggraph)
+library(igraph)
+library(RColorBrewer)
+
+df_connect <- df %>%
+  select(qseqid, sseqid, pident)
+
+colnames(df_connect) <- c("from", "to", "value")
+
+df_df1 <- df %>%
+  select(qseqid) %>%
+  distinct()
+
+df_df1$qseqid <- as.character(df_df1$qseqid)
+
+for (i in 1:nrow(df_df1)){
+  df_df1[i,"group"] <- stri_reverse(str_split_fixed(stri_reverse(df_df1[i,"qseqid"]), "_", 2)[[2]])
+}
+
+df_df1 <- df_df1 %>%
+  arrange(qseqid)
+
+df1 <- df_df1 %>%
+  select(group) %>%
+  distinct()
+
+df1$from <- "origin"
+
+colnames(df1)[1] <- "to"
+
+colnames(df_df1) <- c("to", "from")
+
+hierarchy <- rbind(df1, df_df1) %>%
+  select(from, to)
+
+connect1 <- df_connect %>%
+  filter(value != 0) %>%
+  arrange(from) %>%
+  mutate(cat = if_else(value >= 95, "high", 
+                       if_else(value <= 95 & value >=90, "high2",
+                               if_else(value <= 85 & value >= 80, "medium", 
+                                       if_else(value <= 65 & value >= 60, "low", "NA"))))) %>%
+  select(-value) %>%
+  rename(value = cat) %>%
+  filter(value == "high")
+
+
+connect2 <- df_connect %>%
+  filter(value != 0) %>%
+  arrange(from) %>%
+  mutate(cat = if_else(value >= 95, "high", 
+                       if_else(value <= 95 & value >=90, "high2",
+                               if_else(value <= 85 & value >= 80, "medium", 
+                                       if_else(value <= 65 & value >= 60, "low", "NA"))))) %>%
+  select(-value) %>%
+  rename(value = cat) %>%
+  filter(value == "high2")
+
+connect3 <- df_connect %>%
+  filter(value != 0) %>%
+  arrange(from) %>%
+  mutate(cat = if_else(value >= 95, "high", 
+                       if_else(value <= 95 & value >=90, "high2",
+                               if_else(value <= 85 & value >= 80, "medium", 
+                                       if_else(value <= 65 & value >= 60, "low", "NA"))))) %>%
+  select(-value) %>%
+  rename(value = cat) %>%
+  filter(value == "medium")
+
+connect4 <- df_connect %>%
+  filter(value != 0) %>%
+  arrange(from) %>%
+  mutate(cat = if_else(value >= 95, "high", 
+                       if_else(value <= 95 & value >=90, "high2",
+                               if_else(value <= 85 & value >= 80, "medium", 
+                                       if_else(value <= 65 & value >= 60, "low", "NA"))))) %>%
+  select(-value) %>%
+  rename(value = cat) %>%
+  filter(value == "low")
+
+# create a vertices data.frame. One line per object of our hierarchy
+vertices = data.frame(
+  name = unique(c(as.character(hierarchy$from), as.character(hierarchy$to))) , 
+  value = runif(112) 
+) 
+# Let's add a column with the group of each name. It will be useful later to color points
+vertices$group = hierarchy$from[ match( vertices$name, hierarchy$to ) ]
+
+colnames(vertices)[2] <- "value1"
+
+vertices <- vertices %>%
+  left_join(df_enzyme)
+
+
+# Create a graph object
+mygraph <- graph_from_data_frame( hierarchy, vertices=vertices )
+ 
+# The connection object must refer to the ids of the leaves:
+from1 = match( connect1$from, vertices$name)
+to1 = match( connect1$to, vertices$name)
+
+from2 = match( connect2$from, vertices$name)
+to2 = match( connect2$to, vertices$name)
+
+from3 = match( connect3$from, vertices$name)
+to3 = match( connect3$to, vertices$name)
+
+from4 = match( connect4$from, vertices$name)
+to4 = match( connect4$to, vertices$name)
+
+library(RColorBrewer)
+# Define the number of colors you want
+nb.cols <- 18
+mycolors <- colorRampPalette(brewer.pal(9, "Set1"))(nb.cols)
+#
+
+# Basic usual argument
+p=ggraph(mygraph, layout = 'dendrogram', circular = TRUE) +
+  geom_conn_bundle(data = get_con(from = from4, to = to4, value=connect4$value), width=2, edge_colour = "#74C476") +
+  geom_conn_bundle(data = get_con(from = from3, to = to3, value=connect3$value), width=2, edge_colour = "#6BAED6") +
+  geom_conn_bundle(data = get_con(from = from2, to = to2, value=connect2$value), width=2, edge_colour = "#3182BD") +
+  geom_conn_bundle(data = get_con(from = from1, to = to1, value=connect1$value), width=2, edge_colour = "#08519C") + 
+   geom_node_point(aes(filter = leaf, x = x*1.05, y=y*1.05, colour=group),  size=6)+
+  scale_colour_manual(values=mycolors)+
+  geom_node_text(aes(x = x*1.1, y=y*1.1, filter=leaf, 
+                     angle = -((-node_angle(x, y)+90)%%180)+90, label = Enzyme), 
+                 size=6, hjust='outward')  +
+  theme_void() +
+  theme(
+    legend.position="none",
+    plot.margin=unit(c(0,0,0,0),"cm")
+  ) +
+  expand_limits(x = c(-1.5, 1.5), y = c(-1.5, 1.5))
+
+plot(p)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=13, fig.width=15}
+p=ggraph(mygraph, layout = 'dendrogram', circular = TRUE) +
+  geom_conn_bundle(data = get_con(from = from4, to = to4, value=connect4$value), width=2, edge_colour = "#74C476") +
+  geom_conn_bundle(data = get_con(from = from3, to = to3, value=connect3$value), width=2, edge_colour = "#6BAED6") +
+  geom_conn_bundle(data = get_con(from = from2, to = to2, value=connect2$value), width=2, edge_colour = "#3182BD") +
+  geom_conn_bundle(data = get_con(from = from1, to = to1, value=connect1$value), width=2, edge_colour = "#08519C") + 
+   geom_node_point(aes(filter = leaf, x = x*1.05, y=y*1.05, colour=group),  size=6)+
+  scale_colour_manual(values=mycolors)+
+  geom_node_text(aes(x = x*1.1, y=y*1.1, filter=leaf, 
+                     angle = -((-node_angle(x, y)+90)%%180)+90, label = Enzyme), 
+                 size=6, hjust='outward')  +
+  theme_void() +
+  theme(
+    #legend.position="none",
+    plot.margin=unit(c(0,0,0,0),"cm")
+  ) +
+  expand_limits(x = c(-1.5, 1.5), y = c(-1.5, 1.5))
+
+plot(p)
+```

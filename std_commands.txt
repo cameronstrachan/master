@@ -2,6 +2,7 @@
 
 # Login
 
+ssh strachan@biodatascience.tulln.fhwn.ac.at
 J5uZUfVJHx
 
 # SCP
@@ -18,5 +19,3 @@ rsync -e ssh -avzP --append
 
 for f in *.fastq.gz; do mv -- "$f" "$\{f//-/x\}"; done
 
-
-2PBE_A_Chain_A
