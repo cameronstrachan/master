@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#from Bio import SearchIO
+from Bio import SearchIO
 import os,sys
 import pandas as pd
 import numpy as np
@@ -9,11 +9,11 @@ import subprocess
 from shutil import copyfile
 
 # custom libraries
-sys.path.insert(0, '/home/strachan/master/') 
+sys.path.insert(0, '/home/strachan/master/')
 from modules import seq_core_lin as sc
 
 def concat(inputfolder='path/to/input/', outputpath='path/to/output/file.txt', filenames=[]):
-	
+
 	if not os.path.exists(outputpath):
 		with open(outputpath, 'w') as outfile:
 		    for file in filenames:
@@ -26,7 +26,7 @@ def concat(inputfolder='path/to/input/', outputpath='path/to/output/file.txt', f
 
 
 def blastxmltotable(xmlinputfolder='path/to/input/', blastinputfolder= 'path/to/input/',outputpath='path/to/output/file.txt', xmlfilenames=[], blastfilename=[]):
-	
+
 	headerdictdict = {}
 
 	for file in blastfilename:
@@ -37,7 +37,6 @@ def blastxmltotable(xmlinputfolder='path/to/input/', blastinputfolder= 'path/to/
 	df = pd.DataFrame(headerdictdict, index=[0]).transpose()
 	df.columns = ['header']
 
-	df['qseq_length'] = np.nan
 	df['sseq_length'] = np.nan
 	df['sseq_accession'] = np.nan
 	df['sseq_description'] = np.nan
@@ -47,25 +46,43 @@ def blastxmltotable(xmlinputfolder='path/to/input/', blastinputfolder= 'path/to/
 	df['alignment_length'] = np.nan
 	df['percent_identity'] = np.nan
 
+	df_list = []
+
 	for file in xmlfilenames:
-	    qresult = SearchIO.read(xmlinputfolder + file, 'blast-xml')
-	    row_index = file.split('.xml')[0]
-	    df.loc[df.index == row_index, 'qseq_length'] = qresult.seq_len
-	    if len(qresult) != 0:
-	        df.loc[df.index == row_index, 'sseq_length'] = qresult[0].seq_len
-	        df.loc[df.index == row_index, 'sseq_accession'] = qresult[0].accession
-	        df.loc[df.index == row_index, 'sseq_description'] = qresult[0].description
-	        df.loc[df.index == row_index, 'bitscore'] = qresult[0][0].bitscore
-	        df.loc[df.index == row_index, 'evalue'] = qresult[0][0].evalue
-	        df.loc[df.index == row_index, 'matched_residues'] = qresult[0][0].ident_num
-	        df.loc[df.index == row_index, 'alignment_length'] = qresult[0][0].aln_span
-	        per_id = (qresult[0][0].ident_num / qresult[0].seq_len)*100
-	        df.loc[df.index == row_index, 'percent_identity'] = per_id
-	    else:
-	        pass
-	    
-	df = df.dropna()
-	df.to_csv(outputpath)
+		qresult = SearchIO.read(xmlinputfolder + file, 'blast-xml')
+		row_index = file.split('.xml')[0]
+		df.loc[df.index == row_index, 'qseq_length'] = qresult.seq_len
+
+		if len(qresult) != 0:
+
+			for j in range(len(qresult)):
+
+				df_hit = df.loc[[row_index]]
+
+				df_hit.loc[df_hit.index == row_index, 'sseq_length'] = qresult[j].seq_len
+				df_hit.loc[df_hit.index == row_index, 'sseq_accession'] = qresult[j].accession
+				df_hit.loc[df_hit.index == row_index, 'sseq_description'] = qresult[j].description
+				df_hit.loc[df_hit.index == row_index, 'bitscore'] = qresult[j][0].bitscore
+				df_hit.loc[df_hit.index == row_index, 'evalue'] = qresult[j][0].evalue
+				df_hit.loc[df_hit.index == row_index, 'matched_residues'] = qresult[j][0].ident_num
+				df_hit.loc[df_hit.index == row_index, 'alignment_length'] = qresult[j][0].aln_span
+				per_id = (qresult[j][0].ident_num / qresult[j][0].aln_span)*100
+				df_hit.loc[df_hit.index == row_index, 'percent_identity'] = per_id
+
+				df_hit['hit_num'] = j + 1
+
+				df_list.append(df_hit)
+
+				#outputpath2 = outputpath.split('.txt')[0] + '_Hit_' + str(j) + '.txt'
+				#df.to_csv(outputpath2)
+
+		else:
+			pass
+
+	df_all = pd.concat(df_list, axis = 0)
+	df_all.to_csv(outputpath)
+
+
 
 def runqiime(inputfolderloc='path/to/input', paired=True, numcores=7):
 
@@ -77,7 +94,7 @@ def runqiime(inputfolderloc='path/to/input', paired=True, numcores=7):
 	if paired == True:
 		subprocess.call(['/home/strachan/master/bash/qiime_import_paired_lin.sh', inputfolder])
 		#pass
-	else: 
+	else:
 		subprocess.call(['/home/strachan/master/bash/qiime_import_single_lin.sh', inputfolder])
 		#pass
 
@@ -85,7 +102,7 @@ def runqiime(inputfolderloc='path/to/input', paired=True, numcores=7):
 	print("https://view.qiime2.org/" + "\n")
 
 	if paired == True:
-		
+
 		lengthcutoff = input("\n" + "Forward Read, Left Cutoff? (interger):")
 
 		lengthcutoff1 = int(lengthcutoff)
@@ -130,11 +147,11 @@ def runqiime(inputfolderloc='path/to/input', paired=True, numcores=7):
 
 	subprocess.call('/home/strachan/master/bash/qiime_export_lin.sh')
 
-	table_merge = 'dataflow/02-qiime-merge/' + 'table' + '_' + foldername + '.qza' 
+	table_merge = 'dataflow/02-qiime-merge/' + 'table' + '_' + foldername + '.qza'
 	copyfile('dataflow/02-qiime/table.qza', table_merge)
 
-	seq_merge = 'dataflow/02-qiime-merge/' + 'rep-seqs' + '_' +foldername + '.qza' 
-	copyfile('dataflow/02-qiime/rep-seqs.qza', seq_merge)	
+	seq_merge = 'dataflow/02-qiime-merge/' + 'rep-seqs' + '_' +foldername + '.qza'
+	copyfile('dataflow/02-qiime/rep-seqs.qza', seq_merge)
 
 	#os.rename('dataflow/03-asv-table/taxonomy.tsv', outputprefixstaxa + '-fc-gg-full.txt')
 
