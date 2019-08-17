@@ -33,7 +33,7 @@ for dir in dirs:
 	if os.path.exists(dir_to_make) == False:
 		os.mkdir(dir_to_make)
 
-command = 'cp dataflow/01-fastq/*.qz dataflow/01-fastq/trimmed/'
+command = 'cp dataflow/01-fastq/*.qz dataflow/01-fastq/trimmed'
 os.system(command)
 
 # STEP 2. Run DADA2.
