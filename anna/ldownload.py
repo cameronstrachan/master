@@ -3,7 +3,14 @@ import subprocess
 import pandas as pd
 
 # custom libraries
-sys.path.insert(0, '/Users/cameronstrachan/master/')
+
+system = str(input('\n' + 'Local or Server (L or S):'))
+
+if system == 'S':
+    sys.path.insert(0, '/home/strachan/master/')
+else:
+    sys.path.insert(0, '/Users/cameronstrachan/master/')
+
 from modules import seq_core_lin as sc
 from modules import seq_gen_lin as sg
 from modules import seq_scrape as ss
