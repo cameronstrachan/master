@@ -1,0 +1,63 @@
+"","fasta_header","domain","domain_conf","phylum","phylum_conf","class","class_conf","order","order_conf","family","family_conf","genus","genus_conf"
+"1","Viki_Iso_10.616F_1","Bacteria",1,"Firmicutes",1,"Negativicutes",1,"Selenomonadales",1,"Acidaminococcaceae",1,"Acidaminococcus",1
+"2","Viki_Iso_11.616F_2","Bacteria",1,"Actinobacteria",1,"Actinobacteria",1,"Bifidobacteriales",0.99,"Bifidobacteriaceae",0.99,NA,0.49
+"3","Viki_Iso_12.616F_3","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Lactobacillales",0.99,NA,0.78,NA,0.77
+"4","Viki_Iso_18.616F_4","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Lactobacillales",1,"Streptococcaceae",1,"Streptococcus",1
+"5","Viki_Iso_21.616F_5","Bacteria",1,"Actinobacteria",1,"Actinobacteria",1,"Actinomycetales",1,"Actinomycetaceae",0.81,NA,0.5
+"6","Viki_Iso_22.616F_6","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Lactobacillales",1,"Streptococcaceae",1,"Streptococcus",1
+"7","Viki_Iso_23.616F_7","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Lactobacillales",1,"Lactobacillaceae",1,"Lactobacillus",1
+"8","Viki_Iso_25.616F_8","Bacteria",1,"Proteobacteria",1,"Gammaproteobacteria",1,"Pseudomonadales",1,"Moraxellaceae",1,"Acinetobacter",1
+"9","Viki_Iso_27.616F_9","Bacteria",1,"Proteobacteria",1,"Gammaproteobacteria",1,"Pseudomonadales",1,"Moraxellaceae",1,"Acinetobacter",1
+"10","Viki_Iso_3.616F_10","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Lactobacillales",1,"Streptococcaceae",1,"Streptococcus",1
+"11","Viki_Iso_32.616F_11","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Bacillales",1,"Bacillaceae 1",1,"Bacillus",1
+"12","Viki_Iso_5.616F_12","Bacteria",1,"Actinobacteria",1,"Actinobacteria",1,"Actinomycetales",1,"Actinomycetaceae",1,"Actinomyces",1
+"13","Viki_Iso_7.616F_13","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Lactobacillales",1,"Streptococcaceae",1,"Streptococcus",1
+"14","Viki_Iso_19.616F_14","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Lactobacillales",1,"Streptococcaceae",1,"Streptococcus",1
+"15","Viki_Iso_24.616F_15","Bacteria",1,"Proteobacteria",1,"Gammaproteobacteria",1,"Pseudomonadales",1,"Moraxellaceae",1,"Acinetobacter",1
+"16","Viki_Iso_26.616F_16","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Lactobacillales",1,"Streptococcaceae",1,"Streptococcus",1
+"17","Viki_Iso_29.616F_17","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Bacillales",1,"Bacillaceae 1",1,"Bacillus",1
+"18","Viki_Iso_30.616F_18","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Lactobacillales",1,"Streptococcaceae",1,"Streptococcus",1
+"19","Viki_Iso_31.616F_19","Bacteria",1,"Proteobacteria",1,"Gammaproteobacteria",1,"Enterobacteriales",1,"Enterobacteriaceae",1,"Proteus",1
+"20","Viki_Iso_1.616F_20","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Bacillales",1,"Staphylococcaceae",1,"Staphylococcus",1
+"21","Viki_Iso_13.616F_21","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Lactobacillales",1,"Streptococcaceae",1,"Streptococcus",1
+"22","Viki_Iso_15.616F_22","Bacteria",1,"Actinobacteria",1,"Actinobacteria",1,"Actinomycetales",1,"Microbacteriaceae",1,"Pseudoclavibacter",1
+"23","Viki_Iso_16.616F_23","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Lactobacillales",1,"Streptococcaceae",1,"Streptococcus",1
+"24","Viki_Iso_17.616F_24","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Lactobacillales",1,"Streptococcaceae",1,"Streptococcus",1
+"25","Viki_Iso_2.616F_25","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Lactobacillales",1,"Streptococcaceae",1,"Streptococcus",1
+"26","Viki_Iso_4.616F_26","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Lactobacillales",1,"Streptococcaceae",1,"Streptococcus",1
+"27","Viki_Iso_6.616F_27","Bacteria",1,"Actinobacteria",1,"Actinobacteria",1,"Actinomycetales",1,"Actinomycetaceae",1,"Actinomyces",1
+"28","Viki_Iso_8.616F_28","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Lactobacillales",1,"Streptococcaceae",1,"Streptococcus",1
+"29","Viki_Iso_9.616F_29","Bacteria",1,"Actinobacteria",1,"Actinobacteria",1,"Actinomycetales",1,"Corynebacteriaceae",1,"Corynebacterium",1
+"30","i21_1wh_27F_30","Bacteria",1,"Actinobacteria",1,"Actinobacteria",1,"Actinomycetales",0.99,NA,0.77,NA,0.44
+"31","i21_2wh_27F_31","Bacteria",1,"Actinobacteria",1,"Actinobacteria",1,"Actinomycetales",0.99,NA,0.74,NA,0.46
+"32","i21_1_1492R_32","Bacteria",1,"Actinobacteria",1,"Actinobacteria",1,"Actinomycetales",1,NA,0.48,NA,0.28
+"33","i21_1_27F_33","Bacteria",1,"Actinobacteria",1,"Actinobacteria",1,"Actinomycetales",1,"Actinomycetaceae",0.8,NA,0.49
+"34","Cam_31072019_Iso_10_27F_34","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Lactobacillales",1,"Streptococcaceae",1,"Streptococcus",1
+"35","Cam_31072019_Iso_1_27F_35","Bacteria",1,"Firmicutes",1,"Clostridia",1,"Clostridiales",1,"Lachnospiraceae",1,"Pseudobutyrivibrio",1
+"36","Cam_31072019_Iso_9_27F_36","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Lactobacillales",1,"Streptococcaceae",1,"Streptococcus",1
+"37","Cam_31072019_Iso_7_27F_37","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Lactobacillales",1,"Streptococcaceae",1,"Streptococcus",1
+"38","Cam_31072019_Iso_5_27F_38","Bacteria",1,"Firmicutes",1,"Clostridia",1,"Clostridiales",1,"Lachnospiraceae",1,NA,0.32
+"39","i21_2_1492_39","Bacteria",1,"Actinobacteria",1,"Actinobacteria",1,"Actinomycetales",1,NA,0.4,NA,0.4
+"40","Cam_31072019_Iso_2_27F_40","Bacteria",1,"Firmicutes",1,"Negativicutes",1,"Selenomonadales",1,"Veillonellaceae",1,"Selenomonas",0.95
+"41","Cam_31072019_Iso_6_27F_41","Bacteria",1,"Firmicutes",1,"Clostridia",1,"Clostridiales",1,"Lachnospiraceae",1,"Pseudobutyrivibrio",0.98
+"42","Cam_31072019_Iso_3_27F_42","Bacteria",1,"Firmicutes",1,"Negativicutes",1,"Selenomonadales",1,"Veillonellaceae",1,"Selenomonas",1
+"43","Cam_31072019_Iso_8_27F_43","Bacteria",1,"Firmicutes",1,"Negativicutes",1,"Selenomonadales",1,"Veillonellaceae",1,NA,0.71
+"44","Cam_31072019_Iso_4_27F_44","Bacteria",1,"Firmicutes",1,"Clostridia",1,"Clostridiales",1,"Lachnospiraceae",1,NA,0.32
+"45","i21_2_27F_45","Bacteria",1,"Actinobacteria",1,"Actinobacteria",1,"Actinomycetales",1,NA,0.78,NA,0.6
+"46","8_R-0_MM.ITS1_46","Bacteria",0.87,NA,0.28,NA,0.17,NA,0.17,NA,0.17,NA,0.03
+"47","14_E-1_MM.ITS1_47","Bacteria",0.93,NA,0.28,NA,0.16,NA,0.06,NA,0.05,NA,0.05
+"48","16_E-0_MM.ITS1_48","Bacteria",0.9,NA,0.35,NA,0.24,NA,0.24,NA,0.24,NA,0.04
+"49","17_E-0_MM.ITS1_49","Bacteria",0.83,NA,0.25,NA,0.16,NA,0.16,NA,0.16,NA,0.03
+"50","25_E-0_MM.ITS1_50","Bacteria",0.88,NA,0.33,NA,0.17,NA,0.06,NA,0.06,NA,0.06
+"51","1_T47_YPD_16S.1492R_51","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Bacillales",1,NA,0.72,NA,0.66
+"52","2_T47_YPD_16S.1492R_52","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Bacillales",1,"Bacillaceae 1",1,"Bacillus",1
+"53","3_T47_YPD_16S.1492R_53","Bacteria",1,"Actinobacteria",1,"Actinobacteria",1,"Actinomycetales",1,"Corynebacteriaceae",1,"Corynebacterium",1
+"54","4_T47_YPD_16S.1492R_54","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Bacillales",1,"Bacillaceae 1",1,"Bacillus",1
+"55","11_R-2_YPD_16S.1492R_55","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Lactobacillales",1,"Streptococcaceae",1,"Streptococcus",1
+"56","15_E-0_MM_16S.1492R_56","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Bacillales",1,"Staphylococcaceae",1,"Staphylococcus",1
+"57","18_E-2_YPD_16S.1492R_57","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Lactobacillales",1,"Enterococcaceae",1,"Enterococcus",1
+"58","19_E-2_YPD_16S.1492R_58","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Lactobacillales",1,"Streptococcaceae",1,"Streptococcus",1
+"59","20_E-2_YPD_16S.1492R_59","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Bacillales",1,"Planococcaceae",1,"Kurthia",1
+"60","21_E-2_YPD_16S.1492R_60","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Bacillales",1,"Bacillaceae 1",1,"Bacillus",1
+"61","22_E-2_YPD_16S.1492R_61","Bacteria",1,"Firmicutes",1,"Bacilli",1,"Lactobacillales",1,"Streptococcaceae",1,"Streptococcus",1
+"62","23_E-2_YPD_16S.1492R_62","Bacteria",1,"Proteobacteria",1,"Gammaproteobacteria",1,"Enterobacteriales",1,"Enterobacteriaceae",1,"Proteus",1
