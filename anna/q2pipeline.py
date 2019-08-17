@@ -33,28 +33,10 @@ for dir in dirs:
 	if os.path.exists(dir_to_make) == False:
 		os.mkdir(dir_to_make)
 
-# STEP 2. Trim the forward primer.
+command = 'cp dataflow/01-fastq/*.qz dataflow/01-fastq/trimmed/'
+os.system(command)
 
-print('\n' + CRED + 'PRIMER TRIMMING' + CEND)
-
-forward = input('\n' + 'Forward primer sequence:')
-
-forward_in = ' -g ' + str(forward) + ' '
-
-dirin = 'dataflow/01-fastq/'
-dirout = 'dataflow/01-fastq/trimmed/'
-
-files = [f for f in os.listdir(dirin) if f.endswith('.fastq.gz')]
-
-for file in files:
-
-	type = file.split('_')[3]
-	input_f = dirin + file
-	output_f = dirout + file
-	command = 'cutadapt  -f "fastq"  -o ' + output_f + forward_in + input_f + ' >> dataflow/00-logs/forward_primer_trimming_stats.txt'
-	os.system(command)
-
-# STEP 3. Run DADA2.
+# STEP 2. Run DADA2.
 
 print('\n' + CRED + 'DATA IMPORT' + CEND + '\n')
 
@@ -77,7 +59,7 @@ os.system(command)
 
 data_params = {'Left Cutoff':left,'Length Cutoff':trunc}
 
-# STEP 4. Cluster sequences at 99% identity.
+# STEP 3. Cluster sequences at 99% identity.
 
 print('\n' + CRED + '99% CLUSTERING' + CEND + '\n')
 
