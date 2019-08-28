@@ -31,3 +31,12 @@ file_obj = sc.Fasta('nitrospinae_genomes.fasta', 'dataflow/01-prot/')
 file_obj.setOutputName('nitrospinae_genomes_above80.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
 file_obj.subsetfasta(seqlist = genes, headertag='above80')
+
+genes_df = pd.read_csv('dataflow/04-analysis-tables/selected_genomes_rbh.csv', low_memory=False)
+genes_df_above70 = genes_df.loc[(genes_df['mean_pi'] >= 90)]
+genes = genes_df_above70['qseqid'].tolist()
+
+file_obj = sc.Fasta('nitrospinae_genomes.fasta', 'dataflow/01-prot/')
+file_obj.setOutputName('nitrospinae_genomes_above90.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.subsetfasta(seqlist = genes, headertag='above90')
