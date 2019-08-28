@@ -24,5 +24,3 @@ df_genes <- read.csv("~/master/anna/extracted_regions_genes.csv")
 df_final <- df_genes %>%
   select(-X) %>%
   left_join(df_annotations)
-
-write.csv(df_final, "~/master/anna/annotated_regions.csv")
