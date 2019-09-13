@@ -17,8 +17,8 @@ library(ggthemes)
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-files <- list.files('~/master/anna/dataflow/02-blast/')
-blastdir <- '~/master/anna/dataflow/02-blast/'
+files <- list.files('~/master/anna/dataflow/02-blast/allvall/')
+blastdir <- '~/master/anna/dataflow/02-blast/allvall/'
 
 dflist <- list()
 
@@ -90,6 +90,10 @@ df_plot_stinki <- df_plot %>%
 df_plot_noah <- df_plot %>%
   filter(genome1 == "noahi") %>%
   arrange(gene1)
+
+df_plot_gracillis <- df_plot %>%
+  filter(genome1 == "gracillis") %>%
+  arrange(gene1)
 ```
 
 
@@ -147,6 +151,34 @@ plot_stinki <- ggplot(df_plot_stinki, aes(x=gene1)) +
   #scale_x_discrete("Ordered genes",  breaks = xbreaks)
 
 plot_stinki
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=20, fig.height=5}
+plot_gracillis <- ggplot(df_plot_gracillis, aes(x=gene1)) +
+  
+  theme_few() +
+  
+  geom_point(aes(y = mean_pi, colour = genome2), stat = "identity", size = 2) +
+  
+  theme(plot.title = element_text(size = 25), 
+        axis.text.x = element_text(angle = 90, hjust = 1, size = 12),  
+        axis.text.y = element_text(size = 20), 
+        axis.title.x = element_text(size = 20), 
+        axis.title.y = element_text(size = 20)) + 
+  
+  ylab("Percent identity (%)") + 
+  
+  xlab("Gene number") + 
+  
+  ylim(25,100) +
+  
+  #theme(legend.position="none") +
+  
+  theme(legend.text=element_text(size=20)) + 
+  theme(legend.title=element_text(size=20)) #+
+  #scale_x_discrete("Ordered genes",  breaks = xbreaks)
+
+plot_gracillis
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
