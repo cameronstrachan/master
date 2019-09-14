@@ -1,0 +1,13 @@
+#                                                               --- full sequence ---- --- best 1 domain ---- --- domain number estimation ----
+# target name        accession  query name           accession    E-value  score  bias   E-value  score  bias   exp reg clu  ov env dom rep inc description of target
+#------------------- ---------- -------------------- ---------- --------- ------ ----- --------- ------ -----   --- --- --- --- --- --- --- --- ---------------------
+#
+# Program:         hmmscan
+# Version:         3.2.1 (June 2018)
+# Pipeline mode:   SCAN
+# Query file:      Nitrospina_noahi_hybrid_protein.faa
+# Target file:     COX3.hmm
+# Option settings: hmmscan --tblout cox3_noahi.txt --cpu 60 COX3.hmm Nitrospina_noahi_hybrid_protein.faa 
+# Current dir:     /home/strachan/master/anna/hmm
+# Date:            Thu Aug 29 20:30:34 2019
+# [ok]

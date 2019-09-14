@@ -1,0 +1,14 @@
+#                                                               --- full sequence ---- --- best 1 domain ---- --- domain number estimation ----
+# target name        accession  query name           accession    E-value  score  bias   E-value  score  bias   exp reg clu  ov env dom rep inc description of target
+#------------------- ---------- -------------------- ---------- --------- ------ ----- --------- ------ -----   --- --- --- --- --- --- --- --- ---------------------
+COX1                 PF00115.20 CCQ90255.1           -            1.2e-72  231.2  61.8   1.9e-72  230.4  61.8   1.3   1   0   0   1   1   1   1 Cytochrome C and Quinol oxidase polypeptide I
+#
+# Program:         hmmscan
+# Version:         3.2.1 (June 2018)
+# Pipeline mode:   SCAN
+# Query file:      GCA_000341545.2_ASM34154v2_protein.faa
+# Target file:     COX1.hmm
+# Option settings: hmmscan --tblout cox1_gracillis.txt --cpu 60 COX1.hmm GCA_000341545.2_ASM34154v2_protein.faa 
+# Current dir:     /home/strachan/master/anna/hmm
+# Date:            Thu Aug 29 20:31:05 2019
+# [ok]
