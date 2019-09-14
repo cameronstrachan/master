@@ -166,7 +166,7 @@ class Fasta(File):
 
         return self.headers
 
-    def saveonelinefasta(self):
+    def saveonelinefasta(self, header='number'):
 
         '''
         Calling this function will simply save a new fasta file where all the sequences
@@ -181,8 +181,12 @@ class Fasta(File):
             for k,v in fastadic.items():
                 header = k.replace(':', '')
                 seq = v.rstrip()
-                outputfile.write(">" + header + '_' + str(j) + '\n')
-                outputfile.write(v + '\n')
+                if header == 'number':
+                    outputfile.write(">" + header + '_' + str(j) + '\n')
+                    outputfile.write(v + '\n')
+                else:
+                    outputfile.write(">" + header + '\n')
+                    outputfile.write(v + '\n')
                 j = j + 1
         else:
             print("\n" + 'File exists: ' + self.outputlocation + self.outputname)

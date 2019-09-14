@@ -57,3 +57,25 @@ file_obj.setOutputLocation(blastdir)
 outputfilename = 'strains_to_wetzels.txt'
 file_obj.setOutputName(outputfilename)
 file_obj.runblast(blast='blastn', db=blastdb, dblocation=blastdbdir, max_target_seqs=20, evalue=1e-3, num_threads = 6, max_hsps = 20)
+
+# peffi, goat
+
+blastdbdir = '02-blast-db/'
+blastdir = '02-blast/'
+file = 'wetzels_et_al_goat.fasta'
+
+file_obj = sc.Fasta(file, '01-nucl/')
+file_obj.setOutputName(file)
+file_obj.setOutputLocation(blastdbdir)
+file_obj.runmakeblastdb(dbtype='nucl')
+
+blastdb = file
+
+file = 'sanger_strain_library_oneLine.fasta'
+
+file_obj = sc.Fasta(file, '01-nucl/')
+file_obj.setOutputLocation(blastdir)
+
+outputfilename = 'strains_to_wetzels_goat.txt'
+file_obj.setOutputName(outputfilename)
+file_obj.runblast(blast='blastn', db=blastdb, dblocation=blastdbdir, max_target_seqs=20, evalue=1e-3, num_threads = 6, max_hsps = 20)

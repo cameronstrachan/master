@@ -1,13 +1,20 @@
 ---
-title: "Untitled"
+title: "Novel betaproteobacteria abundance"
 author: "Cameron Strachan"
 date: '2019-08-27'
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
-Summarize the cow epithelial data from Vicki
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+library(tidyverse)
+```
 
-```{r, warning=FALSE, message=FALSE}
+
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+#Summarize the cow epithelial data from Vicki
 df_blast <- read.delim("~/master/strain_collection/02-blast/strains_to_neubauer.txt", header=FALSE)
 colnames(df_blast)[1:13] <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
 
@@ -42,9 +49,10 @@ df_final_neubauer <- df_count %>%
 df_final_neubauer$Study <- "Neubauer"
 ```
 
-Summarize the cow epithelial data from Peffi, and standardize the column names so that I can combine the data
 
-```{r, warning=FALSE, message=FALSE}
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+# Summarize the cow epithelial data from Peffi, and standardize the column names so that I can combine the data
 df_blast <- read.delim("~/master/strain_collection/02-blast/strains_to_wetzels.txt", header=FALSE)
 colnames(df_blast)[1:13] <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
 
@@ -92,9 +100,10 @@ df_final_wetzels$Phase <- gsub("S5", "Baseline_return", df_final_wetzels$Phase)
 df_final_wetzels$Study <- "Wetzels"
 ```
 
-Combine the 2 datasets and select the betaproteobacteria
 
-```{r, warning=FALSE, message=FALSE}
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+#Combine the 2 datasets and select the betaproteobacteria
 df_beta <- bind_rows(df_final_neubauer, df_final_wetzels) %>%
   filter(order == "Neisseriales") %>%
   select(-order, -family, -genus) %>%
@@ -111,7 +120,7 @@ df_beta <- bind_rows(df_final_neubauer, df_final_wetzels) %>%
 
 ```
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
 plot <- ggplot(df_beta, aes(x=Phase_simple, y=mean_cow_percent, group=CowName)) + 
   geom_point(aes(colour=CowName)) + 
   facet_wrap(sseqid~Study, scales = "free_y") +

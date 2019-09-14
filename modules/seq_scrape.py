@@ -43,7 +43,7 @@ def ncbigenomescrape(searchterm, searchterm2='complete genome[title]', location=
 
 def srafastqdownlaod(accession, outputdir='dataflow/01-fastq'):
 
-	command = '../bin/fastq-dump.2.9.4 ' + '--outdir ' + outputdir + ' --gzip --skip-technical  --readids --read-filter pass --dumpbase --split-3 --clip  ' + accession
+	command = '../bin/fastq-dump.2.9.2 ' + '--outdir ' + outputdir + ' --gzip --skip-technical  --readids --read-filter pass --dumpbase --split-3 --clip  ' + accession
 	process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
 	output, error = process.communicate()
 
