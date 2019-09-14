@@ -19,3 +19,6 @@ rsync -e ssh -avzP --append
 
 for f in *.fastq.gz; do mv -- "$f" "$\{f//-/x\}"; done
 
+find . -name '*.fastq' -exec bash -c ' mv $0 ${0/\_pass/_1_L001_R1_001}' {} \;
+
+

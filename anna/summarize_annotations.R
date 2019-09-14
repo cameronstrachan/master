@@ -1,7 +1,7 @@
 library(tidyverse)
 library(string)
 
-df_annotations <- read.csv("~/master/anna/dataflow/03-tables/compiled_nr_blast.txt")
+df_annotations <- read.csv("~/master/anna/dataflow/03-tables/nitrospinae_genomes_above80.txt")
 
 df_annotations <- df_annotations %>% 
   select(X, sseq_description, percent_identity, hit_num) %>%
@@ -18,6 +18,9 @@ df_annotations <- df_annotations %>%
 
 df_annotations$annotations <- gsub('c\\(', '', df_annotations$annotations)
 df_annotations$annotations <- gsub('\\)', '', df_annotations$annotations)
+df_annotations$annotations <- gsub('\\"', '', df_annotations$annotations)
+
+write.csv(df_annotations, "~/master/anna/dataflow/03-tables/nitrospinae_genomes_above80.csv")
 
 df_genes <- read.csv("~/master/anna/extracted_regions_genes.csv")
 
