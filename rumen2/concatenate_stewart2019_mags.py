@@ -15,7 +15,7 @@ from modules import seq_core_lin as sc
 from modules import seq_gen_lin as sg
 
 df = pd.read_csv('dataflow/00-meta/stewart2019_ftp_meta.csv', low_memory=False)
-df_mags = df_mags[df_mags['scientific_name'] == 'MAG']
+df_mags = df[df['scientific_name'] == 'MAG']
 files = df_mags['file'].tolist()
 
 for file in files:
