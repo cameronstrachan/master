@@ -19,10 +19,10 @@ df_mags = df[df['scientific_name'] == 'MAG']
 files = df_mags['file'].tolist()
 
 for file in files:
-    command = 'mv ' + file + ' mags/' + file
+    command = 'mv dataflow/01-nucl/' + file + ' dataflow/01-nucl/mags/' + file
     os.system(command)
 
-os.system('gunzip *.gz')
+os.system('dataflow/01-nucl/mags/gunzip *.gz')
 
 files = df_mags['file_unzip'].tolist()
 
