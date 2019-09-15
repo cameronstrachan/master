@@ -20,10 +20,11 @@ files = df_mags['file'].tolist()
 
 for file in files:
     command = 'mv dataflow/01-nucl/' + file + ' dataflow/01-nucl/mags/' + file
-    os.system(command)
+    print(command)
+    #os.system(command)
 
-os.system('gunzip dataflow/01-nucl/mags/*.gz')
+#os.system('gunzip dataflow/01-nucl/mags/*.gz')
 
-files = df_mags['file_unzip'].tolist()
+#files = df_mags['file_unzip'].tolist()
 
-sg.concat(inputfolder='dataflow/01-nucl/mags/', outputpath='dataflow/01-nucl/stewart2019_mags.fasta', filenames=files)
+#sg.concat(inputfolder='dataflow/01-nucl/mags/', outputpath='dataflow/01-nucl/stewart2019_mags.fasta', filenames=files)
