@@ -22,7 +22,7 @@ for file in files:
     command = 'mv dataflow/01-nucl/' + file + ' dataflow/01-nucl/mags/' + file
     os.system(command)
 
-os.system('dataflow/01-nucl/mags/gunzip *.gz')
+os.system('gunzip dataflow/01-nucl/mags/*.gz')
 
 files = df_mags['file_unzip'].tolist()
 
