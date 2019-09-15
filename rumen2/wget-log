@@ -1,9 +1,0 @@
---2019-09-14 09:57:59--  http://ftp.sra.ebi.ac.uk/vol1/ERZ102/ERZ1024279/10676_0031_idba.fa.gz
-Resolving ftp.sra.ebi.ac.uk... 193.62.192.7
-Connecting to ftp.sra.ebi.ac.uk|193.62.192.7|:80... connected.
-HTTP request sent, awaiting response... 200 OK
-Length: 110727326 (106M) [application/octet-stream]
-/dataflow/01-nucl: No such file or directory
-/dataflow/01-nucl/10676_0031_idba.fa.gz: No such file or directory
-
-Cannot write to '/dataflow/01-nucl/10676_0031_idba.fa.gz' (No such file or directory).
