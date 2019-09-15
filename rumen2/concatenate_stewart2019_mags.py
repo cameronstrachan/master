@@ -1,3 +1,8 @@
+# python libraries
+import os, sys
+import subprocess
+import pandas as pd
+
 # custom libraries
 system = str(input('\n' + 'Local or Server (L or S):'))
 
