@@ -32,7 +32,7 @@ for file in files:
     outname = file.split('.fa')[0] + '_rename.fasta'
     files_rename.append(outname)
     file_obj.setOutputName(outname)
-    file_obj.setOutputLocation('01-nucl/mags/')
+    file_obj.setOutputLocation('dataflow/01-nucl/mags/')
     file_obj.headerrename()
 
 sg.concat(inputfolder='dataflow/01-nucl/mags/', outputpath='dataflow/01-nucl/stewart2019_mags.fasta', filenames=files_rename)
