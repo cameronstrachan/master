@@ -36,3 +36,13 @@ for file in files:
     #file_obj.headerrename()
 
 sg.concat(inputfolder='dataflow/01-nucl/mags/', outputpath='dataflow/01-nucl/stewart2019_mags.fasta', filenames=files_rename)
+
+file_obj = sc.Fasta('stewart2019_mags.fasta', 'dataflow/01-nucl/')
+file_obj.setOutputName('stewart2019_mags_genes.fasta')
+file_obj.setOutputLocation('dataflow/01-nucl/')
+file_obj.runprodigal(type='nucl')
+
+file_obj = sc.Fasta('stewart2019_mags.fasta', 'dataflow/01-nucl/')
+file_obj.setOutputName('stewart2019_mags_prot.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.runprodigal()
