@@ -16,13 +16,13 @@ from modules import seq_gen_lin as sg
 
 df = pd.read_csv('dataflow/00-meta/stewart2019_ftp_meta.csv', low_memory=False)
 df_mags = df[df['type'] == 'MAG']
-files = df_mags['file'].tolist()
+#files = df_mags['file'].tolist()
 
-for file in files:
-    command = 'mv dataflow/01-nucl/' + file + ' dataflow/01-nucl/mags/' + file
-    os.system(command)
+#for file in files:
+#    command = 'mv dataflow/01-nucl/' + file + ' dataflow/01-nucl/mags/' + file
+#    os.system(command)
 
-os.system('gunzip dataflow/01-nucl/mags/*.gz')
+#os.system('gunzip dataflow/01-nucl/mags/*.gz')
 
 files = df_mags['file_unzip'].tolist()
 
