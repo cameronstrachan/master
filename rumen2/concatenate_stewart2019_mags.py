@@ -25,5 +25,14 @@ df_mags = df[df['type'] == 'MAG']
 #os.system('gunzip dataflow/01-nucl/mags/*.gz')
 
 files = df_mags['file_unzip'].tolist()
+files_rename = []
 
-sg.concat(inputfolder='dataflow/01-nucl/mags/', outputpath='dataflow/01-nucl/stewart2019_mags.fasta', filenames=files)
+for file in files:
+    file_obj = sc.Fasta(file, 'dataflow/01-nucl/mags/')
+    outname = file.split('.fa')[0] + '_rename.fasta'
+    files_rename.append(outname)
+    file_obj.setOutputName(outname)
+    file_obj.setOutputLocation('01-nucl/mags/')
+    file_obj.headerrename()
+
+sg.concat(inputfolder='dataflow/01-nucl/mags/', outputpath='dataflow/01-nucl/stewart2019_mags.fasta', filenames=files_rename)
