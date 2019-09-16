@@ -3,9 +3,7 @@ import os, sys
 import subprocess
 import pandas as pd
 
-from Bio import Entrez, SeqIO
 
-Entrez.email = 'strachc@gmail.com'
 
 # custom libraries
 system = str(input('\n' + 'Local or Server (L or S):'))
@@ -32,6 +30,8 @@ def get_assemblies(term, download=True, path='assemblies'):
         download: whether to download the results
         path: folder to save to
     """
+    from Bio import Entrez, SeqIO
+    Entrez.email = 'strachc@gmail.com'
 
     handle = Entrez.esearch(db="assembly", term=term, retmax='10')
     record = Entrez.read(handle)
@@ -39,10 +39,12 @@ def get_assemblies(term, download=True, path='assemblies'):
     print (f'found {len(ids)} ids')
     links = []
     for id in ids:
+        print(id)
         #get summary
         summary = get_assembly_summary(id)
         #get ftp link
         url = summary['DocumentSummarySet']['DocumentSummary'][0]['FtpPath_RefSeq']
+        print(url)
         if url == '':
             continue
         label = os.path.basename(url)
