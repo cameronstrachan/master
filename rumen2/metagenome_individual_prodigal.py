@@ -26,7 +26,7 @@ for file in files:
 
 for file in files:
     file_obj = sc.Fasta(file, 'dataflow/01-nucl/metagenomes/')
-    file_outname = file.split('.fa') + '_genes.fasta'
+    file_outname = file.split('.fa')[0] + '_genes.fasta'
     file_obj.setOutputName(file_outname)
     file_obj.setOutputLocation('dataflow/01-nucl/metagenomes/')
     file_obj.runprodigal(type='nucl')
