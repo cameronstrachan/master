@@ -21,6 +21,7 @@ files = df_meta['file_unzip'].tolist()
 files_rename = []
 
 for file in files:
+    outname = file.split('.fa')[0] + '_rename.fasta'
     files_rename.append(outname)
 
 for file in files:
