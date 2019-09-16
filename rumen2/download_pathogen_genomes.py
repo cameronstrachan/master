@@ -33,7 +33,7 @@ def get_assemblies(term, download=True, path='assemblies'):
         path: folder to save to
     """
 
-    handle = Entrez.esearch(db="assembly", term=term, retmax='200')
+    handle = Entrez.esearch(db="assembly", term=term, retmax='10')
     record = Entrez.read(handle)
     ids = record['IdList']
     print (f'found {len(ids)} ids')
@@ -55,6 +55,6 @@ def get_assemblies(term, download=True, path='assemblies'):
             urllib.request.urlretrieve(link, f'{label}.fna.gz')
     return links
 
-links = get_assemblies("Listeria monocytogenes", download=False)
+links = get_assemblies('"Pseudomonas aeruginosa"[Organism]', download=False)
 
 print(links)
