@@ -44,6 +44,9 @@ def get_assemblies(term, download=True, path='assemblies'):
         summary = get_assembly_summary(id)
         #get ftp link
         url = summary['DocumentSummarySet']['DocumentSummary'][0]['FtpPath_RefSeq']
+
+        print(summary)
+
         print(url)
         if url == '':
             print('nothing')
