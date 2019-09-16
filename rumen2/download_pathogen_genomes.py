@@ -46,6 +46,7 @@ def get_assemblies(term, download=True, path='assemblies'):
         url = summary['DocumentSummarySet']['DocumentSummary'][0]['FtpPath_RefSeq']
         print(url)
         if url == '':
+            print('nothing')
             continue
         label = os.path.basename(url)
         #get the fasta link - change this to get other formats
