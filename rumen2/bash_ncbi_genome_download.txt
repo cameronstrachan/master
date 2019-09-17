@@ -1,0 +1,28 @@
+esearch -db assembly -query 'listeria monocytogenes' \
+    | esummary \
+    | xtract -pattern DocumentSummary -element FtpPath_GenBank \
+    | while read -r line ;
+    do
+        fname=$(echo $line | grep -o 'GCA_.*' | sed 's/$/_genomic.fna.gz/') ;
+        wget "$line/$fname" ;
+    done
+
+
+esearch -db assembly -query 'staphylococcus aureus' \
+    | esummary \
+    | xtract -pattern DocumentSummary -element FtpPath_GenBank \
+    | while read -r line ;
+    do
+        fname=$(echo $line | grep -o 'GCA_.*' | sed 's/$/_genomic.fna.gz/') ;
+        wget "$line/$fname" ;
+    done
+
+esearch -db assembly -query 'campylobacter coli' \
+    | esummary \
+    | xtract -pattern DocumentSummary -element FtpPath_GenBank \
+    | while read -r line ;
+    do
+        fname=$(echo $line | grep -o 'GCA_.*' | sed 's/$/_genomic.fna.gz/') ;
+        wget "$line/$fname" ;
+    done
+    
