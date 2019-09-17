@@ -1,0 +1,5 @@
+#
+# Alias file created: Sep 17, 2019  12:30 PM
+#
+TITLE dataflow/01-nucl/campylobacter_coli.fasta
+DBLIST campylobacter_coli.fasta.00 campylobacter_coli.fasta.01
