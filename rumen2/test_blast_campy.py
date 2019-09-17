@@ -19,6 +19,11 @@ blastout = 'dataflow_test/02-blast-out/'
 blastin = 'dataflow_test/01-nucl/'
 
 file_obj = sc.Fasta('metagenome_genes.fasta', blastin)
+file_obj.setOutputName('metagenome_genes_300.fasta')
+file_obj.setOutputLocation(blastin)
+file_obj.lengthcutoff(replaceheaders = False, length = 300, direction = 'above')
+
+file_obj = sc.Fasta('metagenome_genes_300.fasta', blastin)
 file_obj.setOutputName('metagenome_genes_campylobacter_coli.txt')
 file_obj.setOutputLocation(blastout)
-file_obj.runblast(blast='blastn', db='campylobacter_coli.fasta', dblocation=blastdb, max_target_seqs=5000, evalue=1e-3, num_threads = 60, max_hsps = 1)
+file_obj.runblast(blast='blastn', db='campylobacter_coli.fasta', dblocation=blastdb, max_target_seqs=5000, evalue=1e-100, num_threads = 60, max_hsps = 1)
