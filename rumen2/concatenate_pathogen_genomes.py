@@ -21,6 +21,6 @@ for dir in dirs:
     path_dir = head_dir + dir + '/'
     unzip_command = 'gunzip ' + path_dir + '*.gz'
     os.system(unzip_command)
-    lis = [f for f in os.listdir(path_dir) if f.endswith(".fa")]
+    lis = [f for f in os.listdir(path_dir) if f.endswith(".fna")]
     output_file = head_dir + dir + '.fasta'
     sg.concat(inputfolder=path_dir, outputpath=output_file, filenames=lis)
