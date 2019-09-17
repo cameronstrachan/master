@@ -55,6 +55,7 @@ Thumbs.db
 *.xml
 *.png
 *.Rhistory
+*.txt
 
 # Folders #
 ###########
