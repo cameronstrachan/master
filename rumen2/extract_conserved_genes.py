@@ -35,6 +35,7 @@ for db_file in dbs:
     file_obj.setOutputLocation(blastout)
     #file_obj.runblast(blast='blastn', db=db_file, dblocation=blastdb, max_target_seqs=5000, evalue=1e-100, num_threads = 60, max_hsps = 1)
     output_files_blast.append(outname)
+    print(output_files_blast)
 
 # step 3 - summarize frequency of hits
 command = 'Rscript summarize_hit_frequency.R '
