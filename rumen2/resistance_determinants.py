@@ -24,4 +24,4 @@ db_file = "card_db.fasta"
 
 file_obj.setOutputName(outputfilename)
 
-file_obj.runblast(blast='blastp', db=db_file, dblocation=blastdb, max_target_seqs=1, evalue=1e-3, num_threads = 60)
+file_obj.runblast(blast='blastp', db=db_file, dblocation=blastdb, max_target_seqs=10, evalue=1e-3, num_threads = 60)
