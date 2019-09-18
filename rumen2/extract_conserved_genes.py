@@ -14,13 +14,6 @@ else:
 from modules import seq_core_lin as sc
 from modules import seq_gen_lin as sg
 
-# step 1 - trim rumen genes file those those above 300bp
-file_obj = sc.Fasta('stewart2019_mags_genes_sub.fasta', blastin)
-file_obj.setOutputName('stewart2019_mags_genes_sub_300.fasta')
-file_obj.setOutputLocation(blastin)
-#file_obj.lengthcutoff(replaceheaders = False, length = 300, direction = 'above')
-
-# step 2 - loop through the different pathogen genome database files, blastn
 blastdb = 'dataflow_test/02-blast-db/'
 blastout = 'dataflow_test/02-blast-out/'
 blastin = 'dataflow_test/01-nucl/'
@@ -28,6 +21,13 @@ input_file = 'stewart2019_mags_genes_sub.fasta'
 dbs = ['campylobacter_coli.fasta', 'listeria_monocytogenes.fasta', 'staphylococcus_aureus.fasta']
 output_files_blast = []
 
+# step 1 - trim rumen genes file those those above 300bp
+file_obj = sc.Fasta('stewart2019_mags_genes_sub.fasta', blastin)
+file_obj.setOutputName('stewart2019_mags_genes_sub_300.fasta')
+file_obj.setOutputLocation(blastin)
+#file_obj.lengthcutoff(replaceheaders = False, length = 300, direction = 'above')
+
+# step 2 - loop through the different pathogen genome database files, blastn
 for db_file in dbs:
     file_obj = sc.Fasta(input_file, blastin)
     outname = input_file.split('.fa')[0] + '_' + df_file.split('.fa')[0] + '.txt'
