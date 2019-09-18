@@ -57,7 +57,7 @@ df['file'] = input_file
 df.index.name = 'id'
 df.reset_index(inplace=True)
 
-df.columns = ['id', 'full_header']
+df.columns = ['col1', 'col2', 'col3']
 df['id_unnumbered'] = 'NA'
 
 
