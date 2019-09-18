@@ -18,7 +18,7 @@ from modules import seq_gen_lin as sg
 file_obj = sc.Fasta('stewart2019_mags_genes_sub.fasta', blastin)
 file_obj.setOutputName('stewart2019_mags_genes_sub_300.fasta')
 file_obj.setOutputLocation(blastin)
-file_obj.lengthcutoff(replaceheaders = False, length = 300, direction = 'above')
+#file_obj.lengthcutoff(replaceheaders = False, length = 300, direction = 'above')
 
 # step 2 - loop through the different pathogen genome database files, blastn
 blastdb = 'dataflow_test/02-blast-db/'
