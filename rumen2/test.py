@@ -14,6 +14,25 @@ else:
 from modules import seq_core_lin as sc
 from modules import seq_gen_lin as sg
 
+blastdb = 'dataflow_test/02-blast-db/'
+blastout = 'dataflow_test/02-blast-out/'
+blastin = 'dataflow_test/01-nucl/'
+input_file = 'stewart2019_mags_genes_sub.fasta'
+dbs = ['campylobacter_coli.fasta', 'listeria_monocytogenes.fasta', 'staphylococcus_aureus.fasta']
+output_files_blast = []
+
+for db_file in dbs:
+    outname = input_file.split('.fa')[0] + '_' + db_file.split('.fa')[0] + '.txt'
+    output_files_blast.append(outname)
+
+command = 'Rscript summarize_hit_frequency.R '
+output_files_freq = []
+
+for file in output_files_blast:
+    command = command + file + ' '
+    outname = file.split('.tx')[0] + '.csv'
+    output_files_freq.append(outname)
+
 genes = []
 analysis_folder = 'dataflow_test/03-analysis/'
 for file in output_files_freq:
@@ -24,8 +43,7 @@ for file in output_files_freq:
 
 genes_unique = list(set(genes))
 
-blastin = 'dataflow_test/01-nucl/'
-input_file = 'stewart2019_mags_genes_sub.fasta'
+
 
 file_obj = sc.Fasta(input_file, blastin)
 file_obj.setOutputName(input_file)
