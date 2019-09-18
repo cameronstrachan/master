@@ -56,14 +56,12 @@ df['file'] = input_file
 df.columns = ['id', 'full_header']
 df['id_unnumbered'] = 'NA'
 
-print(genes_unique)
+print(genes_uniquse)
 
-for index, row in df.iterrows():
-    row['id_unnumbered'] = str(row['id']).rsplit('_', 1)[0]
+#for index, row in df.iterrows():
+#    row['id_unnumbered'] = str(row['id']).rsplit('_', 1)[0]
 
-
-
-#df['id_unnumbered'] = df.apply(lambda x: str(x['id']).rsplit('_', 1)[0], axis=1)
+df['id_unnumbered'] = df.apply(lambda x: str(x['id']).rsplit('_', 1)[0], axis=1)
 
 #df = df[df['id_unnumbered'].isin(genes_unique)]
 df.to_csv(headerfile + input_file.split('.fa')[0] + '_headers2.csv')
