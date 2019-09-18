@@ -62,8 +62,6 @@ df['id_unnumbered'] = 'NA'
 
 df['id_unnumbered'] = df.apply(lambda x: str(x['id']).rsplit('_', 1)[0], axis=1)
 
-#df = df[df['id_unnumbered'].isin(genes_unique)]
+df = df[df['id'].isin(genes_unique)]
 
-print(genes_unique)
-
-df.to_csv(headerfile + input_file.split('.fa')[0] + '_headers.csv')
+df.to_csv(headerfile + input_file.split('.fa')[0] + '_mapped_headers.csv')
