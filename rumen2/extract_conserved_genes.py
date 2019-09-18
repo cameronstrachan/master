@@ -30,7 +30,7 @@ file_obj.setOutputLocation(blastin)
 # step 2 - loop through the different pathogen genome database files, blastn
 for db_file in dbs:
     file_obj = sc.Fasta(input_file, blastin)
-    outname = input_file.split('.fa')[0] + '_' + df_file.split('.fa')[0] + '.txt'
+    outname = input_file.split('.fa')[0] + '_' + db_file.split('.fa')[0] + '.txt'
     file_obj.setOutputName(outname)
     file_obj.setOutputLocation(blastout)
     #file_obj.runblast(blast='blastn', db=db_file, dblocation=blastdb, max_target_seqs=5000, evalue=1e-100, num_threads = 60, max_hsps = 1)
@@ -54,7 +54,7 @@ analysis_folder = 'dataflow_test/03-analysis/'
 for file in output_files_freq:
     csv_file = analysis_folder + file
     df = pd.read_csv(csv_file, low_memory=False)
-    gene_ids = df_seqs['gene'].tolist()
+    gene_ids = df['gene'].tolist()
     genes.append(gene_ids)
 
 genes_unique = set(genes)
