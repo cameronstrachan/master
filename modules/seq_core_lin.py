@@ -292,6 +292,22 @@ class Fasta(File):
         else:
             print("\n" + 'File exists: ' + self.outputlocation + self.outputname)
 
+    def translateORFs(self):
+        '''
+        Calling this function simply saves the files with a specific length cutoff
+        in a folder called lengthcutoff.
+        '''
+        fastadic = self.fasta2dict()
+        outputfile = self.openwritefile()
+        orfdic = dict()
+
+        for k,v in fastadic.items():
+            seq = v.rstrip()
+            seq_obj = Seq(seq)
+            seq_trans = str(seq_obj.translate())
+            outputfile.write(">" + k + '\n')
+            outputfile.write(seq_trans + '\n')
+
     def extractORFs_gff3(self, gff3_table_loc = 'dataflow/00-meta/rumen_prevotella.csv'):
 
         fastadic = self.fasta2dict()

@@ -48,8 +48,7 @@ for file in output_files_blast:
 
 os.system(command)
 
-# step 4 - extract genes from the frequency tables for annotation
-
+# step 4 - extract genes from the frequency tables for annotation and convert to ORFS
 genes = []
 analysis_folder = 'dataflow_test/03-analysis/'
 for file in output_files_freq:
@@ -65,3 +64,13 @@ outname = input_file.split('.fa')[0] + '_pathogen_mapped.fasta'
 file_obj.setOutputName(outname)
 file_obj.setOutputLocation(blastin)
 file_obj.subsetfasta(seqlist = genes_unique, headertag='none')
+
+file_obj = sc.Fasta(outname, 'dataflow_test/01-nucl/')
+file_obj.setOutputName(outname)
+file_obj.setOutputLocation('dataflow_test/01-prot/')
+file_obj.translateORFs()
+
+# step 5 - annotate the ORFs
+file_obj = sc.Fasta(outname, 'dataflow_test/01-prot/')
+file_obj.setOutputLocation('dataflow_test/02-blast-xml/')
+file_obj.runonlineblast(numhits=10)
