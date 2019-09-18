@@ -35,7 +35,6 @@ for db_file in dbs:
     file_obj.setOutputLocation(blastout)
     #file_obj.runblast(blast='blastn', db=db_file, dblocation=blastdb, max_target_seqs=5000, evalue=1e-100, num_threads = 60, max_hsps = 1)
     output_files_blast.append(outname)
-    print(output_files_blast)
 
 # step 3 - summarize frequency of hits
 command = 'Rscript summarize_hit_frequency.R '
@@ -73,4 +72,19 @@ file_obj.translateORFs()
 # step 5 - annotate the ORFs
 file_obj = sc.Fasta(outname, 'dataflow_test/01-prot/')
 file_obj.setOutputLocation('dataflow_test/02-blast-xml/')
-file_obj.runonlineblast(numhits=10)
+file_obj.runonlineblast(numhits=1)
+
+blastfiles = [outname]
+xmlfiles = [f for f in os.listdir('02-blast-xml') if f.endswith(".xml")]
+sg.blastxmltotable(xmlinputfolder='02-blast-xml/', blastinputfolder='01-nucl/',outputpath='03-anlysis/compiled_annotations.txt', xmlfilenames=xmlfiles, blastfilename=blastfiles)
+
+# make header map file to extract locations of genes
+
+file_obj = sc.Fasta(input_file, blastin)
+file_obj.setOutputName(input_file)
+headers = file_obj.fasta2headermap()
+
+headerfile = 'dataflow_test/03-anlysis/'
+df = pd.DataFrame.from_dict(headers, orient="index")
+df['file'] = file
+df.to_csv(headerfile + input_file.split('.fa')[0] + '.csv')
