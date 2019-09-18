@@ -14,17 +14,10 @@ else:
 from modules import seq_core_lin as sc
 from modules import seq_gen_lin as sg
 
-file_obj = sc.Fasta('listeria_monocytogenes.fasta', 'dataflow/01-nucl/')
-file_obj.setOutputName('listeria_monocytogenes.fasta')
-file_obj.setOutputLocation('dataflow/02-blast-db/')
-file_obj.runmakeblastdb(dbtype='nucl')
+files = ['pseudomonas_aeruginosa', 'campylobacter_jejuni', 'clostridioides_difficile', 'acinetobacter_baumannii', 'streptococcus_pneumoniae', 'neisseria_gonorrhoeae']
 
-file_obj = sc.Fasta('staphylococcus_aureus.fasta', 'dataflow/01-nucl/')
-file_obj.setOutputName('staphylococcus_aureus.fasta')
-file_obj.setOutputLocation('dataflow/02-blast-db/')
-file_obj.runmakeblastdb(dbtype='nucl')
-
-file_obj = sc.Fasta('campylobacter_coli.fasta', 'dataflow/01-nucl/')
-file_obj.setOutputName('campylobacter_coli.fasta')
-file_obj.setOutputLocation('dataflow/02-blast-db/')
-file_obj.runmakeblastdb(dbtype='nucl')
+for file in files:
+    file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
+    file_obj.setOutputName(file)
+    file_obj.setOutputLocation('dataflow/02-blast-db/')
+    file_obj.runmakeblastdb(dbtype='nucl')
