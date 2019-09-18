@@ -1,12 +1,12 @@
 library(tidyverse)
 
-df <- read.delim("~/master/rumen2/dataflow_test/02-blast-out/metagenome_genes_campylobacter_coli.txt", header=FALSE)
+df <- read.delim("~/master/rumen2/dataflow_test/02-blast-out/metagenome_genes_sub_campylobacter_coli.txt", header=FALSE)
 colnames(df)[1:13] <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
 
 df <- df %>%
   mutate(per_cov = (length / qlen) * 100) %>%
   filter(per_cov > 98) %>%
-  filter(pident > 99)
+  filter(pident == 100)
   
 df_freq <- as.data.frame(table(df$qseqid)) %>%
   filter(Freq > 0) %>%

@@ -43,8 +43,6 @@ for file in output_files_freq:
 
 genes_unique = list(set(genes))
 
-
-
 file_obj = sc.Fasta(input_file, blastin)
 file_obj.setOutputName(input_file)
 headers = file_obj.fasta2headermap()
@@ -52,5 +50,6 @@ headers = file_obj.fasta2headermap()
 headerfile = 'dataflow_test/03-analysis/'
 df = pd.DataFrame.from_dict(headers, orient="index")
 df['file'] = input_file
-#df[df['A'].isin(genes_unique]
-df.to_csv(headerfile + input_file.split('.fa')[0] + '.csv')
+df.columns = ['index', 'id', 'full_header']
+df = df[df['id'].isin(genes_unique]
+df.to_csv(headerfile + input_file.split('.fa')[0] + '_headers.csv')
