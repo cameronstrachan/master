@@ -14,7 +14,14 @@ else:
 from modules import seq_core_lin as sc
 from modules import seq_gen_lin as sg
 
-file_obj = sc.Fasta('stewart2019_mags_genes_sub_pathogen_mapped.fasta', 'dataflow_test/01-nucl/')
-file_obj.setOutputName('stewart2019_mags_genes_sub_pathogen_mapped.fasta')
-file_obj.setOutputLocation('dataflow_test/01-prot/')
-file_obj.translateORFs()
+blastin = 'dataflow_test/01-nucl/'
+input_file = 'stewart2019_mags_genes_sub.fasta'
+
+file_obj = sc.Fasta(input_file, blastin)
+file_obj.setOutputName(input_file)
+headers = file_obj.fasta2headermap()
+
+headerfile = 'dataflow_test/03-anlysis/'
+df = pd.DataFrame.from_dict(headers, orient="index")
+df['file'] = file
+df.to_csv(headerfile + input_file.split('.fa')[0] + '.csv')
