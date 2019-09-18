@@ -7,7 +7,6 @@ esearch -db assembly -query 'listeria monocytogenes' \
         wget "$line/$fname" ;
     done
 
-
 esearch -db assembly -query 'staphylococcus aureus' \
     | esummary \
     | xtract -pattern DocumentSummary -element FtpPath_GenBank \
@@ -25,4 +24,57 @@ esearch -db assembly -query 'campylobacter coli' \
         fname=$(echo $line | grep -o 'GCA_.*' | sed 's/$/_genomic.fna.gz/') ;
         wget "$line/$fname" ;
     done
-    
+
+esearch -db assembly -query 'pseudomonas aeruginosa' \
+    | esummary \
+    | xtract -pattern DocumentSummary -element FtpPath_GenBank \
+    | while read -r line ;
+    do
+        fname=$(echo $line | grep -o 'GCA_.*' | sed 's/$/_genomic.fna.gz/') ;
+        wget "$line/$fname" ;
+    done
+
+esearch -db assembly -query 'campylobacter jejuni' \
+    | esummary \
+    | xtract -pattern DocumentSummary -element FtpPath_GenBank \
+    | while read -r line ;
+    do
+        fname=$(echo $line | grep -o 'GCA_.*' | sed 's/$/_genomic.fna.gz/') ;
+        wget "$line/$fname" ;
+    done
+
+esearch -db assembly -query 'clostridioides difficile' \
+    | esummary \
+    | xtract -pattern DocumentSummary -element FtpPath_GenBank \
+    | while read -r line ;
+    do
+        fname=$(echo $line | grep -o 'GCA_.*' | sed 's/$/_genomic.fna.gz/') ;
+        wget "$line/$fname" ;
+    done
+
+esearch -db assembly -query 'acinetobacter baumannii' \
+    | esummary \
+    | xtract -pattern DocumentSummary -element FtpPath_GenBank \
+    | while read -r line ;
+    do
+        fname=$(echo $line | grep -o 'GCA_.*' | sed 's/$/_genomic.fna.gz/') ;
+        wget "$line/$fname" ;
+    done
+
+esearch -db assembly -query 'streptococcus pneumoniae' \
+    | esummary \
+    | xtract -pattern DocumentSummary -element FtpPath_GenBank \
+    | while read -r line ;
+    do
+        fname=$(echo $line | grep -o 'GCA_.*' | sed 's/$/_genomic.fna.gz/') ;
+        wget "$line/$fname" ;
+    done
+
+esearch -db assembly -query 'neisseria gonorrhoeae' \
+    | esummary \
+    | xtract -pattern DocumentSummary -element FtpPath_GenBank \
+    | while read -r line ;
+    do
+        fname=$(echo $line | grep -o 'GCA_.*' | sed 's/$/_genomic.fna.gz/') ;
+        wget "$line/$fname" ;
+    done
