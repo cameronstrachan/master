@@ -58,7 +58,7 @@ for file in output_files_freq:
     gene_ids = df['gene'].tolist()
     genes.append(gene_ids)
 
-genes_unique = list(set(genes))
+genes_unique = list_unique(set(genes))
 
 file_obj = sc.Fasta(input_file, blastin)
 outname = input_file.split('.fa')[0] + '_pathogen_mapped.fasta'
