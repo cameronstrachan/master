@@ -14,14 +14,14 @@ else:
 from modules import seq_core_lin as sc
 from modules import seq_gen_lin as sg
 
+blastdb = 'dataflow_test/02-blast-db/'
 
-file = "rumen_genomes.fasta"
+file_obj = sc.Fasta('stewart2019_mags_genes_sub_pathogen_mapped.fasta', 'dataflow_test/01-prot/')
+file_obj.setOutputLocation('dataflow_test/02-blast-out/')
 
-file_obj = sc.Fasta(file, indir)
-file_obj.setOutputLocation(blastdir)
-
-outputfilename = "rumen_genomes_card.txt"
-blastdb = "card_db.fasta"
+outputfilename = "stewart2019_mags_genes_sub_pathogen_mapped_card.txt"
+db_file = "card_db.fasta"
 
 file_obj.setOutputName(outputfilename)
-file_obj.runblast(blast='blastp', db=blastdb, dblocation=blastdbdir, max_target_seqs=1, evalue=1e-3, num_threads = 60)
+
+file_obj.runblast(blast='blastp', db=db_file, dblocation=blastdb, max_target_seqs=1, evalue=1e-3, num_threads = 60)
