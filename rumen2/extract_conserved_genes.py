@@ -14,21 +14,22 @@ else:
 from modules import seq_core_lin as sc
 from modules import seq_gen_lin as sg
 
-blastdb = 'dataflow_test/02-blast-db/'
-blastout = 'dataflow_test/02-blast-out/'
-blastxml = 'dataflow_test/02-blast-xml/'
-blastin = 'dataflow_test/01-nucl/'
-input_file = 'stewart2019_mags_genes_sub.fasta'
-prot_dir = 'dataflow_test/01-prot/'
-analysis_folder = 'dataflow_test/03-analysis/'
+blastdb = 'dataflow/02-blast-db/'
+blastout = 'dataflow/02-blast-out/'
+blastxml = 'dataflow/02-blast-xml/'
+blastin = 'dataflow/01-nucl/'
+prot_dir = 'dataflow/01-prot/'
+analysis_folder = 'dataflow/03-analysis/'
 dbs = ['campylobacter_coli.fasta', 'listeria_monocytogenes.fasta', 'staphylococcus_aureus.fasta']
 output_files_blast = []
 
 # step 1 - trim rumen genes file those those above 300bp
-file_obj = sc.Fasta('stewart2019_mags_genes_sub.fasta', blastin)
-file_obj.setOutputName('stewart2019_mags_genes_sub_300.fasta')
+file_obj = sc.Fasta('stewart2019_mags_genes.fasta', blastin)
+file_obj.setOutputName('stewart2019_mags_genes_300.fasta')
 file_obj.setOutputLocation(blastin)
-#file_obj.lengthcutoff(replaceheaders = False, length = 300, direction = 'above')
+file_obj.lengthcutoff(replaceheaders = False, length = 300, direction = 'above')
+
+input_file = 'stewart2019_mags_genes_300.fasta'
 
 # step 2 - loop through the different pathogen genome database files, blastn
 for db_file in dbs:
@@ -36,7 +37,7 @@ for db_file in dbs:
     outname = input_file.split('.fa')[0] + '_' + db_file.split('.fa')[0] + '.txt'
     file_obj.setOutputName(outname)
     file_obj.setOutputLocation(blastout)
-    #file_obj.runblast(blast='blastn', db=db_file, dblocation=blastdb, max_target_seqs=5000, evalue=1e-100, num_threads = 60, max_hsps = 1)
+    file_obj.runblast(blast='blastn', db=db_file, dblocation=blastdb, max_target_seqs=5000, evalue=1e-100, num_threads = 60, max_hsps = 1)
     output_files_blast.append(outname)
 
 # step 3 - summarize frequency of hits
@@ -73,13 +74,13 @@ file_obj.setOutputLocation(prot_dir)
 file_obj.translateORFs()
 
 # step 5 - annotate the ORFs
-file_obj = sc.Fasta(outname, prot_dir)
-file_obj.setOutputLocation(blastxml)
-file_obj.runonlineblast(numhits=1)
+#file_obj = sc.Fasta(outname, prot_dir)
+#file_obj.setOutputLocation(blastxml)
+#file_obj.runonlineblast(numhits=1)
 
-blastfiles = [outname]
-xmlfiles = [f for f in os.listdir(blastxml) if f.endswith(".xml")]
-sg.blastxmltotable(xmlinputfolder=blastxml, blastinputfolder=blastin,outputpath='dataflow_test/03-analysis/compiled_annotations.txt', xmlfilenames=xmlfiles, blastfilename=blastfiles)
+#blastfiles = [outname]
+#xmlfiles = [f for f in os.listdir(blastxml) if f.endswith(".xml")]
+#sg.blastxmltotable(xmlinputfolder=blastxml, blastinputfolder=blastin,outputpath='dataflow/03-analysis/compiled_annotations.txt', xmlfilenames=xmlfiles, blastfilename=blastfiles)
 
 # step 6 - make header map file to extract locations of genes
 
@@ -87,7 +88,7 @@ file_obj = sc.Fasta(input_file, blastin)
 file_obj.setOutputName(input_file)
 headers = file_obj.fasta2headermap()
 
-analysis_folder = 'dataflow_test/03-analysis/'
+analysis_folder = 'dataflow/03-analysis/'
 df = pd.DataFrame.from_dict(headers, orient="index")
 df['file'] = input_file
 
