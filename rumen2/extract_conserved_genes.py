@@ -40,7 +40,7 @@ for db_file in dbs:
 command = 'Rscript summarize_hit_frequency.R '
 output_files_freq = []
 
-for file in output_files:
+for file in output_files_blast:
     command = command + file + ' '
     outname = file.split('.tx')[0] + '.csv'
     output_files_freq.append(outname)
