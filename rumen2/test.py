@@ -51,5 +51,5 @@ headerfile = 'dataflow_test/03-analysis/'
 df = pd.DataFrame.from_dict(headers, orient="index")
 df['file'] = input_file
 df.columns = ['index', 'id', 'full_header']
-df = df[df['id'].isin(genes_unique]
+df = df[df['id'].isin(genes_unique)]
 df.to_csv(headerfile + input_file.split('.fa')[0] + '_headers.csv')
