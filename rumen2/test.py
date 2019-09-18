@@ -48,19 +48,12 @@ genes_unique = list(set(genes))
 
 file_obj = sc.Fasta(input_file, blastin)
 file_obj.setOutputName(input_file)
-#headers = file_obj.fasta2headermap()
+headers = file_obj.fasta2headermap()
 
-genes_unique_no_numners = []
-
-for gene in genes_unique:
-    gene_mod = gene.rsplit('_', 1)[0]
-    genes_unique_no_numners.append(gene_mod)
-
-print(genes_unique_no_numners)
-
-#headerfile = 'dataflow_test/03-analysis/'
-#df = pd.DataFrame.from_dict(headers, orient="index")
-#df['file'] = input_file
-#df.columns = ['id', 'full_header']
-#df = df[df['id'].isin(genes_unique_no_numners)]
-#df.to_csv(headerfile + input_file.split('.fa')[0] + '_headers.csv')
+headerfile = 'dataflow_test/03-analysis/'
+df = pd.DataFrame.from_dict(headers, orient="index")
+df['file'] = input_file
+df.columns = ['id', 'full_header']
+df['id_unnumbered'] = df['id'].rsplit('_', 1)[0]
+df = df[df['id_unnumbered'].isin(genes_unique)]
+df.to_csv(headerfile + input_file.split('.fa')[0] + '_headers.csv')
