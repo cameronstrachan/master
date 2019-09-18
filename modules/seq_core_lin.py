@@ -406,27 +406,7 @@ class Fasta(File):
                     out_handle.write(result_handle.read())
                     result_handle.close()
 
-    def extract16s(self, threads=6, bit_thresh=0, length_thresh=500, masking=False):
-        '''
-        Use code from https://github.com/christophertbrown/bioscripts to extract 16s using HMMs.
-        Masking seems to lower case areas that are thought to be insertions.
-        '''
 
-        bit_thresh = float(bit_thresh)
-        length_thresh = int(length_thresh)
-
-        #filepath = self.location + self.name
-        #outputfile = open(file_obj.outputlocation + file_obj.outputname, 'w')
-
-        outputfile = self.openwritefile()
-        fasta = self.openfile()
-
-        cm = '../databases/ssu-align-0p1.1.cm'
-
-        hmms = run_cmsearch(fasta, threads, cm)
-
-        for seq in find_16S(fasta, hmms, bit_thresh, length_thresh, masking, int(0)):
-            outputfile.write('\n'.join(seq) + '\n')
 
 
 class GenBank(File):
