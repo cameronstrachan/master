@@ -75,7 +75,7 @@ file_obj.setOutputLocation('dataflow_test/02-blast-xml/')
 #file_obj.runonlineblast(numhits=1)
 
 blastfiles = [outname]
-xmlfiles = [f for f in os.listdir('02-blast-xml') if f.endswith(".xml")]
-sg.blastxmltotable(xmlinputfolder='02-blast-xml/', blastinputfolder='01-nucl/',outputpath='03-anlysis/compiled_annotations.txt', xmlfilenames=xmlfiles, blastfilename=blastfiles)
+xmlfiles = [f for f in os.listdir('dataflow_test/02-blast-xml') if f.endswith(".xml")]
+sg.blastxmltotable(xmlinputfolder='dataflow_test/02-blast-xml/', blastinputfolder='dataflow_test/01-nucl/',outputpath='dataflow_test/03-anlysis/compiled_annotations.txt', xmlfilenames=xmlfiles, blastfilename=blastfiles)
 
 # make header map file to extract locations of genes
