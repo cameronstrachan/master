@@ -72,7 +72,7 @@ file_obj.translateORFs()
 # step 5 - annotate the ORFs
 file_obj = sc.Fasta(outname, 'dataflow_test/01-prot/')
 file_obj.setOutputLocation('dataflow_test/02-blast-xml/')
-#file_obj.runonlineblast(numhits=1)
+file_obj.runonlineblast(numhits=1)
 
 blastfiles = [outname]
 xmlfiles = [f for f in os.listdir('dataflow_test/02-blast-xml') if f.endswith(".xml")]
