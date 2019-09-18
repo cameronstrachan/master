@@ -23,5 +23,5 @@ headers = file_obj.fasta2headermap()
 
 headerfile = 'dataflow_test/03-anlysis/'
 df = pd.DataFrame.from_dict(headers, orient="index")
-df['file'] = file
+df['file'] = input_file
 df.to_csv(headerfile + input_file.split('.fa')[0] + '.csv')
