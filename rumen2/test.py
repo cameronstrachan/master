@@ -56,7 +56,7 @@ df['file'] = input_file
 df.columns = ['id', 'full_header']
 df['id_unnumbered'] = 'NA'
 
-print(genes_uniquse)
+print(genes_unique)
 
 #for index, row in df.iterrows():
 #    row['id_unnumbered'] = str(row['id']).rsplit('_', 1)[0]
