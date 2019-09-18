@@ -14,7 +14,7 @@ else:
 from modules import seq_core_lin as sc
 from modules import seq_gen_lin as sg
 
-files = ['pseudomonas_aeruginosa', 'campylobacter_jejuni', 'clostridioides_difficile', 'acinetobacter_baumannii', 'streptococcus_pneumoniae', 'neisseria_gonorrhoeae']
+files = ['pseudomonas_aeruginosa.fasta', 'campylobacter_jejuni.fasta', 'clostridioides_difficile.fasta', 'acinetobacter_baumannii.fasta', 'streptococcus_pneumoniae.fasta', 'neisseria_gonorrhoeae.fasta']
 
 for file in files:
     file_obj = sc.Fasta(file, 'dataflow/01-nucl/')

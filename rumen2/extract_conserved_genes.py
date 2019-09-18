@@ -20,7 +20,7 @@ blastxml = 'dataflow/02-blast-xml/'
 blastin = 'dataflow/01-nucl/'
 prot_dir = 'dataflow/01-prot/'
 analysis_folder = 'dataflow/03-analysis/'
-dbs = ['campylobacter_coli.fasta', 'listeria_monocytogenes.fasta', 'staphylococcus_aureus.fasta', 'pseudomonas_aeruginosa', 'campylobacter_jejuni', 'clostridioides_difficile', 'acinetobacter_baumannii', 'streptococcus_pneumoniae', 'neisseria_gonorrhoeae']
+dbs = ['campylobacter_coli.fasta', 'listeria_monocytogenes.fasta', 'staphylococcus_aureus.fasta', 'pseudomonas_aeruginosa.fasta', 'campylobacter_jejuni.fasta', 'clostridioides_difficile.fasta', 'acinetobacter_baumannii.fasta', 'streptococcus_pneumoniae.fasta', 'neisseria_gonorrhoeae.fasta']
 output_files_blast = []
 
 # step 1 - trim rumen genes file those those above 300bp
