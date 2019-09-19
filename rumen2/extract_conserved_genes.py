@@ -24,12 +24,12 @@ dbs = ['campylobacter_coli.fasta', 'listeria_monocytogenes.fasta', 'staphylococc
 output_files_blast = []
 
 # step 1 - trim rumen genes file those those above 300bp
-file_obj = sc.Fasta('stewart2019_mags_genes.fasta', blastin)
-file_obj.setOutputName('stewart2019_mags_genes_300.fasta')
+file_obj = sc.Fasta('stewart2019_mags_genes_cp.fasta', blastin)
+file_obj.setOutputName('stewart2019_mags_genes_300_cp.fasta')
 file_obj.setOutputLocation(blastin)
 file_obj.lengthcutoff(replaceheaders = False, length = 300, direction = 'above')
 
-input_file = 'stewart2019_mags_genes_300.fasta'
+input_file = 'stewart2019_mags_genes_300_cp.fasta'
 
 # step 2 - loop through the different pathogen genome database files, blastn
 for db_file in dbs:
