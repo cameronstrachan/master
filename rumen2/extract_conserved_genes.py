@@ -27,7 +27,7 @@ output_files_blast = []
 file_obj = sc.Fasta('stewart2019_mags_genes_cp.fasta', blastin)
 file_obj.setOutputName('stewart2019_mags_genes_300_cp.fasta')
 file_obj.setOutputLocation(blastin)
-file_obj.lengthcutoff(replaceheaders = False, length = 300, direction = 'above')
+#file_obj.lengthcutoff(replaceheaders = False, length = 300, direction = 'above')
 
 input_file = 'stewart2019_mags_genes_300_cp.fasta'
 
@@ -37,7 +37,7 @@ for db_file in dbs:
     outname = input_file.split('.fa')[0] + '_' + db_file.split('.fa')[0] + '.txt'
     file_obj.setOutputName(outname)
     file_obj.setOutputLocation(blastout)
-    file_obj.runblast(blast='blastn', db=db_file, dblocation=blastdb, max_target_seqs=5000, evalue=1e-100, num_threads = 60, max_hsps = 1)
+    #file_obj.runblast(blast='blastn', db=db_file, dblocation=blastdb, max_target_seqs=5000, evalue=1e-100, num_threads = 60, max_hsps = 1)
     output_files_blast.append(outname)
 
 # step 3 - summarize frequency of hits

@@ -14,9 +14,9 @@ for (x in 1:length(args)){
 
 for (file in files){
 
-  input_file <- paste("~/master/rumen2/dataflow_test/02-blast-out/", file, sep = "")
+  input_file <- paste("~/master/rumen2/dataflow/02-blast-out/", file, sep = "")
   file_prefix <- as.character(strsplit(file, ".txt")[1])
-  output_file <- paste("~/master/rumen2/dataflow_test/03-analysis/", file_prefix, '.csv', sep = '')
+  output_file <- paste("~/master/rumen2/dataflow/03-analysis/", file_prefix, '.csv', sep = '')
 
   df <- read.delim(input_file, header=FALSE)
   colnames(df)[1:13] <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
