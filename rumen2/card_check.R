@@ -1,6 +1,6 @@
 library(tidyverse)
 
-df_card <- read.delim("~/master/rumen2/dataflow_test/02-blast-out/stewart2019_mags_genes_sub_pathogen_mapped_card.txt", header=FALSE)
+df_card <- read.delim("~/master/rumen2/dataflow/02-blast-out/stewart2019_mags_genes_300_cp_pathogen_mapped_card.txt", header=FALSE)
 colnames(df_card)[1:13] <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
 
 df_card <- df_card %>%
@@ -14,7 +14,7 @@ df_card$organism <- gsub("_", " ", df_card$organism)
 df_card <- df_card %>%
   separate(gene, into = c('rm', "accession", "ARD", "gene"), sep = "\\|")
 
-df_headers <- read.csv("~/master/rumen2/dataflow_test/03-analysis/stewart2019_mags_genes_sub_mapped_headers.csv")
+df_headers <- read.csv("~/master/rumen2/dataflow/03-analysis/stewart2019_mags_genes_300_cp_mapped_headers.csv")
 df_headers$X <- NULL
 
 colnames(df_headers)[1] <- 'qseqid'

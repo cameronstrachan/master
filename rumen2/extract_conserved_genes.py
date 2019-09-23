@@ -49,7 +49,7 @@ for file in output_files_blast:
     outname = file.split('.tx')[0] + '.csv'
     output_files_freq.append(outname)
 
-os.system(command)
+#os.system(command)
 
 # step 4 - extract genes from the frequency tables for annotation and convert to ORFS
 genes = []
@@ -66,12 +66,12 @@ file_obj = sc.Fasta(input_file, blastin)
 outname = input_file.split('.fa')[0] + '_pathogen_mapped.fasta'
 file_obj.setOutputName(outname)
 file_obj.setOutputLocation(blastin)
-file_obj.subsetfasta(seqlist = genes_unique, headertag='none')
+#file_obj.subsetfasta(seqlist = genes_unique, headertag='none')
 
 file_obj = sc.Fasta(outname, blastin)
 file_obj.setOutputName(outname)
 file_obj.setOutputLocation(prot_dir)
-file_obj.translateORFs()
+#file_obj.translateORFs()
 
 # step 5 - annotate the ORFs
 #file_obj = sc.Fasta(outname, prot_dir)
@@ -84,8 +84,7 @@ file_obj.translateORFs()
 
 # step 6 - make header map file to extract locations of genes
 
-file_obj = sc.Fasta(input_file, blastin)
-file_obj.setOutputName(input_file)
+file_obj = sc.Fasta('stewart2019_mags_genes_cp.fasta', blastin)
 headers = file_obj.fasta2headermap()
 
 analysis_folder = 'dataflow/03-analysis/'
@@ -115,4 +114,4 @@ db_file = "card_db.fasta"
 
 file_obj.setOutputName(outputfilename)
 
-file_obj.runblast(blast='blastp', db=db_file, dblocation=blastdb, max_target_seqs=1, evalue=1e-3, num_threads = 60)
+#file_obj.runblast(blast='blastp', db=db_file, dblocation=blastdb, max_target_seqs=1, evalue=1e-3, num_threads = 60)
