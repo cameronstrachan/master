@@ -26,11 +26,10 @@ df <- df %>%
   mutate(per_cov = (length / qlen) * 100) %>%
   filter(per_cov > 98) %>%
   filter(pident > 99) %>%
-  select(qseqid, sseqid, pident, sstart, send)
+  select(qseqid, sseqid, pident, sstart, send) %>%
+  inner_join(df_headers)
+  paste("~/master/rumen2/dataflow/03-analysis/start_stop_", file, sep = '')
+  
+  write.csv(df, paste("~/master/rumen2/dataflow/03-analysis/start_stop_", file, sep = ''))
 i <- i + 1
 }
-
-df <- bind_rows(list_files) %>%
-  inner_join(df_headers)
-
-write.csv(df, "~/master/rumen2/dataflow/03-analysis/start_stop_data.csv")
