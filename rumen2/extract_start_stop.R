@@ -18,7 +18,7 @@ list_files <- list()
 i <- 1
 
 for (file in files){
-file_in <- paste("~/master/rumen2/dataflow/02-blast-out/", file)
+file_in <- paste("~/master/rumen2/dataflow/02-blast-out/", file, sep = '')
 df <- read.delim(file_in, header=FALSE)
 colnames(df)[1:13] <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
 
