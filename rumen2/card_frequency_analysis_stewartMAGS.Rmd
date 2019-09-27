@@ -96,37 +96,6 @@ df_card_freq_sub <- df_card_freq %>%
 
 df_card_freq_sub$num_versions <- as.numeric(df_card_freq_sub$num_versions)
 df_card_freq_sub$file <- as.character(df_card_freq_sub$file)
-
-
-freq_plots_list <- list()
-genomes <- unique(as.character(df_card_freq_sub$file))
-i <- 1
-
-for (genome in genomes){
-  df_plot <- df_card_freq_sub %>%
-    filter(file == genome)
-  
-  plot_freq <- ggplot(df_plot, aes(x=reorder(gene, frequency_med))) +
-    theme_few() +
-    geom_point(aes(y = frequency_med, colour = num_versions),
-      stat = "identity", fill = "lightgrey", size = 3) +
-    theme(strip.text = element_text(size = 14),
-          axis.text.y = element_text(size = 14), 
-          axis.title.y = element_text(size = 18),
-          axis.text.x = element_text(angle = 90, hjust = 1, size = 14)) +
-  ylab("Median Frequency") +
-    ggtitle(genome)
-  
-  freq_plots_list[[i]] <- plot_freq
-  i <- i + 1
-}
-```
-
-```{r, fig.height=5, fig.width=5}
-#for (j in 1:length(freq_plots_list)) {
-#  plot(freq_plots_list[[j]])
-#  cat("\r\n\r\n")
-#}
 ```
 
 ```{r}
@@ -138,7 +107,7 @@ genomes <- c("clostridioides difficile", "campylobacter coli", "campylobacter je
 
 df_card_freq_sub$file <- factor(df_card_freq_sub$file, levels = genomes)
 
-df_card_freq_sub$frequency_med_per_log <- as.numeric(round(log2((df_card_freq_sub$frequency_med / df_card_freq_sub$num_genomes) *100), 1))
+df_card_freq_sub$frequency_med <- as.numeric((df_card_freq_sub$frequency_med / df_card_freq_sub$num_genomes) *100)
 ```
 
 ```{r, fig.height=10, fig.width=18}
@@ -149,7 +118,7 @@ df_card_freq_sub <- df_card_freq_sub %>%
 
 plot_freq_wrap <- ggplot(df_card_freq_sub, aes(x=gene)) +
     theme_gdocs() +
-    geom_point(aes(y = frequency_med_per_log, colour = num_versions),
+    geom_point(aes(y = frequency_med, colour = num_versions),
       stat = "identity", fill = "lightgrey", size = 4) +
     theme(strip.text = element_text(size = 14),
           axis.text.y = element_text(size = 14), 

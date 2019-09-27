@@ -91,8 +91,7 @@ df_pathogen_grouped_cluster <- bind_rows(df_contig_list) %>%
   mutate(cluster_size = cluster_end - cluster_start) %>%
   ungroup() %>%
   filter(num_genes_cluster > 1) %>%
-  filter(cluster_size < 10000) %>%
-  select(ard, pathogen, cluster_type, cluster_size)
+  filter(cluster_size < 8000) 
 
 df_pathogen_grouped_cluster$cluster_type <- as.character(df_pathogen_grouped_cluster$cluster_type)
 df_pathogen_grouped_cluster$cluster_type <- gsub("c\\(", "", df_pathogen_grouped_cluster$cluster_type)
@@ -100,8 +99,13 @@ df_pathogen_grouped_cluster$cluster_type <- gsub("\\)$", "", df_pathogen_grouped
 df_pathogen_grouped_cluster$cluster_type <- gsub("\"", "", df_pathogen_grouped_cluster$cluster_type)
 
 df_pathogen_grouped_cluster <- df_pathogen_grouped_cluster %>%
-  select(-ard) %>%
+  select(pathogen, cluster_type, cluster, cluster_size, num_genes_cluster) %>% 
+  group_by(cluster_type, pathogen, cluster_size) %>%
+  mutate(num_clusters = length(unique(cluster))) %>%
+  ungroup() %>%
+  select(-cluster) %>%
   distinct()
+
 
 ##
 
@@ -118,7 +122,7 @@ df <- df %>%
 df$rumen_genome_id <- NA
 
 for (i in 1:nrow(df)){
-  df[i,"rumen_genome_id"] <- stri_reverse(str_split_fixed(stri_reverse(df[i,"gene_name"]), "_", 3)[[3]])
+  df[i,"rumen_genome_id"] <- stri_reverse(str_split_fixed(stri_reverse(df[i,"gene_name"]), "_", 2)[[2]])
 }
 
 df$rumen <- 'rumen'
@@ -187,8 +191,7 @@ df_rumen_grouped_cluster <- bind_rows(df_contig_list) %>%
   mutate(cluster_size = cluster_end - cluster_start) %>%
   ungroup() %>%
   filter(num_genes_cluster > 1) %>%
-  filter(cluster_size < 10000) %>%
-  select(ard, rumen, cluster_type, cluster_size)
+  filter(cluster_size < 8000)
 
 df_rumen_grouped_cluster$cluster_type <- as.character(df_rumen_grouped_cluster$cluster_type)
 df_rumen_grouped_cluster$cluster_type <- gsub("c\\(", "", df_rumen_grouped_cluster$cluster_type)
@@ -196,8 +199,13 @@ df_rumen_grouped_cluster$cluster_type <- gsub("\\)$", "", df_rumen_grouped_clust
 df_rumen_grouped_cluster$cluster_type <- gsub("\"", "", df_rumen_grouped_cluster$cluster_type)
 
 df_rumen_grouped_cluster <- df_rumen_grouped_cluster %>%
-  select(-ard) %>%
+  select(rumen, cluster_type, cluster, cluster_size, num_genes_cluster) %>% 
+  group_by(cluster_type, rumen, cluster_size) %>%
+  mutate(num_clusters = length(unique(cluster))) %>%
+  ungroup() %>%
+  select(-cluster) %>%
   distinct()
+
 
 #
 
@@ -214,37 +222,35 @@ df_final_4genes <- df_final %>%
   
   group_by(source, cluster_type) %>%
   mutate(cluster_variants = length(unique(cluster_size))) %>%
-  ungroup() #%>%
- 
-  #mutate(aada = if_else(grepl("aad\\(6\\)", cluster_type), "yes", "no")) %>%
-  #mutate(aph = if_else(grepl("APH\\(3'\\)-IIIa", cluster_type), "yes", "no")) %>%
-  #mutate(aada_b = if_else(grepl("ANT\\(6\\)-Ib", cluster_type), "yes", "no")) %>%
-  #mutate(sat = if_else(grepl("SAT-4", cluster_type), "yes", "no")) %>%
-  #gather(gene, gene_presence, -source, -cluster_type, -cluster_size, -cluster_variants, -num_cluster_types) %>%
-  #filter(gene_presence != "no")
-  
-
-#
+  ungroup() 
 ```
 
-```{r, fig.height=7, fig.width=14}
+```{r, fig.height=5, fig.width=13}
 df_final_4genes <- df_final_4genes %>%
-  filter(source != "")
+  filter(source != "") %>%
+  distinct() %>%
+  group_by(source, cluster_type) %>%
+  mutate(range_length = max(cluster_size) - min(cluster_size)) %>%
+  ungroup() %>%
+  select(-cluster_size) %>%
+  distinct()
 
 df_final_4genes$num_cluster_types <- as.factor(df_final_4genes$num_cluster_types)
 
-plot <- ggplot(df_final_4genes, aes(x=num_cluster_types)) +
+plot <- ggplot(df_final_4genes, aes(x=range_length)) +
   theme_gdocs() +
-  geom_jitter(aes(y = cluster_variants, colour = cluster_type, shape = source),
-             stat = "identity", fill = "lightgrey", size = 2, width = 0.2) +
-  theme(strip.text = element_text(size = 14),
+  geom_point(aes(y = num_clusters, colour = cluster_type),
+             stat = "identity", fill = "lightgrey", size = 3, width = 0.1) +
+  theme(strip.text = element_text(size = 20),
         axis.text.y = element_text(size = 14), 
         axis.title.y = element_text(size = 16),
         axis.text.x = element_text(angle = 90, hjust = 1, size = 14)) +
-  ylab("Number variants") +
-  xlab("Number unique cluster") +
+  ylab("Number of time cluster observed") +
+  xlab("Range in size of cluster") +
   scale_shape_manual(values=c(15, 16, 17, 18, 7, 9)) + 
-  guides(colour=guide_legend(ncol=2))
+  guides(colour=guide_legend(ncol=2)) + 
+  facet_wrap( ~ source, ncol = 2)
 
 plot
 ```
+
