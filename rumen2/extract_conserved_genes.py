@@ -20,16 +20,16 @@ blastxml = 'dataflow/02-blast-xml/'
 blastin = 'dataflow/01-nucl/'
 prot_dir = 'dataflow/01-prot/'
 analysis_folder = 'dataflow/03-analysis/'
-dbs = ['campylobacter_coli.fasta', 'listeria_monocytogenes.fasta', 'staphylococcus_aureus.fasta', 'pseudomonas_aeruginosa.fasta', 'campylobacter_jejuni.fasta', 'clostridioides_difficile.fasta', 'acinetobacter_baumannii.fasta', 'streptococcus_pneumoniae.fasta', 'neisseria_gonorrhoeae.fasta', 'clostridioides_difficile_dave.fasta']
+dbs = ['clostridioides_difficile_dave.fasta', 'campylobacter_coli.fasta', 'campylobacter_jejuni.fasta', 'staphylococcus_aureus.fasta', 'pseudomonas_aeruginosa.fasta', 'clostridioides_difficile.fasta', 'acinetobacter_baumannii.fasta', 'streptococcus_pneumoniae.fasta']
 output_files_blast = []
 
 # step 1 - trim rumen genes file those those above 300bp
 file_obj = sc.Fasta('stewart2019_metagenomes_genes.fasta', blastin)
-file_obj.setOutputName('stewart2019_metagenomes_genes_300.fasta')
+file_obj.setOutputName('stewart2019_metagenomes_genes_1000.fasta')
 file_obj.setOutputLocation(blastin)
-file_obj.lengthcutoff(replaceheaders = False, length = 300, direction = 'above')
+file_obj.lengthcutoff(replaceheaders = False, length = 1000, direction = 'above')
 
-input_file = 'stewart2019_metagenomes_genes_300.fasta'
+input_file = 'stewart2019_metagenomes_genes_1000.fasta'
 
 # step 2 - loop through the different pathogen genome database files, blastn
 for db_file in dbs:
