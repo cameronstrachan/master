@@ -316,6 +316,7 @@ class Fasta(File):
         regiondic = dict()
         regions_df.rename(columns={"start": col_start, "end": col_end, "contig": col_contig, "name": col_new_name})
         j = 1
+        print(regions_df)
 
         for index, row in regions_df.iterrows():
             start = int(int(row['start']) - 1)
