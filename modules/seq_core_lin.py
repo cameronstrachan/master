@@ -308,33 +308,35 @@ class Fasta(File):
             outputfile.write(">" + k + '\n')
             outputfile.write(seq_trans + '\n')
 
-    def extract_regions(self, df = 'dataflow/03-analysis/cluster_positions.csv', col_start = "cluster_start", col_end = "cluster_end", col_contig = "pathogen_genome_id"):
-
+    def extract_regions(self, df = 'dataflow/03-analysis/cluster_positions.csv', col_start = "cluster_start", col_end = "cluster_end", col_contig = "pathogen_genome_id", col_new_name = "cluster_type"):
 
         fastadic = self.fasta2dict()
         outputfile = self.openwritefile()
         regions_df = pd.read_csv(df, low_memory=False)
         regiondic = dict()
-        regions_df.rename(columns={"start": col_start, "end": col_end, "contig": col_contig})
+        regions_df.rename(columns={"start": col_start, "end": col_end, "contig": col_contig, "name": col_new_name})
+        j = 1
 
         for index, row in regions_df.iterrows():
             start = int(int(row['start']) - 1)
             end = int(row['end'])
             contig = row['contig']
+            new_name = row['name'] + "_" + str(j)
 
             for k,v in fastadic.items():
                 header = k.rstrip()
                 if header == contig:
                     seq = v.rstrip()
                     seq_new = seq[start: end]
-                    regiondic.update({orf: seq_new})
+                    regiondic.update({new_name: seq_new})
+                    j = j + 1
 
         for k,v in regiondic.items():
             header = k.rstrip()
             seq = v.rstrip()
             outputfile.write(">" + k + '\n')
             outputfile.write(v + '\n')
-            
+
     def extractORFs_gff3(self, gff3_table_loc = 'dataflow/00-meta/rumen_prevotella.csv'):
 
         fastadic = self.fasta2dict()
