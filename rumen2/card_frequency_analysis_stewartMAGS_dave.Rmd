@@ -18,11 +18,11 @@ library(ggthemes)
 ```
 
 ```{r}
-df_card <- read.delim("~/master/rumen2/dataflow/02-blast-out/stewart2019_mags_genes_300_cp_pathogen_mapped_card.txt", header=FALSE)
+df_card <- read.delim("~/master/rumen2/dataflow/02-blast-out/stewart2019_metagenomes_genes_1000_pathogen_mapped_card.txt", header=FALSE)
 colnames(df_card)[1:13] <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
 
 df_card <- df_card %>%
-  #filter(pident > 70) %>%
+  filter(pident > 70) %>%
   separate(sseqid, into = c("gene", "organism"), sep = "\\[")
 
 df_card$gene <- gsub("_", "", df_card$gene)
@@ -34,29 +34,18 @@ df_card <- df_card %>%
 ```
 
 ```{r}
-files <- list.files("~/master/rumen2/dataflow/03-analysis/", pattern = "\\.csv$")
-df_freq_list <- list()
-i <- 1
+file_in <- paste("~/master/rumen2/dataflow/03-analysis/stewart2019_metagenomes_genes_1000_clostridioides_difficile_dave.csv")
+df_freq <- read.csv(file_in)
+df_freq$X <- NULL
+df_freq$file <- 'stewart2019_metagenomes_genes_1000_clostridioides_difficile_dave.csv'
 
-for (file in files){
-  file_in <- paste("~/master/rumen2/dataflow/03-analysis/", file, sep = "")
-  df_freq <- read.csv(file_in)
-  df_freq$X <- NULL
-  df_freq$file <- file
-  df_freq_list[[i]] <- df_freq
-  i <- i + 1
-}
-
-df_freq <- bind_rows(df_freq_list)
 df_freq$file <- gsub("stewart2019_mags_genes_300_cp_", "", df_freq$file)
 df_freq$file <- gsub(".csv", "", df_freq$file)
 df_freq$file <- gsub("_", " ", df_freq$file)
 names(df_freq)[1] <- 'qseqid'
 ```
 
-```{r}
-df_genome_count <- read.csv("~/master/rumen2/dataflow/00-meta/stewart_2019_genome_count.csv")
-```
+
 
 ```{r}
 df_card_freq <- inner_join(df_card, df_freq)
@@ -70,9 +59,7 @@ df_card_freq <- df_card_freq %>%
   group_by(file) %>%
   mutate(num_genes = length(unique(gene))) %>%
   ungroup() %>%
-  arrange(desc(num_genes)) %>%
-  inner_join(df_genome_count) %>%
-  mutate(frequency_med_per_genomes = frequency_med / num_genomes)
+  arrange(desc(num_genes))
   
 
 
@@ -81,8 +68,7 @@ df_card_freq$num_versions <- as.factor(df_card_freq$num_versions)
 
 df_card_freq_clean <- df_card_freq %>%
   select(file, ARD, gene, frequency_med, num_versions, num_genes,  pident, qlen, length, num_genomes) %>%
-  distinct() %>%
-  filter(pident > 50)
+  distinct()
 
 colnames(df_card_freq_clean) <- c("Pathogen", "ARD ID", "ARD Name", "Median Frequency of Observed Genes", "Number of Versions of Observed Genes", "Number of ARDs Observed", "Percent Identity", "Query Length", "ARD Length", 'Number of Pathogen Genomes')
 
@@ -93,9 +79,7 @@ write.csv(df_card_freq_clean, "~/master/rumen2/newfigures/df_card_freq_clean.csv
 ```{r}
 df_card_freq_sub <- df_card_freq %>%
   filter(file != 'listeria monocytogenes') %>%
-  filter(file != 'pseudomonas aeruginosa')  %>%
-  filter(pident > 95)
-
+  filter(file != 'pseudomonas aeruginosa') 
 
 df_card_freq_sub$num_versions <- as.numeric(df_card_freq_sub$num_versions)
 df_card_freq_sub$file <- as.character(df_card_freq_sub$file)

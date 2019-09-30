@@ -17,4 +17,4 @@ file_obj.saveonelinefasta()
 file_obj = sc.Fasta('sanger_strain_library_oneLine.fasta', '01-nucl/')
 
 file_obj.setOutputLocation('02-blast/')
-file_obj.runonlineblast(blasttype='blastn', database="nr", numhits=50, evalue=0.005)
+#file_obj.runonlineblast(blasttype='blastn', database="nr", numhits=50, evalue=0.005)

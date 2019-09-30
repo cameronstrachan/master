@@ -25,4 +25,7 @@ find . -name '*.fastq' -exec bash -c ' mv $0 ${0/\_pass/_1_L001_R1_001}' {} \;
 
 ls -1 | wc -l
 
-scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rumen2/dataflow_test/02-blast-out/stewart2019_mags_genes_sub_pathogen_mapped_card.txt /Users/cameronstrachan/master/rumen2/dataflow_test/02-blast-out/stewart2019_mags_genes_sub_pathogen_mapped_card.txt
+J5uZUfVJHx
+
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rumen2/dataflow/03-analysis/stewart2019_mags_genes_300_cp_mapped_headers.csv /Users/cameronstrachan/master/rumen2/dataflow/03-analysis/stewart2019_mags_genes_300_cp_mapped_headers.csv
+
