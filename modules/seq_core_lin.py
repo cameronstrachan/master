@@ -314,7 +314,7 @@ class Fasta(File):
         outputfile = self.openwritefile()
         regions_df = pd.read_csv(df, low_memory=False)
         regiondic = dict()
-        regions_df = regions_df.rename(columns={"start": col_start, "end": col_end, "contig": col_contig, "name": col_new_name})
+        regions_df = regions_df.rename(columns={col_start: "start", col_end:"end", col_contig:"contig", col_new_name:"name"})
         j = 1
         print(regions_df.head())
 
