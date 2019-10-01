@@ -76,21 +76,18 @@ file_obj.setOutputLocation('dataflow/01-prot/')
 file_obj.dereplicate()
 
 # annotate genes against CARD
+db_file = "card_db.fasta"
+blastdb = 'dataflow/02-blast-db/'
+blastout = 'dataflow/02-blast-out/'
 
 file_obj = sc.Fasta('campylobacter_coli_extracted_clusters_derep_derep.fasta', 'dataflow/01-prot/')
 file_obj.setOutputLocation(blastout)
-
 outputfilename = "campylobacter_coli_extracted_clusters_derep_derep" + '_card.txt'
-db_file = "card_db.fasta"
-blastdb = 'dataflow/02-blast-db/'
 file_obj.setOutputName(outputfilename)
 file_obj.runblast(blast='blastp', db=db_file, dblocation=blastdb, max_target_seqs=1, evalue=1e-3, num_threads = 60)
 
 file_obj = sc.Fasta('campylobacter_jejuni_extracted_clusters_derep_derep.fasta', 'dataflow/01-prot/')
 file_obj.setOutputLocation(blastout)
-
 outputfilename = "campylobacter_jejuni_extracted_clusters_derep_derep" + '_card.txt'
-db_file = "card_db.fasta"
-blastdb = 'dataflow/02-blast-db/'
 file_obj.setOutputName(outputfilename)
 file_obj.runblast(blast='blastp', db=db_file, dblocation=blastdb, max_target_seqs=1, evalue=1e-3, num_threads = 60)
