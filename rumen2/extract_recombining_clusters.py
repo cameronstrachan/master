@@ -23,3 +23,29 @@ file_obj = sc.Fasta('campylobacter_jejuni.fasta', 'dataflow/01-nucl/')
 file_obj.setOutputName('campylobacter_jejuni_extracted_clusters.fasta')
 file_obj.setOutputLocation('dataflow/01-nucl/')
 file_obj.extract_regions(df = 'dataflow/03-analysis/cluster_positions_cjejuni.csv', col_start = "cluster_start", col_end = "cluster_end", col_contig = "pathogen_genome_id")
+
+# dereplicate
+
+file_obj = sc.Fasta('campylobacter_coli_extracted_clusters.fasta', 'dataflow/01-nucl/')
+file_obj.setOutputName('campylobacter_coli_extracted_clusters_derep.fasta')
+file_obj.setOutputLocation('dataflow/01-nucl/')
+file_obj.dereplicate()
+
+
+file_obj = sc.Fasta('campylobacter_jejuni_extracted_clusters.fasta', 'dataflow/01-nucl/')
+file_obj.setOutputName('campylobacter_jejuni_extracted_clusters_derep.fasta')
+file_obj.setOutputLocation('dataflow/01-nucl/')
+file_obj.dereplicate()
+
+# run prodigal
+
+file_obj = sc.Fasta('campylobacter_coli_extracted_clusters_derep.fasta', 'dataflow/01-nucl/')
+file_obj.setOutputName('campylobacter_coli_extracted_clusters_derep.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.runprodigal()
+
+
+file_obj = sc.Fasta('campylobacter_jejuni_extracted_clusters_derep.fasta', 'dataflow/01-nucl/')
+file_obj.setOutputName('campylobacter_jejuni_extracted_clusters_derep.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.runprodigal()

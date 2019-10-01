@@ -98,6 +98,25 @@ df_pathogen_grouped_cluster$cluster_type <- gsub("c\\(", "", df_pathogen_grouped
 df_pathogen_grouped_cluster$cluster_type <- gsub("\\)$", "", df_pathogen_grouped_cluster$cluster_type)
 df_pathogen_grouped_cluster$cluster_type <- gsub("\"", "", df_pathogen_grouped_cluster$cluster_type)
 
+df_save_cluster_positions <- df_pathogen_grouped_cluster %>%
+  filter(pathogen == "campylobacter coli" | pathogen == "campylobacter jejuni") %>%
+  filter(cluster_type == "APH(3')-IIIa, tetO" | cluster_type == "APH(3')-IIIa, SAT-4, tetO" | cluster_type == "APH(3')-IIIa, SAT-4") %>%
+  select(pathogen, pathogen_genome_id, cluster_type, cluster_start, cluster_end, cluster_size) %>%
+  distinct()
+
+df_save_cluster_positions$cluster_type <- gsub(", ", "_", df_save_cluster_positions$cluster_type)
+df_save_cluster_positions$file <- gsub(" ", "_", df_save_cluster_positions$pathogen)
+df_save_cluster_positions$file <- paste(df_save_cluster_positions$file, ".fasta", sep = "")
+
+df_save_cluster_ccoli <- df_pathogen_grouped_cluster %>%
+  filter(pathogen == "campylobacter coli")
+
+df_save_cluster_cjejuni <- df_pathogen_grouped_cluster %>%
+  filter(pathogen == "campylobacter jejuni")
+
+write.csv(df_save_cluster_ccoli, "~/master/rumen2/dataflow/03-analysis/cluster_positions_ccoli.csv")
+write.csv(df_save_cluster_cjejuni, "~/master/rumen2/dataflow/03-analysis/cluster_positions_cjejuni.csv")
+
 df_pathogen_grouped_cluster <- df_pathogen_grouped_cluster %>%
   select(pathogen, cluster_type, cluster, cluster_size, num_genes_cluster) %>% 
   group_by(cluster_type, pathogen, cluster_size) %>%

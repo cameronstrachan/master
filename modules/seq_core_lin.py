@@ -316,7 +316,6 @@ class Fasta(File):
         regiondic = dict()
         regions_df = regions_df.rename(columns={col_start: "start", col_end:"end", col_contig:"contig", col_new_name:"name"})
         j = 1
-        print(regions_df.head())
 
         for index, row in regions_df.iterrows():
             start = int(int(row['start']) - 1)
@@ -333,6 +332,29 @@ class Fasta(File):
                     j = j + 1
 
         for k,v in regiondic.items():
+            header = k.rstrip()
+            seq = v.rstrip()
+            outputfile.write(">" + k + '\n')
+            outputfile.write(v + '\n')
+
+    def dereplicate(self):
+
+        fastadic = self.fasta2dict()
+        derepdic = dict()
+        outputfile = self.openwritefile()
+        i = 1
+        print(fastadic)
+        for k,v in fastadic.items():
+            if i == 1:
+                derepdic.update({k:v})
+                i = i + 1
+            elif v in derepdic.values():
+                i = i + 1
+            else:
+                derepdic.update({k:v})
+                i = i + 1
+
+        for k,v in derepdic.items():
             header = k.rstrip()
             seq = v.rstrip()
             outputfile.write(">" + k + '\n')
