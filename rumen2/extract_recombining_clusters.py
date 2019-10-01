@@ -49,15 +49,28 @@ file_obj.setOutputName('campylobacter_jejuni_extracted_clusters_derep.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
 file_obj.runprodigal()
 
+# one line prot seqs
+
+file_obj = sc.Fasta('campylobacter_coli_extracted_clusters_derep.fasta', 'dataflow/01-prot/')
+file_obj.setOutputName('campylobacter_coli_extracted_clusters_derep_oneline.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.saveonelinefasta()
+
+
+file_obj = sc.Fasta('campylobacter_jejuni_extracted_clusters_derep.fasta', 'dataflow/01-prot/')
+file_obj.setOutputName('campylobacter_jejuni_extracted_clusters_derep_oneline.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.saveonelinefasta()
+
 # dereplicate prot seqs
 
-file_obj = sc.Fasta('campylobacter_coli_extracted_clusters_derep', 'dataflow/01-prot/')
+file_obj = sc.Fasta('campylobacter_coli_extracted_clusters_derep_oneline.fasta', 'dataflow/01-prot/')
 file_obj.setOutputName('campylobacter_coli_extracted_clusters_derep_derep.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
 file_obj.dereplicate()
 
 
-file_obj = sc.Fasta('campylobacter_jejuni_extracted_clusters_derep', 'dataflow/01-prot/')
+file_obj = sc.Fasta('campylobacter_jejuni_extracted_clusters_derep_oneline.fasta', 'dataflow/01-prot/')
 file_obj.setOutputName('campylobacter_jejuni_extracted_clusters_derep_derep.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
 file_obj.dereplicate()
