@@ -44,8 +44,40 @@ file_obj.setOutputName('campylobacter_coli_extracted_clusters_derep.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
 file_obj.runprodigal()
 
-
 file_obj = sc.Fasta('campylobacter_jejuni_extracted_clusters_derep.fasta', 'dataflow/01-nucl/')
 file_obj.setOutputName('campylobacter_jejuni_extracted_clusters_derep.fasta')
 file_obj.setOutputLocation('dataflow/01-prot/')
 file_obj.runprodigal()
+
+# dereplicate prot seqs
+
+file_obj = sc.Fasta('campylobacter_coli_extracted_clusters_derep', 'dataflow/01-prot/')
+file_obj.setOutputName('campylobacter_coli_extracted_clusters_derep_derep.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.dereplicate()
+
+
+file_obj = sc.Fasta('campylobacter_jejuni_extracted_clusters_derep', 'dataflow/01-prot/')
+file_obj.setOutputName('campylobacter_jejuni_extracted_clusters_derep_derep.fasta')
+file_obj.setOutputLocation('dataflow/01-prot/')
+file_obj.dereplicate()
+
+# annotate genes against CARD
+
+file_obj = sc.Fasta('campylobacter_coli_extracted_clusters_derep_derep.fasta', 'dataflow/01-prot/')
+file_obj.setOutputLocation(blastout)
+
+outputfilename = "campylobacter_coli_extracted_clusters_derep_derep" + '_card.txt'
+db_file = "card_db.fasta"
+blastdb = 'dataflow/02-blast-db/'
+file_obj.setOutputName(outputfilename)
+file_obj.runblast(blast='blastp', db=db_file, dblocation=blastdb, max_target_seqs=1, evalue=1e-3, num_threads = 60)
+
+file_obj = sc.Fasta('campylobacter_jejuni_extracted_clusters_derep_derep.fasta', 'dataflow/01-prot/')
+file_obj.setOutputLocation(blastout)
+
+outputfilename = "campylobacter_jejuni_extracted_clusters_derep_derep" + '_card.txt'
+db_file = "card_db.fasta"
+blastdb = 'dataflow/02-blast-db/'
+file_obj.setOutputName(outputfilename)
+file_obj.runblast(blast='blastp', db=db_file, dblocation=blastdb, max_target_seqs=1, evalue=1e-3, num_threads = 60)
