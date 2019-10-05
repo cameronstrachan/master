@@ -22,7 +22,7 @@ def get_project_ids(term):
     record = Entrez.read(handle)
     ids = record['IdList']
     numbers = dict()
-    
+
     for id in ids:
         #get summary
         summary = get_assembly_summary(id)
@@ -30,7 +30,7 @@ def get_project_ids(term):
         project = summary['DocumentSummarySet']['DocumentSummary'][0]['GB_BioProjects'][0]['BioprojectAccn']
         numbers.update({acessions:project})
         import time
-        time.sleep(0.4)
+        time.sleep(0.1)
     return numbers
 
 project_ids = get_project_ids('campylobacter coli')
