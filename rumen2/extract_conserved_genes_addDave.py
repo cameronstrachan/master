@@ -23,7 +23,7 @@ analysis_folder = 'dataflow/03-analysis/'
 dbs = ['clostridioides_difficile_dave.fasta']
 output_files_blast = []
 
-input_file = 'stewart2019_metagenomes_genes_300_dave.fasta'
+input_file = 'stewart2019_mags_genes_300_dave.fasta'
 
 # step 2 - loop through the different pathogen genome database files, blastn
 for db_file in dbs:
