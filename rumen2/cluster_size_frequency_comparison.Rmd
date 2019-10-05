@@ -108,10 +108,10 @@ df_save_cluster_positions$cluster_type <- gsub(", ", "_", df_save_cluster_positi
 df_save_cluster_positions$file <- gsub(" ", "_", df_save_cluster_positions$pathogen)
 df_save_cluster_positions$file <- paste(df_save_cluster_positions$file, ".fasta", sep = "")
 
-df_save_cluster_ccoli <- df_pathogen_grouped_cluster %>%
+df_save_cluster_ccoli <- df_save_cluster_positions %>%
   filter(pathogen == "campylobacter coli")
 
-df_save_cluster_cjejuni <- df_pathogen_grouped_cluster %>%
+df_save_cluster_cjejuni <- df_save_cluster_positions %>%
   filter(pathogen == "campylobacter jejuni")
 
 write.csv(df_save_cluster_ccoli, "~/master/rumen2/dataflow/03-analysis/cluster_positions_ccoli.csv")
@@ -302,4 +302,63 @@ plot <- ggplot(df_plot, aes(x=range_length)) +
   scale_color_brewer(palette = "Paired")
 
 plot
+```
+
+
+```{r}
+df_card_coli_cluster <- read.delim("~/master/rumen2/dataflow/02-blast-out/campylobacter_coli_extracted_clusters_derep_derep_card.txt", header=FALSE)
+colnames(df_card_coli_cluster)[1:13] <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+
+df_card_coli_cluster <- df_card_coli_cluster %>%
+  separate(sseqid, into = c("gene", "organism"), sep = "\\[") %>%
+  filter(pident > 50)
+
+df_card_coli_cluster$gene <- gsub("_$", "", df_card_coli_cluster$gene)
+df_card_coli_cluster$gene <- gsub("_", " ", df_card_coli_cluster$gene)
+df_card_coli_cluster$organism <- gsub("\\]_", "", df_card_coli_cluster$organism)
+df_card_coli_cluster$organism <- gsub("_", " ", df_card_coli_cluster$organism)
+
+df_card_coli_cluster <- df_card_coli_cluster %>%
+  separate(gene, into = c('rm', "accession", "ARD", "gene"), sep = "\\|") %>%
+  filter(gene != "tetO") %>%
+  filter(gene != "APH(3')-IIIa") %>%
+  filter(gene != "SAT-4")
+
+df_card_coli_cluster$file <- "Campylobacter coli"
+
+df_card_jejuni_cluster <- read.delim("~/master/rumen2/dataflow/02-blast-out/campylobacter_jejuni_extracted_clusters_derep_derep_card.txt", header=FALSE)
+colnames(df_card_jejuni_cluster)[1:13] <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+
+df_card_jejuni_cluster <- df_card_jejuni_cluster %>%
+  separate(sseqid, into = c("gene", "organism"), sep = "\\[") %>%
+  filter(pident > 50)
+
+df_card_jejuni_cluster$gene <- gsub("_$", "", df_card_jejuni_cluster$gene)
+df_card_jejuni_cluster$gene <- gsub("_", " ", df_card_jejuni_cluster$gene)
+df_card_jejuni_cluster$organism <- gsub("\\]_", "", df_card_jejuni_cluster$organism)
+df_card_jejuni_cluster$organism <- gsub("_", " ", df_card_jejuni_cluster$organism)
+
+df_card_jejuni_cluster <- df_card_jejuni_cluster %>%
+  separate(gene, into = c('rm', "accession", "ARD", "gene"), sep = "\\|") %>%
+  filter(gene != "tetO") %>%
+  filter(gene != "APH(3')-IIIa") %>%
+  filter(gene != "SAT-4")
+
+df_card_jejuni_cluster$file <- "Campylobacter jejuni"
+
+df_genes_recombining_with <- bind_rows(df_card_coli_cluster, df_card_jejuni_cluster)
+
+for (i in 1:nrow(df_genes_recombining_with)){
+  df_genes_recombining_with[i,"cluster"] <- stri_reverse(str_split_fixed(stri_reverse(df_genes_recombining_with[i,"qseqid"]), "_", 3)[[3]])
+}
+
+df_genes_recombining_with <- df_genes_recombining_with %>%
+  select(file, cluster, ARD, gene, pident, length)
+
+df_genes_recombining_with$cluster <- gsub("_", ",", df_genes_recombining_with$cluster)
+
+colnames(df_genes_recombining_with) <- c("Pathogen", "Cluster", "ARD ID", "ARD Name", "Percent Identity", "Length of alignment")
+
+write.csv(df_genes_recombining_with, "~/master/rumen2/newfigures/recombining_clean.csv")
+
 ```

@@ -22,7 +22,7 @@ df_card <- read.delim("~/master/rumen2/dataflow/02-blast-out/stewart2019_mags_ge
 colnames(df_card)[1:13] <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
 
 df_card <- df_card %>%
-  #filter(pident > 70) %>%
+  filter(pident > 95) %>%
   separate(sseqid, into = c("gene", "organism"), sep = "\\[")
 
 df_card$gene <- gsub("_", "", df_card$gene)
