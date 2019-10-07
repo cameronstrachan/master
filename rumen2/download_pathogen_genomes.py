@@ -30,11 +30,10 @@ def get_project_ids(term):
         project = summary['DocumentSummarySet']['DocumentSummary'][0]['GB_BioProjects'][0]['BioprojectAccn']
         numbers.update({acessions:project})
         import time
-        time.sleep(0.1)
+        #time.sleep(0.1)
     return numbers
 
-project_ids = get_project_ids('campylobacter coli')
-print(project_ids)
+project_ids = get_project_ids('clostridioides difficile')
 
 def get_project_summary(id):
     """Get esummary for an entrez id"""
@@ -54,7 +53,10 @@ def get_projectinfo(term):
     summary = get_project_summary(id)
     title = summary['DocumentSummarySet']['DocumentSummary'][0]['Project_Title']
     description = summary['DocumentSummarySet']['DocumentSummary'][0]['Project_Description']
-    title_desc = title + " : " + description
+    rel_med = summary['DocumentSummarySet']['DocumentSummary'][0]['Relevance_Medical']
+    rel_ag = summary['DocumentSummarySet']['DocumentSummary'][0]['Relevance_Agricultural']
+
+    title_desc = title + " : " + description + " : " + rel_med + ' : ' + rel_ag
     return title_desc
 
 descriptions = dict()
@@ -64,4 +66,4 @@ for k,v in project_ids.items():
     descriptions.update({k:info})
 
 df = pd.DataFrame.from_dict(descriptions, orient="index")
-df.to_csv('dataflow/03-analysis/ccoli_projects.csv')
+df.to_csv('dataflow/03-analysis/cdiff_projects.csv')

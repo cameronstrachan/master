@@ -12,7 +12,8 @@ df_headers <- df_headers %>%
   select(-rm)
 #
 
-files <- c("stewart2019_mags_genes_300_cp_acinetobacter_baumannii.txt", "stewart2019_mags_genes_300_cp_neisseria_gonorrhoeae.txt", "stewart2019_mags_genes_300_cp_campylobacter_coli.txt", "stewart2019_mags_genes_300_cp_pathogen_mapped_card.txt", "stewart2019_mags_genes_300_cp_campylobacter_jejuni.txt", "stewart2019_mags_genes_300_cp_pseudomonas_aeruginosa.txt", "stewart2019_mags_genes_300_cp_clostridioides_difficile.txt", "stewart2019_mags_genes_300_cp_staphylococcus_aureus.txt", "stewart2019_mags_genes_300_cp_listeria_monocytogenes.txt", "stewart2019_mags_genes_300_cp_streptococcus_pneumoniae.txt")
+#files <- c("stewart2019_mags_genes_300_cp_acinetobacter_baumannii.txt", "stewart2019_mags_genes_300_cp_neisseria_gonorrhoeae.txt", "stewart2019_mags_genes_300_cp_campylobacter_coli.txt", "stewart2019_mags_genes_300_cp_pathogen_mapped_card.txt", "stewart2019_mags_genes_300_cp_campylobacter_jejuni.txt", "stewart2019_mags_genes_300_cp_pseudomonas_aeruginosa.txt", "stewart2019_mags_genes_300_cp_clostridioides_difficile.txt", "stewart2019_mags_genes_300_cp_staphylococcus_aureus.txt", "stewart2019_mags_genes_300_cp_listeria_monocytogenes.txt", "stewart2019_mags_genes_300_cp_streptococcus_pneumoniae.txt")
+files <- c('stewart2019_mags_genes_300_dave_clostridioides_difficile_dave.txt')
 
 list_files <- list()
 i <- 1
