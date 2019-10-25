@@ -6,7 +6,7 @@ CRED = '\033[91m'
 CGREEN  = '\33[32m'
 CEND = '\033[0m'
 
-# STEP 1. Make directories 
+# STEP 1. Make directories
 
 if os.path.exists('dataflow') == False:
 	os.mkdir('dataflow')
@@ -21,7 +21,7 @@ for dir in dirs:
 	if os.path.exists(dir_to_make) == False:
 		os.mkdir(dir_to_make)
 
-# STEP 2. Run DADA2.
+# STEP 2. IMPORT DATA.
 
 print('\n' + CRED + 'DATA IMPORT' + CEND + '\n')
 
@@ -29,11 +29,11 @@ os.system('q2pipeline/q2_import.sh \'SampleData[PairedEndSequencesWithQuality]\'
 
 print('\n' + CGREEN + 'Visualize dataflow/02-qiime-viz/demux-trimmed.qzv at https://view.qiime2.org/' + CEND + '\n')
 
+# RUN DADA2
+
 print('\n' + CRED + 'DADA2' + CEND + '\n')
 
 cores = str(input('\n' + 'Number of cores to use with DADA2 (interger):'))
-
-if paired == True:
 
 left_forward = str(input("\n" + "Forward Read, Left Cutoff? (interger):"))
 
