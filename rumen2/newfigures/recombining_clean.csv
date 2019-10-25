@@ -1,0 +1,22 @@
+"","Pathogen","Cluster","ARD ID","ARD Name","Percent Identity","Length of alignment"
+"1","Campylobacter coli","APH(3')-IIIa,SAT-4,tetO","ARO:3002628","aad(6)",100,163
+"2","Campylobacter coli","APH(3')-IIIa,SAT-4,tetO","ARO:3002630","ANT(9)-Ia",55.745,235
+"3","Campylobacter coli","APH(3')-IIIa,SAT-4,tetO","ARO:3002628","aad(6)",100,163
+"4","Campylobacter coli","APH(3')-IIIa,tetO","ARO:3002835","lnuA",55.128,156
+"5","Campylobacter coli","APH(3')-IIIa,SAT-4,tetO","ARO:3002628","aad(6)",100,163
+"6","Campylobacter coli","APH(3')-IIIa,tetO","ARO:3002628","aad(6)",97.561,82
+"7","Campylobacter coli","APH(3')-IIIa,SAT-4,tetO","ARO:3002630","ANT(9)-Ia",58.201,189
+"8","Campylobacter coli","APH(3')-IIIa,SAT-4,tetO","ARO:3002630","ANT(9)-Ia",55.508,236
+"9","Campylobacter coli","APH(3')-IIIa,SAT-4,tetO","ARO:3002630","ANT(9)-Ia",54.589,207
+"10","Campylobacter coli","APH(3')-IIIa,tetO","ARO:3002636","APH(2'')-IIIa",99.349,307
+"11","Campylobacter coli","APH(3')-IIIa,tetO","ARO:3002630","ANT(9)-Ia",100,242
+"12","Campylobacter coli","APH(3')-IIIa,tetO","ARO:3002629","ANT(6)-Ib",72.954,281
+"13","Campylobacter jejuni","APH(3')-IIIa,tetO","ARO:3002630","ANT(9)-Ia",55.508,236
+"14","Campylobacter jejuni","APH(3')-IIIa,tetO","ARO:3002628","aad(6)",100,163
+"15","Campylobacter jejuni","APH(3')-IIIa,tetO","ARO:3002630","ANT(9)-Ia",57.592,191
+"16","Campylobacter jejuni","APH(3')-IIIa,tetO","ARO:3004191","APH(2'')-If",90.236,297
+"17","Campylobacter jejuni","APH(3')-IIIa,SAT-4,tetO","ARO:3002628","aad(6)",100,163
+"18","Campylobacter jejuni","APH(3')-IIIa,SAT-4,tetO","ARO:3002628","aad(6)",100,163
+"19","Campylobacter jejuni","APH(3')-IIIa,tetO","ARO:3002835","lnuA",55.128,156
+"20","Campylobacter jejuni","APH(3')-IIIa,tetO","ARO:3002628","aad(6)",100,163
+"21","Campylobacter jejuni","APH(3')-IIIa,SAT-4,tetO","ARO:3002628","aad(6)",100,163

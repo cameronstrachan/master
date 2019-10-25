@@ -19,7 +19,7 @@ library(stringi)
 ```
 
 ```{r}
-df <- read.csv('~/master/rumen2/dataflow/03-analysis/compiled_start_stop.txt')
+df <- read.csv('~/master/rumen2/dataflow/03-analysis/compiled_start_stop_wDave.txt')
 
 df <- df %>%
   mutate(pathogen_centroid = ((pathogen_end_dir - pathogen_start_dir)/2) + pathogen_start_dir) %>%
@@ -130,7 +130,7 @@ df_pathogen_grouped_cluster <- df_pathogen_grouped_cluster %>%
 
 
 
-df <- read.csv('~/master/rumen2/dataflow/03-analysis/compiled_start_stop.txt')
+df <- read.csv('~/master/rumen2/dataflow/03-analysis/compiled_start_stop_wDave.txt')
 
 df <- df %>%
   mutate(pathogen_centroid = ((pathogen_end_dir - pathogen_start_dir)/2) + pathogen_start_dir) %>%
@@ -241,7 +241,8 @@ df_final_4genes <- df_final %>%
   
   group_by(source, cluster_type) %>%
   mutate(cluster_variants = length(unique(cluster_size))) %>%
-  ungroup() 
+  ungroup() #%>%
+  #filter(source != " clostridioides difficile dave")
 ```
 
 ```{r}
@@ -253,7 +254,8 @@ df_plot <- df_final_4genes %>%
   ungroup() %>%
   select(-cluster_size) %>%
   distinct() %>%
-  mutate(range_length_cor = if_else(range_length > 100, range_length, as.integer(1)))
+  mutate(range_length_cor = if_else(range_length > 100, range_length, as.integer(1))) 
+  
 
 df_plot$num_cluster_types <- as.factor(df_plot$num_cluster_types)
 
@@ -304,6 +306,26 @@ plot <- ggplot(df_plot, aes(x=range_length)) +
 plot
 ```
 
+```{r, fig.height=15, fig.width=7}
+df_plot$num_cluster_log10 <- log10(df_plot$num_clusters)
+
+plot <- ggplot(df_plot, aes(x=range_length)) +
+  theme_gdocs() +
+  geom_point(aes(y = num_clusters, colour = cluster_type),
+             stat = "identity", fill = "lightgrey", size = 4, width = 0.1) +
+  theme(strip.text = element_text(size = 20),
+        axis.text.y = element_text(size = 14), 
+        axis.title.y = element_text(size = 16),
+        axis.text.x = element_text(angle = 90, hjust = 1, size = 14)) +
+  #ylab("Number of time cluster observed") +
+  #xlab("Range in size of cluster") +
+  scale_shape_manual(values=c(15, 16, 17, 18, 7, 9)) + 
+  guides(colour=guide_legend(ncol=1)) + 
+  facet_wrap( ~ source, ncol = 1)+ 
+  scale_color_brewer(palette = "Paired")
+
+plot
+```
 
 ```{r}
 df_card_coli_cluster <- read.delim("~/master/rumen2/dataflow/02-blast-out/campylobacter_coli_extracted_clusters_derep_derep_card.txt", header=FALSE)

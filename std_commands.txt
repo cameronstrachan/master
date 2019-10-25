@@ -29,3 +29,6 @@ J5uZUfVJHx
 
 scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rumen2/dataflow/03-analysis/stewart2019_mags_genes_300_cp_mapped_headers.csv /Users/cameronstrachan/master/rumen2/dataflow/03-analysis/stewart2019_mags_genes_300_cp_mapped_headers.csv
 
+dataflow/02-blast-out/stewart2019_metagenomes_genes_1000_pathogen_mapped_card.txt
+
+stewart2019_mags_genes_300_dave_clostridioides_difficile_dave.csv/Users/cameronstrachan/master/rumen2/dataflow/03-analysis/mags/start_stop_stewart2019_mags_genes_300_cp_clostridioides_difficile.txt

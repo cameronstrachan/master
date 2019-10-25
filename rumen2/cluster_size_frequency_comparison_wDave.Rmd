@@ -19,7 +19,7 @@ library(stringi)
 ```
 
 ```{r}
-df <- read.csv('~/master/rumen2/dataflow/03-analysis/compiled_start_stop.txt')
+df <- read.csv('~/master/rumen2/dataflow/03-analysis/compiled_start_stop_wDave.txt')
 
 df <- df %>%
   mutate(pathogen_centroid = ((pathogen_end_dir - pathogen_start_dir)/2) + pathogen_start_dir) %>%
@@ -130,7 +130,7 @@ df_pathogen_grouped_cluster <- df_pathogen_grouped_cluster %>%
 
 
 
-df <- read.csv('~/master/rumen2/dataflow/03-analysis/compiled_start_stop.txt')
+df <- read.csv('~/master/rumen2/dataflow/03-analysis/compiled_start_stop_wDave.txt')
 
 df <- df %>%
   mutate(pathogen_centroid = ((pathogen_end_dir - pathogen_start_dir)/2) + pathogen_start_dir) %>%

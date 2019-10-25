@@ -98,7 +98,7 @@ write.csv(df_card_freq_clean, "~/master/rumen2/newfigures/df_card_freq_clean.csv
 ```{r}
 df_card_freq_sub <- df_card_freq %>%
   filter(file != 'listeria monocytogenes') %>%
-  filter(file != 'clostridioides difficile dave')  %>%
+  #filter(file != 'clostridioides difficile dave')  %>%
   filter(pident > 95)
 
 
