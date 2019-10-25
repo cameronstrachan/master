@@ -25,7 +25,7 @@ for dir in dirs:
 
 print('\n' + CRED + 'DATA IMPORT' + CEND + '\n')
 
-os.system('q2pipeline/q2_import.sh \'SampleData[PairedEndSequencesWithQuality]\'')
+os.system('../bash/q2pipeline/q2_import.sh \'SampleData[PairedEndSequencesWithQuality]\'')
 
 print('\n' + CGREEN + 'Visualize dataflow/02-qiime-viz/demux-trimmed.qzv at https://view.qiime2.org/' + CEND + '\n')
 
