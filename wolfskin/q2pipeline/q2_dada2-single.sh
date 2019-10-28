@@ -3,21 +3,17 @@
 # This script runs DADA2. You need to select the trimming parameters as well as the 
 # number of cores that will be used. The DADA2 stats are then made into a visualization,
 # so that it can be seen how many reads were removed by DADA2. The files are the renamed.
-# This script is only for paired end data. 
+# This script is for non-paired end data. 
 
-trimleft_forward=$1
-trimleft_reverse=$2
-trunclength_forward=$3
-trunclength_reverse=$4
-numthreads=$5
+trimleft=$1
+trunclength=$2
+numthreads=$3
 
 
-qiime dada2 denoise-paired \
+qiime dada2 denoise-single \
 	--i-demultiplexed-seqs dataflow/02-qiime/demux-trimmed.qza \
-	--p-trim-left-f $trimleft_forward \
-	--p-trim-left-r $trimleft_reverse \
-	--p-trunc-len-f $trunclength_forward \
-	--p-trunc-len-r $trunclength_reverse \
+	--p-trim-left $trimleft \
+	--p-trunc-len $trunclength \
 	--o-representative-sequences dataflow/02-qiime/rep-seqs-dada2.qza \
 	--o-table dataflow/02-qiime/table-dada2.qza \
 	--o-denoising-stats dataflow/02-qiime/stats-dada2.qza \
