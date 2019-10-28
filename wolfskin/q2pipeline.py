@@ -25,7 +25,7 @@ for dir in dirs:
 
 print('\n' + CRED + 'DATA IMPORT' + CEND + '\n')
 
-os.system('../bash/q2pipeline/q2_import.sh \'SampleData[PairedEndSequencesWithQuality]\'')
+os.system('q2pipeline/q2_import.sh \'SampleData[PairedEndSequencesWithQuality]\'')
 
 print('\n' + CGREEN + 'Visualize dataflow/02-qiime-viz/demux-trimmed.qzv at https://view.qiime2.org/' + CEND + '\n')
 
@@ -43,7 +43,7 @@ trunc_forward = str(input("\n" + "Forward Read, Length Cutoff? (interger):"))
 
 trunc_reverse = str(input("\n" + "Reverse Read, Length Cutoff? (interger):"))
 
-command = '../bash/q2pipeline/q2_dada2-paired.sh ' + left_forward + ' ' + left_reverse + ' ' + trunc_forward + ' ' + trunc_reverse + ' ' + cores
+command = 'q2pipeline/q2_dada2-paired.sh ' + left_forward + ' ' + left_reverse + ' ' + trunc_forward + ' ' + trunc_reverse + ' ' + cores
 print('\n')
 os.system(command)
 
