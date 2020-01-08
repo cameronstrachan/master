@@ -241,8 +241,8 @@ df_final_4genes <- df_final %>%
   
   group_by(source, cluster_type) %>%
   mutate(cluster_variants = length(unique(cluster_size))) %>%
-  ungroup() #%>%
-  #filter(source != " clostridioides difficile dave")
+  ungroup() %>%
+  filter(source != " clostridioides difficile dave")
 ```
 
 ```{r}
@@ -252,7 +252,7 @@ df_plot <- df_final_4genes %>%
   group_by(source, cluster_type) %>%
   mutate(range_length = max(cluster_size) - min(cluster_size)) %>%
   ungroup() %>%
-  select(-cluster_size) %>%
+  #select(-cluster_size) %>%
   distinct() %>%
   mutate(range_length_cor = if_else(range_length > 100, range_length, as.integer(1))) 
   
@@ -265,32 +265,14 @@ df_plot$source <- factor(df_plot$source, levels = source_levels)
 ```
 
 
-```{r, fig.height=5, fig.width=13}
-plot <- ggplot(df_plot, aes(x=num_clusters)) +
-  theme_gdocs() +
-  geom_point(aes(y = range_length_cor, colour = cluster_type),
-             stat = "identity", fill = "lightgrey", size = 5, width = 0.1) +
-  theme(strip.text = element_text(size = 20),
-        axis.text.y = element_text(size = 14), 
-        axis.title.y = element_text(size = 16),
-        axis.text.x = element_text(angle = 90, hjust = 1, size = 14)) +
-  #ylab("Number of time cluster observed") +
-  #xlab("Range in size of cluster") +
-  scale_shape_manual(values=c(15, 16, 17, 18, 7, 9)) + 
-  guides(colour=guide_legend(ncol=1)) + 
-  facet_wrap( ~ source, ncol = 6)+ 
-  scale_color_brewer(palette = "Paired")
-
-#plot
-```
 
 
-```{r, fig.height=15, fig.width=7}
+```{r, fig.height=9, fig.width=15}
 df_plot$num_cluster_log10 <- log10(df_plot$num_clusters)
 
-plot <- ggplot(df_plot, aes(x=range_length)) +
+plot <- ggplot(df_plot, aes(x=reorder(cluster_type ,-cluster_variants))) +
   theme_gdocs() +
-  geom_point(aes(y = num_cluster_log10, colour = cluster_type),
+  geom_point(aes(y = num_cluster_log10, colour = cluster_variants),
              stat = "identity", fill = "lightgrey", size = 4, width = 0.1) +
   theme(strip.text = element_text(size = 20),
         axis.text.y = element_text(size = 14), 
@@ -299,9 +281,11 @@ plot <- ggplot(df_plot, aes(x=range_length)) +
   #ylab("Number of time cluster observed") +
   #xlab("Range in size of cluster") +
   scale_shape_manual(values=c(15, 16, 17, 18, 7, 9)) + 
-  guides(colour=guide_legend(ncol=1)) + 
-  facet_wrap( ~ source, ncol = 1)+ 
-  scale_color_brewer(palette = "Paired")
+  facet_wrap( ~ source, ncol = 3) + 
+  scale_colour_gradient(low = "#CC6142", high = "#6395CC",
+  space = "Lab", na.value = "grey50", guide = "colourbar",
+  aesthetics = "colour") #+ 
+  #scale_color_brewer(palette = "Paired")
 
 plot
 ```
@@ -324,7 +308,7 @@ plot <- ggplot(df_plot, aes(x=range_length)) +
   facet_wrap( ~ source, ncol = 1)+ 
   scale_color_brewer(palette = "Paired")
 
-plot
+#plot
 ```
 
 ```{r}

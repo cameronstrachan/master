@@ -1,0 +1,150 @@
+---
+title: "tSNE plots"
+author: "Cameron Strachan"
+date: '2019-10-29'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r}
+library(tidyverse)
+library(cowplot)
+```
+
+```{r}
+# load and clean meta data
+df_phylocounts_meta <- read.csv("~/master/wolfskin/dataflow/00-meta/sample-metadata.csv")
+df_phylocounts_meta <- as.data.frame(df_phylocounts_meta)
+row.names(df_phylocounts_meta) <- df_phylocounts_meta[,1]
+
+df_phylocounts_meta <- df_phylocounts_meta[-56, ]
+df_phylocounts_meta$Contact_to_WSC_animals <- as.character(df_phylocounts_meta$Contact_to_WSC_animals)
+df_phylocounts_meta$Contact_to_WSC_animals[is.na(df_phylocounts_meta$Contact_to_WSC_animals)] <- "not_relevant"
+df_phylocounts_meta$Contact_to_WSC_animals <- as.factor(df_phylocounts_meta$Contact_to_WSC_animals)
+```
+
+```{r}
+# load feature table with both control and normal sampes
+df_phlycounts_counts <- read.csv("~/master/wolfskin/dataflow/03-asv-table/feature-table-decontam.txt", sep = '\t', skip = 1)
+colnames(df_phlycounts_counts)[1] <- "asv_id"
+
+df_phlycounts_counts <- df_phlycounts_counts[order(df_phlycounts_counts$asv_id),] 
+
+numsamples <- length(df_phlycounts_counts)
+
+otumat <- as.matrix(df_phlycounts_counts[,2:numsamples])
+rownames(otumat) <- as.data.frame(df_phlycounts_counts)[,1]
+```
+
+```{r}
+library("phyloseq")
+library("ape")
+library(plyr)
+
+tree = read.tree("~/master/wolfskin/dataflow/03-asv-seqs/tree-decontam.nwk")
+
+# load phyloseq obect
+
+OTU = otu_table(otumat, taxa_are_rows = TRUE)
+
+samplesdata <- sample_data(df_phylocounts_meta)
+physeq = phyloseq(OTU, samplesdata, tree)
+```
+
+# seed 3
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=4, fig.width=6}
+set.seed(3)
+library(ggplot2)
+library(ggpubr)
+library(RColorBrewer)
+library(ggthemes)
+
+# Phyloseq object with relative abundance
+
+physeq_trim = subset_samples(physeq, SAMPLEtype!="D3s")
+physeq_trim_norm = transform_sample_counts(physeq_trim, function(x) sqrt(x))
+
+#physeq_trim_norm = transform_sample_counts(physeq_trim, function(x) x / sum(x))
+
+getPalette = colorRampPalette(brewer.pal(9, "Set1"))
+colourCount = length(unique(df_phylocounts_meta$SAMPLEtype))
+
+library(tsnemicrobiota)
+
+
+#t-SNE plot bray
+set.seed(3)
+t_SNE <- tsne_phyloseq(physeq_trim_norm, distance = "bray", perplexity = 25, 
+  precomputed_distance = NULL, pseudocounts = 1, verbose = 1,
+  rng_seed = NULL, philr_options = list(), control = list())
+
+
+
+tsne_plot <- plot_tsne_phyloseq(physeq_trim_norm, t_SNE,
+    color = 'SAMPLEtype', title='t-SNE (bray)',shape="Contact_to_WSC_animals") +
+    geom_point(size=1.5)+scale_color_manual(values = getPalette(colourCount)) +
+             scale_shape_manual(values=15:18) + 
+  theme_classic()
+
+tsne_plot
+
+
+#t-SNE plot jsd
+set.seed(3)
+t_SNE <- tsne_phyloseq(physeq_trim_norm, distance = "jsd", perplexity = 25,
+  precomputed_distance = NULL, pseudocounts = 1, verbose = 1,
+  rng_seed = NULL, philr_options = list(), control = list())
+
+
+tsne_plot <- plot_tsne_phyloseq(physeq_trim_norm, t_SNE,
+    color = 'SAMPLEtype', title='t-SNE (jsd)', shape="Contact_to_WSC_animals") +
+    geom_point(size=1.5)+scale_color_manual(values = getPalette(colourCount)) +
+             scale_shape_manual(values=15:18) + 
+  theme_classic() 
+
+tsne_plot
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=4, fig.width=6}
+#t-SNE plot bray
+set.seed(3)
+t_SNE <- tsne_phyloseq(physeq_trim_norm, distance = "bray", perplexity = 25, 
+  precomputed_distance = NULL, pseudocounts = 1, verbose = 1,
+  rng_seed = NULL, philr_options = list(), control = list())
+
+labels_to_add <- as.character(t_SNE$names)
+
+
+tsne_plot <- plot_tsne_phyloseq(physeq_trim_norm, t_SNE,
+    color = 'SAMPLEtype', title='t-SNE (bray)') +
+    scale_color_manual(values = getPalette(colourCount)) +
+  geom_text(aes(label = labels_to_add)) + 
+  theme_classic()
+
+tsne_plot
+
+
+#t-SNE plot jsd
+set.seed(3)
+t_SNE <- tsne_phyloseq(physeq_trim_norm, distance = "jsd", perplexity = 25,
+  precomputed_distance = NULL, pseudocounts = 1, verbose = 1,
+  rng_seed = NULL, philr_options = list(), control = list())
+
+labels_to_add <- as.character(t_SNE$names)
+
+tsne_plot <- plot_tsne_phyloseq(physeq_trim_norm, t_SNE,
+    color = 'SAMPLEtype', title='t-SNE (jsd)') +
+    scale_color_manual(values = getPalette(colourCount)) +
+  geom_text(aes(label = labels_to_add)) + 
+  theme_classic() 
+
+tsne_plot
+
+```

@@ -1,0 +1,79 @@
+---
+title: "Pack effect on skin microbiome"
+author: "Cameron Strachan"
+date: '2019-11-22'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r, warning=FALSE, message=FALSE}
+library(vegan)
+library(dplyr)
+library(printr)
+library(tidyr)
+```
+
+```{r}
+# import decontaminated feature table
+df_ftTable <- read.delim("~/master/wolfskin/dataflow/03-asv-table/feature-table-decontam.txt", 
+                         comment.char = "", skip = 1, header = TRUE)
+
+# convert to numeric
+df_ftTable <- sapply(df_ftTable, as.numeric)
+
+# convert to data frame and remove first row
+df_ftTable <- as.data.frame(t(df_ftTable))
+df_ftTable <- df_ftTable[-1,]
+
+# order by rownames
+df_ftTable <- 
+  df_ftTable[order(rownames(df_ftTable)), order(names(df_ftTable))]
+
+# calculate bray curtis distance matrix
+df_dsDist <- vegdist(df_ftTable, method="bray")
+
+# convert distance matrix to matrix
+df_dsMatrix <- as.matrix(df_dsDist)
+
+# convert distance matrix to data frame
+df_dsTable <- as.data.frame(df_dsMatrix)
+```
+
+```{r}
+# read in meta data
+df_meta <- read.csv("~/master/wolfskin/dataflow/00-meta/sample-metadata.csv")
+
+rownames(df_meta) <- df_meta$SampleID
+
+# order the rows
+df_meta <- df_meta[order(rownames(df_meta)), ]
+
+# subset meta data to those samples present in the dissimilarity matrix
+df_meta_sub <- df_meta[rownames(df_meta) %in% names(df_dsTable),]
+```
+
+```{r}
+# packs with n >= 3 
+true_packs <- 
+  names(table(df_meta_sub$Pack_wolf_dog)[table(df_meta_sub$Pack_wolf_dog) >= 3])
+
+# subset meta data, packs with 3 animals
+df_meta_sub_wolf_dog_pack <- 
+  df_meta_sub[df_meta_sub$Pack_wolf_dog %in% true_packs, ]
+
+# distance matrix, packs with 3 animals
+df_dsTable_wolf_dog_pack <- df_dsTable[
+  rownames(df_dsTable) %in% rownames(df_meta_sub_wolf_dog_pack), 
+  colnames(df_dsTable) %in% rownames(df_meta_sub_wolf_dog_pack)]
+
+# convert matrix to distance object
+df_dsDist_wolf_dog <- as.dist(as.matrix(df_dsTable_wolf_dog_pack))
+```
+
+```{r}
+set.seed(4)
+# carry out permanova with packs
+adonis(df_dsDist_wolf_dog ~ SAMPLEtype*Pack_wolf_dog, 
+       df_meta_sub_wolf_dog_pack, permutations = length(df_dsDist_wolf_dog))
+```

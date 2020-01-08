@@ -1,0 +1,142 @@
+---
+title: "Preliminary analysis of pH and Bacterial Counts: T48 and T49"
+author: "Cameron Strachan"
+date: '2019-10-29'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE)
+```
+
+```{r}
+library(tidyverse)
+library(cowplot)
+library(ggthemes)
+```
+
+## Summary
+
+In this report I have plotted the median pH (Fig. 1) and median bacterial counts (Fig. 2) per experimental day. From these initial plots, it seems that the pH is only affected by the SARA condition (buffer dilution) and not by the mycotoxins. The SARA condition caused a drop in 0.4 pH units, which occurred over the course of the first 3 experimental days (days 6-8) and remained relatively stable until experimental day 12. Further, T49 was consistently ~0.2 pH units lower than T48. As for the bacterial counts, there appears to be no differences between the experimental groups. When looking at the bacterial counts as a whole, there seems to be a drop that occurs, for the most part, from experimental day 10 onwards. 
+
+*Conclusion:* Based on this data, it is worth considering focusing the sequencing efforts on experimental days 6-9, as these days capture the full shift in pH before a significant drop in the overall bacterial community. 
+
+
+```{r}
+# combine pH data
+
+df_ph48 <- read.csv("~/master/rusitec/data/T48/pH_48.csv")
+
+df_ph48 <- df_ph48 %>%
+  gather(reactor, ph, -point, -day, -time)
+  
+df_ph48$reactor <- gsub("X", "", df_ph48$reactor)
+df_ph48$run <- 'T48'
+
+
+df_ph49 <- read.csv("~/master/rusitec/data/T49/pH_49.csv")
+
+df_ph49 <- df_ph49 %>%
+  gather(reactor, ph, -point, -day, -time)
+  
+df_ph49$reactor <- gsub("X", "", df_ph49$reactor)
+df_ph49$run <- 'T49'
+
+df_ph49$ph <- as.numeric(df_ph49$ph)
+
+df_ph <- bind_rows(df_ph48, df_ph49) %>%
+  drop_na()
+```
+
+```{r}
+# combine meta data
+
+df_meta48 <- read.csv("~/master/rusitec/data/T48/meta_48.csv")
+df_meta48$run <- 'T48'
+
+df_meta49 <- read.csv("~/master/rusitec/data/T49/meta_49.csv")
+df_meta49$run <- 'T49'
+
+df_meta <- bind_rows(df_meta48, df_meta49)
+df_meta$reactor <- as.character(df_meta$reactor)
+```
+
+
+
+```{r}
+# combine bacterial cell counts
+
+df_bc48 <- read.csv("~/master/rusitec/data/T48/bacterial_counts_48.csv")
+df_bc48$run <- 'T48'
+
+df_bc49 <- read.csv("~/master/rusitec/data/T49/bacterial_counts_49.csv")
+df_bc49$run <- 'T49'
+
+df_bc <- bind_rows(df_bc48, df_bc49) %>%
+  select(-id)
+
+df_bc$reactor <- as.character(df_bc$reactor)
+```
+
+## Plots
+
+```{r}
+df_plot <- inner_join(df_bc, df_meta) %>%
+  group_by(day, run, treatment) %>%
+  mutate(bc_median = median(counts)) %>%
+  ungroup() %>%
+  inner_join(df_ph) %>%
+  mutate(remove = if_else(reactor == '9' & run == 'T49' | reactor == '2' & run == 'T49', 'yes', 'no')) %>%
+  filter(remove == 'no') %>%
+  group_by(day, run, treatment) %>%
+  mutate(ph_median = median(ph)) %>%
+  mutate(bc_median = median(counts)) %>%
+  ungroup() %>%
+  select(day, run, treatment, ph_median, bc_median) %>%
+  distinct() %>%
+  mutate(bc_median = bc_median / 1000000) %>%
+  mutate(day = day - 1)
+
+df_plot$treatment <- gsub("_", " ", df_plot$treatment)
+```
+
+### Fig 1. pH
+
+The median pH per day and treatment. Lines are fitted per treatment. Here, reactor 2 from T48 as well as reactor 9 from T49 were removed, as the pH probes from these reactors gave outlier measurements. While there appears to be a slight decrease in pH caused by the mycotoxins in the absence of SARA in T48, this did not reproduce in trial T49. In trial 49, there appears to be a increase in pH on the last experimental day (day 13). 
+
+```{r, fig.width=5.5, fig.height=3}
+plot_ph <- ggplot(df_plot, aes(x=day, y=ph_median, group=treatment)) + 
+  theme_classic() +
+  geom_point(aes(colour=treatment)) + 
+  facet_wrap(~run) + 
+  geom_smooth(aes(colour=treatment)) + 
+  ylab("Median pH") +
+  xlab("Experimental Day") 
+
+plot_ph
+```
+
+```{r}
+df_plot <- df_plot %>%
+  mutate(remove = if_else(day == '9' & run == 'T49', 'yes', 'no')) %>%
+  filter(remove == 'no')
+```
+
+### Fig 2. Bacterial counts
+
+The median bacterial counts per day and treatment. The line is fitted across all treatments. Here, experimental day 9 for T49 is removed, as there were outlier measurements for this day. There appears to be no differences in the overall bacterial counts between the treatments. The trends over the course of the two trials are different. In both cases, there is a drop in bacterial counts after experimental day 9. 
+
+```{r, fig.width=5.5, fig.height=3}
+plot_bc <- ggplot(df_plot, aes(x=day, y=bc_median)) + 
+  theme_classic() +
+  geom_point(aes(colour=treatment)) + 
+  facet_wrap(~run) + 
+  geom_smooth(se = FALSE) + 
+  ylab("Median bacterial counts (1E6)") +
+  xlab("Experimental Day")
+
+plot_bc
+```
+

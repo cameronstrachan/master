@@ -234,13 +234,13 @@ p6
 
 \newpage
 
-## ANI with 40% cutoff
+## ANI with 85% cutoff
 
-- Only ANI, but with all value lower than 40 set to 40
+- Only ANI, but with all value lower than 85 set to 85
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 df_rbh_final <- df_rbh_final %>%
-  mutate(aai_id_cutoff = if_else(aai_id < 40, 40, aai_id)) 
+  mutate(aai_id_cutoff = if_else(aai_id < 85, 85, aai_id)) 
 
 p7 <- ggplot(data = df_rbh_final, aes(x = genome1, y = genome2)) + geom_tile(aes(fill = aai_id_cutoff)) + 
     theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 18), 

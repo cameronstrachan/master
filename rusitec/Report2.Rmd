@@ -1,0 +1,238 @@
+---
+title: "Preliminary analysis of VFA and Mycotoxins: T48"
+author: "Cameron Strachan"
+date: '2019-11-04'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE)
+```
+
+```{r}
+library(tidyverse)
+library(cowplot)
+library(ggthemes)
+```
+
+
+```{r}
+# gather VFA data
+
+df_vfa48 <- read.csv("~/master/rusitec/data/T48/VFA_48.csv")
+
+df_vfa48 <- df_vfa48 %>%
+  gather(compound, conc, -day, -reactor)
+  
+df_vfa48$run <- 'T48'
+df_vfa48$reactor <- as.character(df_vfa48$reactor)
+```
+
+```{r}
+# combine meta data
+
+df_meta48 <- read.csv("~/master/rusitec/data/T48/meta_48.csv")
+df_meta48$run <- 'T48'
+
+df_meta49 <- read.csv("~/master/rusitec/data/T49/meta_49.csv")
+df_meta49$run <- 'T49'
+
+df_meta <- bind_rows(df_meta48, df_meta49)
+df_meta$reactor <- as.character(df_meta$reactor)
+```
+
+## Plots
+
+```{r}
+df_plot <- inner_join(df_vfa48, df_meta) %>%
+  
+  group_by(day, run, treatment) %>%
+  mutate(vfa_median_total = median(conc)) %>%
+  mutate(vfa_total = sum(conc)) %>%
+  ungroup()  %>%
+  
+    group_by(day, run, treatment, compound) %>%
+  mutate(vfa_median = median(conc)) %>%
+  ungroup() %>%
+  
+  filter(compound != "Isobutyric_acid")
+
+#df_plot$treatment <- gsub("_", " ", df_plot$treatment)
+```
+
+```{r, fig.width=4.5, fig.height=3}
+plot_ph <- ggplot(df_plot, aes(x=day, y=vfa_total, group=treatment)) + 
+  theme_classic() +
+  geom_point(aes(colour=treatment)) + 
+  facet_wrap(~run) + 
+  geom_smooth(aes(colour=treatment)) + 
+  ylab("Total Conc") +
+  xlab("Experimental Day") 
+
+plot_ph
+```
+
+```{r, fig.width=4.5, fig.height=3}
+plot_ph <- ggplot(df_plot, aes(x=day, y=vfa_median_total, group=treatment)) + 
+  theme_classic() +
+  geom_point(aes(colour=treatment)) + 
+  facet_wrap(~run) + 
+  geom_smooth(aes(colour=treatment)) + 
+  ylab("Median Conc") +
+  xlab("Experimental Day") 
+
+plot_ph
+```
+
+\newpage
+
+```{r, fig.width=9, fig.height=7}
+plot_ph <- ggplot(df_plot, aes(x=day, y=vfa_median, group=treatment)) + 
+  theme_classic() +
+  geom_point(aes(colour=treatment)) + 
+  facet_wrap(~compound, scales = "free") + 
+  geom_smooth(aes(colour=treatment)) + 
+  ylab("Median Conc") +
+  xlab("Experimental Day") 
+
+plot_ph
+```
+
+```{r, fig.width=4.5, fig.height=3}
+df_plot <- inner_join(df_vfa48, df_meta) %>%
+  
+  group_by(day, run, treatment) %>%
+  mutate(vfa_median_total = median(conc)) %>%
+  mutate(vfa_total = sum(conc)) %>%
+  ungroup()  %>%
+  
+  group_by(day, run, treatment, compound) %>%
+  mutate(vfa_median = median(conc)) %>%
+  ungroup() %>%
+  
+  filter(compound != "Isobutyric_acid")
+
+
+df_vfa_starting <- df_plot %>%
+  filter(day == 7) %>%
+  select(compound, treatment, vfa_median) %>%
+  distinct() %>%
+  rename(start_conc = vfa_median)
+
+df_plot <- full_join(df_plot, df_vfa_starting) %>%
+  mutate(vfa_median_start = vfa_median - start_conc)
+```
+
+```{r, fig.width=9, fig.height=7}
+plot_ph <- ggplot(df_plot, aes(x=day, y=vfa_median_start, group=treatment)) + 
+  theme_classic() +
+  geom_point(aes(colour=treatment)) + 
+  facet_wrap(~compound, scales = "free") + 
+  geom_smooth(aes(colour=treatment)) + 
+  ylab("Change in concentration") +
+  xlab("Experimental Day") 
+
+plot_ph
+```
+
+
+```{r}
+df_plot2 <- df_plot %>%
+  select(day, compound, treatment, vfa_median_start) %>%
+  filter(day != 7) %>%
+  filter(day != 14) %>%
+  filter(day != 13) %>%
+  group_by(compound, treatment) %>%
+  mutate(vfa_median_total_days = sum(vfa_median_start + 200 )) %>%
+  ungroup() %>%
+  select(-vfa_median_start, -day) %>%
+  distinct() %>%
+  spread(treatment, vfa_median_total_days) %>%
+  mutate(MTX_diff = control_MTX - control) %>%
+  mutate(SARA_MTX_diff = SARA_MTX - SARA) %>%
+  mutate(SARA_diff = SARA - control) %>%
+  select(compound, MTX_diff, SARA_MTX_diff, SARA_diff) %>%
+  gather(Comparison, Diff, -compound)
+
+df_plot2$compound <- factor(df_plot2$compound, levels = c("Acetic_acid", "Propionic_acid", "Butyric_acid", "Valeric_acid", "Isovaleric_acid"))
+```
+
+
+```{r, fig.width=7, fig.height=4}
+plot_vfa <- ggplot(df_plot2, aes(x=compound, y=Diff, group = Comparison)) + 
+  theme_classic() +
+  geom_point(aes(shape = Comparison), size = 4) + 
+  ylab("Total Median Concentration") +
+  xlab("Experimental Day") +
+  geom_hline(yintercept=0, linetype="dashed", color = "red") 
+
+plot_vfa
+```
+
+```{r}
+df_plot3 <- df_plot %>%
+  select(day, compound, treatment, vfa_median) %>%
+  distinct() %>%
+  spread(compound, vfa_median) %>%
+  mutate(ratio = Acetic_acid / Propionic_acid) %>%
+  select(day, treatment, ratio) %>%
+  distinct()%>%
+  filter(day != 7) %>%
+  mutate(condition = if_else(treatment == "control" | treatment == "control_MTX", "CON", "SARA"))
+```
+
+
+```{r, fig.width=5, fig.height=3}
+plot_vfa <- ggplot(df_plot3, aes(x=day, y=ratio, group = treatment)) + 
+  theme_classic() +
+    geom_point(aes(colour=treatment)) + 
+ geom_smooth(aes(colour=treatment), se = FALSE) + 
+  facet_wrap(~condition) + 
+  ylab("Total Median Concentration") +
+  xlab("Experimental Day") 
+
+plot_vfa
+```
+
+
+
+
+
+\newpage
+
+```{r}
+# gather mycotoxin data
+
+df_myco48 <- read.csv("~/master/rusitec/data/T48/myco_T48.csv")
+
+df_myco48 <- df_myco48 %>%
+  gather(compound, conc, -day, -reactor)
+  
+df_myco48$run <- 'T48'
+df_myco48$reactor <- as.character(df_myco48$reactor)
+```
+
+```{r}
+df_plot <- inner_join(df_myco48, df_meta) %>%
+  
+group_by(day, run, treatment, compound) %>%
+  mutate(vfa_median = median(conc)) %>%
+  ungroup() %>%
+  filter(compound != "ZAN")
+
+df_plot$treatment <- gsub("_", " ", df_plot$treatment)
+```
+
+```{r, fig.width=9, fig.height=5.5}
+plot_ph <- ggplot(df_plot, aes(x=day, y=vfa_median, group=treatment)) + 
+  theme_classic() +
+  geom_point(aes(colour=treatment)) + 
+  facet_wrap(~compound, scales = "free") + 
+  geom_smooth(aes(colour=treatment)) + 
+  ylab("Median Conc") +
+  xlab("Experimental Day") 
+
+plot_ph
+```

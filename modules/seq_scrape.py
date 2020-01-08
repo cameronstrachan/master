@@ -8,7 +8,7 @@ This is simply some functions involved with scraping
 genomic data
 '''
 
-def ncbigenomescrape(searchterm, searchterm2='complete genome[title]', location='none'):
+def ncbigenomescrape(searchterm, searchterm2='assembly[title]', location='none'):
 
 	Entrez.email = "strachc@gmail.com"
 

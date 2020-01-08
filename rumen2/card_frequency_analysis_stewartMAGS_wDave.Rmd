@@ -98,7 +98,8 @@ write.csv(df_card_freq_clean, "~/master/rumen2/newfigures/df_card_freq_clean.csv
 ```{r}
 df_card_freq_sub <- df_card_freq %>%
   filter(file != 'listeria monocytogenes') %>%
-  #filter(file != 'clostridioides difficile dave')  %>%
+  filter(file != 'clostridioides difficile dave')  %>%
+  filter(file != 'pseudomonas aeruginosa')  %>%
   filter(pident > 95)
 
 
@@ -108,10 +109,13 @@ df_card_freq_sub$file <- as.character(df_card_freq_sub$file)
 
 ```{r}
 df_card_freq_sub$gene <- as.character(df_card_freq_sub$gene)
-gene_levels <- c("vanWG", "vanG", "vanTG", "mefA", "ErmG", "lnuC", 'sul2', "tetA(P)", "tet32", "tet44", "tet(40)", "tetO", "ANT(6)-Ib", "aad(6)", "APH(3')-IIIa", "SAT-4")
+gene_levels <- rev(c("vanWG", "vanG", "vanTG", "mefA", "ErmG", "lnuC", 'sul2', "tetA(P)", "tet32", "tet44", "tet(40)", "tetO", "ANT(6)-Ib", "aad(6)", "APH(3')-IIIa", "SAT-4"))
+
+
+
 df_card_freq_sub$gene <- factor(df_card_freq_sub$gene, levels=gene_levels)
 
-genomes <- c("clostridioides difficile", "clostridioides difficile dave", "campylobacter coli", "campylobacter jejuni", "staphylococcus aureus", "acinetobacter baumannii", "streptococcus pneumoniae", "pseudomonas aeruginosa", "listeria monocytogenes")
+genomes <- c("campylobacter coli", "campylobacter jejuni", "staphylococcus aureus", "clostridioides difficile",  "streptococcus pneumoniae", "acinetobacter baumannii")
 
 df_card_freq_sub$file <- factor(df_card_freq_sub$file, levels = genomes)
 
@@ -127,7 +131,7 @@ df_card_freq_sub <- df_card_freq_sub %>%
 plot_freq_wrap <- ggplot(df_card_freq_sub, aes(x=gene)) +
     theme_gdocs() +
     geom_point(aes(y = frequency_med, colour = num_versions),
-      stat = "identity", fill = "lightgrey", size = 4) +
+      stat = "identity", fill = "lightgrey", size = 5) +
     theme(strip.text = element_text(size = 14),
           axis.text.y = element_text(size = 14), 
           axis.title.y = element_text(size = 16),

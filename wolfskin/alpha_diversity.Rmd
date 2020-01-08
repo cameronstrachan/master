@@ -1,0 +1,53 @@
+---
+title: "Alpha diversity"
+author: "Cameron Strachan"
+date: '2019-03-14'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library("ggpubr")
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+shannon <- read.delim("~/master/wolfskin/dataflow/04-exported-tables/alpha_diversity/shannon.tsv", comment.char="#")
+colnames(shannon)[39] <- 'index'
+shannon$index_type <- 'shannon'
+
+simpson <- read.delim("~/master/wolfskin/dataflow/04-exported-tables/alpha_diversity/simpson.tsv", comment.char="#")
+colnames(simpson)[39] <- 'index'
+simpson$index_type <- 'simpson'
+
+chao1 <- read.delim("~/master/wolfskin/dataflow/04-exported-tables/alpha_diversity/chao1.tsv", comment.char="#")
+colnames(chao1)[39] <- 'index'
+chao1$index_type <- 'chao1'
+
+piloue <- read.delim("~/master/wolfskin/dataflow/04-exported-tables/alpha_diversity/piloue_e.tsv", comment.char="#")
+colnames(piloue)[38] <- 'index'
+piloue$index_type <- 'piloue_e'
+
+df_div <- bind_rows(shannon, simpson, chao1, piloue) %>%
+  separate(SAMPLEtype, into = c("species", "sample"), remove = FALSE, sep = "_") %>%
+  filter(species != "C")
+
+df_div$Contact_to_WSC_animals <- as.character(df_div$Contact_to_WSC_animals)
+df_div$Contact_to_WSC_animals[is.na(df_div$Contact_to_WSC_animals)] <- "not_relevant"
+df_div$Contact_to_WSC_animals <- as.factor(df_div$Contact_to_WSC_animals)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=4, fig.height=6}
+df_div_1 <- df_div %>%
+  filter(index_type == 'shannon' | index_type == 'chao1')
+
+p <- ggboxplot(df_div_1, x = "species", y = "index",
+                color = "species", palette =c("#c65999", "#7aa456", "#777acd", "#c96d44"), add = "jitter",  facet.by = "index_type") +
+  facet_grid(index_type ~ ., scales = "free_y")
+p
+```
+
+
+
