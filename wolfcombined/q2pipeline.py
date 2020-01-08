@@ -53,4 +53,4 @@ df_data_params.to_csv("dataflow/00-logs/selected_cutoffs.csv")
 
 # STEP 4. Export seqs and table
 
-os.system('q2pipeline/q2_export.sh)
+os.system('q2pipeline/q2_export.sh')
