@@ -1,17 +1,17 @@
 #!/bin/bash
 
-qiime phylogeny align-to-tree-mafft-fasttree \
-  --i-sequences dataflow/02-qiime/rep-seqs-decontam.qza \
-  --o-alignment dataflow/02-qiime/aligned-rep-seqs-decontam.qza \
-  --o-masked-alignment dataflow/02-qiime/masked-aligned-rep-seqs-decontam.qza \
-  --o-tree dataflow/02-qiime/unrooted-tree-decontam.qza \
-  --o-rooted-tree dataflow/02-qiime/rooted-decontam.qza
+#qiime phylogeny align-to-tree-mafft-fasttree \
+#  --i-sequences dataflow/02-qiime/rep-seqs-decontam.qza \
+#  --o-alignment dataflow/02-qiime/aligned-rep-seqs-decontam.qza \
+#  --o-masked-alignment dataflow/02-qiime/masked-aligned-rep-seqs-decontam.qza \
+#  --o-tree dataflow/02-qiime/unrooted-tree-decontam.qza \
+#  --o-rooted-tree dataflow/02-qiime/rooted-decontam.qza
 
-qiime tools export \
-    --input-path dataflow/02-qiime/rooted-decontam.qza \
-    --output-path dataflow/03-asv-seqs
+#qiime tools export \
+#    --input-path dataflow/02-qiime/rooted-decontam.qza \
+#    --output-path dataflow/03-asv-seqs
 
-mv dataflow/03-asv-seqs/tree.nwk dataflow/03-asv-seqs/tree-decontam.nwk
+#mv dataflow/03-asv-seqs/tree.nwk dataflow/03-asv-seqs/tree-decontam.nwk
 
 qiime feature-table summarize \
   --i-table dataflow/02-qiime/table-decontam.qza \

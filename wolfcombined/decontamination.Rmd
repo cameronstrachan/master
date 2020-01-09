@@ -15,7 +15,7 @@ library(tidyverse)
 
 ```{r}
 # load feature table with both control and normal sampes
-df_phlycounts_counts <- read.csv("~/master/wolfskin/dataflow/03-asv-table/feature-table.txt", sep = '\t', skip = 1)
+df_phlycounts_counts <- read.csv("~/master/wolfcombined/dataflow/03-asv-table/feature-table.txt", sep = '\t', skip = 1)
 colnames(df_phlycounts_counts)[1] <- "asv_id"
 
 df_phlycounts_counts <- df_phlycounts_counts[order(df_phlycounts_counts$asv_id),] 
@@ -24,20 +24,23 @@ df_phlycounts_counts <- df_phlycounts_counts[order(df_phlycounts_counts$asv_id),
 # all samples that are in the negative control are removed, except those that are over 3% abundance in the negative control 
 
 df_negative_control <- df_phlycounts_counts %>%
-  filter(NTCs > 0) %>%
-  mutate(total_neg = sum(NTCs)) %>%
-  gather(sample, count, -asv_id, -NTCs, -total_neg) %>%
+  filter(NTCs > 0 | NTCf > 0) %>%
+  mutate(total_negs = sum(NTCs)) %>%
+  mutate(total_negf = sum(NTCf)) %>%
+  gather(sample, count, -asv_id, -NTCs, -NTCf, -total_negs, -total_negf) %>%
   filter(count > 0) %>%
   group_by(asv_id) %>%
   mutate(prev = length(unique(sample))) %>%
   ungroup() %>%
-  mutate(rel_neg = (NTCs/ total_neg)*100) %>%
-  filter(rel_neg > 3)
+  mutate(rel_negs = (NTCs/ total_negs)*100) %>%
+  mutate(rel_negf = (NTCf/ total_negf)*100) %>%
+  filter(rel_negs > 3) %>%
+  filter(rel_negf > 3) 
 
 neg_asvs <- unique(df_negative_control$asv_id)  
 
 df_phlycounts_counts <- df_phlycounts_counts %>%
-  select(-NTCs)
+  select(-NTCs, -NTCf, -LK)
 
 df_phlycounts_counts <- df_phlycounts_counts[!(df_phlycounts_counts$asv_id %in% neg_asvs), ]
 
@@ -53,16 +56,12 @@ library("ape")
 library(plyr)
 
 # load phyloseq obect
-
 OTU = otu_table(otumat, taxa_are_rows = TRUE)
-
-samplesdata <- sample_data(df_phylocounts_meta)
-physeq = phyloseq(OTU, samplesdata)
 ```
 
 ```{r}
 # save decontaminated table with only wild animals feces
-df_physeq_decontam <- as.data.frame(physeq@otu_table)
+df_physeq_decontam <- as.data.frame(OTU)
 
 df_physeq_decontam <- cbind(rownames(df_physeq_decontam), df_physeq_decontam)
 
@@ -78,5 +77,5 @@ mat2 <- matrix(mat2, ncol = ncol(features_noheader), dimnames = NULL)
 
 mat_final <- rbind(mat2, mat)
 
-write.table(mat_final, '~/master/wolfskin/dataflow/03-asv-table/feature-table-decontam.txt', col.names = FALSE, quote = FALSE, row.names = FALSE, sep = "\t")
+write.table(mat_final, '~/master/wolfcombined/dataflow/03-asv-table/feature-table-decontam.txt', col.names = FALSE, quote = FALSE, row.names = FALSE, sep = "\t")
 ```
