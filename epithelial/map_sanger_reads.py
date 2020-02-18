@@ -14,8 +14,8 @@ else:
 from modules import seq_core_lin as sc
 from modules import seq_gen_lin as sg
 
-file_obj = sc.Fasta('sanger_strain_library.fasta', 'dataflow/01-nucl/')
-file_obj.setOutputName('sanger_strain_library_oneLine.fasta')
+file_obj = sc.Fasta('13506AA-11.fasta', 'dataflow/01-nucl/')
+file_obj.setOutputName('13506AA-11_oneLine.fasta')
 file_obj.setOutputLocation('dataflow/01-nucl/')
 file_obj.saveonelinefasta(header='none')
 
@@ -30,7 +30,7 @@ file_obj.runmakeblastdb(dbtype='nucl')
 
 blastdb = 'neubauer2018_wetzels201_99_oneline.fasta'
 
-file = 'sanger_strain_library_oneLine.fasta'
+file = '13506AA-11_oneLine.fasta'
 
 file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
 file_obj.setOutputLocation(blastdir)
@@ -50,7 +50,7 @@ file_obj.runmakeblastdb(dbtype='nucl')
 
 blastdb = 'goat_clone_library.fasta'
 
-file = 'sanger_strain_library_oneLine.fasta'
+file = '13506AA-11_oneLine.fasta'
 
 file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
 file_obj.setOutputLocation(blastdir)

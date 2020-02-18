@@ -30,17 +30,18 @@ conf$asv_id <- row.names(conf)
 df_taxa <- inner_join(pred, conf) %>%
   select(asv_id, domain, domain_conf, phylum, phylum_conf, class, class_conf, order, order_conf, family, family_conf, genus, genus_conf)
 
-write.csv(df_taxa, '~/master/wolfskin/dataflow/04-exported-tables/classification.csv')
+write.csv(df_taxa, '~/master/wolfcombined/dataflow/04-exported-tables/classification.csv')
 ```
 
 ```{r}
-df_taxa <- read.csv('~/master/wolfskin/dataflow/04-exported-tables/classification.csv')
+df_taxa <- read.csv('~/master/wolfcombined/dataflow/04-exported-tables/classification.csv')
 df_taxa$X <- NULL
 
-df_counts <- read.csv("~/master/wolfskin/dataflow/03-asv-table/feature-table-decontam.txt", sep = '\t', skip = 1)
+df_counts <- read.csv("~/master/wolfcombined/dataflow/03-asv-table/feature-table-decontam.txt", sep = '\t', skip = 1)
 colnames(df_counts)[1] <- "asv_id"
 
 df_counts_phylum <- df_counts %>%
+  select(asv_id, ends_with("s")) %>%
   gather(samples, counts, -asv_id) %>%
   filter(counts > 0) %>%
   inner_join(df_taxa) %>%

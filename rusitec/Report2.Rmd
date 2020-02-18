@@ -21,7 +21,7 @@ library(ggthemes)
 ```{r}
 # gather VFA data
 
-df_vfa48 <- read.csv("~/master/rusitec/data/T48/VFA_48.csv")
+df_vfa48 <- read.csv("T48/VFA_48.csv")
 
 df_vfa48 <- df_vfa48 %>%
   gather(compound, conc, -day, -reactor)
@@ -33,10 +33,10 @@ df_vfa48$reactor <- as.character(df_vfa48$reactor)
 ```{r}
 # combine meta data
 
-df_meta48 <- read.csv("~/master/rusitec/data/T48/meta_48.csv")
+df_meta48 <- read.csv("T48/meta_48.csv")
 df_meta48$run <- 'T48'
 
-df_meta49 <- read.csv("~/master/rusitec/data/T49/meta_49.csv")
+df_meta49 <- read.csv("T49/meta_49.csv")
 df_meta49$run <- 'T49'
 
 df_meta <- bind_rows(df_meta48, df_meta49)
@@ -205,7 +205,7 @@ plot_vfa
 ```{r}
 # gather mycotoxin data
 
-df_myco48 <- read.csv("~/master/rusitec/data/T48/myco_T48.csv")
+df_myco48 <- read.csv("T48/myco_T48.csv")
 
 df_myco48 <- df_myco48 %>%
   gather(compound, conc, -day, -reactor)

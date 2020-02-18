@@ -1,0 +1,86 @@
+---
+title: "Zsofi's evolutionary question"
+author: "Cameron Strachan"
+date: '2019-11-22'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r, warning=FALSE, message=FALSE}
+library(vegan)
+library(dplyr)
+library(printr)
+library(tidyr)
+library("ggpubr")
+```
+
+```{r}
+# import decontaminated feature table
+df_ftTable <- read.delim("~/master/wolfcombined/dataflow/03-asv-table/feature-table-decontam.txt", 
+                         comment.char = "", skip = 1, header = TRUE)
+
+# convert to numeric
+df_ftTable <- sapply(df_ftTable, as.numeric)
+
+# convert to data frame and remove first row
+df_ftTable <- as.data.frame(t(df_ftTable))
+df_ftTable <- df_ftTable[-1,]
+
+# order by rownames
+df_ftTable <- 
+  df_ftTable[order(rownames(df_ftTable)), order(names(df_ftTable))]
+
+# calculate bray curtis distance matrix
+df_dsDist <- vegdist(df_ftTable, method="bray")
+
+# convert distance matrix to matrix
+df_dsMatrix <- as.matrix(df_dsDist)
+
+# convert distance matrix to data frame
+df_dsTable <- as.data.frame(df_dsMatrix)
+```
+
+```{r}
+# read in meta data
+df_meta <- read.csv("~/master/wolfcombined/dataflow/00-meta/sample-metadata.csv")
+
+rownames(df_meta) <- df_meta$SampleID
+
+# order the rows
+df_meta <- df_meta[order(rownames(df_meta)), ]
+
+df_meta <- df_meta %>% 
+  select(SampleID, SAMPLEtype) %>%
+  rename(dog_id = SampleID)
+
+rownames(df_meta) <- c()
+df_meta$dog_id <- as.character(df_meta$dog_id)
+```
+
+```{r}
+df_dsTable$ID <- rownames(df_dsTable)
+rownames(df_dsTable) <- c()
+
+df_comparisons <- df_dsTable %>%
+  select(ID, ends_with("s")) %>%
+  filter(grepl("H", ID)) %>%
+  select(-starts_with("H")) %>%
+  gather(dog_id, distance, -ID) %>%
+  inner_join(df_meta) 
+```
+
+\newpage
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=4, fig.height=6}
+p <- ggboxplot(df_comparisons, x = "SAMPLEtype", y = "distance",
+                color = "SAMPLEtype",  add = "jitter")
+
+p
+```
+
+\newpage
+
+```{r}
+compare_means(distance ~ SAMPLEtype,  data = df_comparisons)
+```

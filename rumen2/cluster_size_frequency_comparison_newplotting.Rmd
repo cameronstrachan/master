@@ -16,6 +16,7 @@ library(tidyverse)
 library(ggplot2)
 library(ggthemes)
 library(stringi)
+library(scales)
 ```
 
 ```{r}
@@ -272,7 +273,7 @@ df_plot$num_cluster_log10 <- log10(df_plot$num_clusters)
 
 plot <- ggplot(df_plot, aes(x=reorder(cluster_type ,-cluster_variants))) +
   theme_gdocs() +
-  geom_point(aes(y = num_cluster_log10, colour = cluster_variants),
+  geom_point(aes(y = num_cluster_log10, colour = cluster_size),
              stat = "identity", fill = "lightgrey", size = 4, width = 0.1) +
   theme(strip.text = element_text(size = 20),
         axis.text.y = element_text(size = 14), 
@@ -303,7 +304,7 @@ df_plot$cluster_type = factor(df_plot$cluster_type, levels = clevels)
 
 plot <- ggplot(df_plot, aes(x=reorder(source,-cluster_variants))) +
   theme_gdocs() +
-  geom_point(aes(y = num_cluster_log10, colour = cluster_variants),
+  geom_point(aes(y = num_clusters, colour = cluster_size),
              stat = "identity", fill = "lightgrey", size = 4, width = 0.1) +
   theme(strip.text = element_text(size = 14),
         axis.text.y = element_text(size = 14), 
@@ -311,9 +312,9 @@ plot <- ggplot(df_plot, aes(x=reorder(source,-cluster_variants))) +
         axis.text.x = element_text(angle = 90, hjust = 1, size = 14)) +
   scale_shape_manual(values=c(15, 16, 17, 18, 7, 9)) + 
   facet_wrap( ~ cluster_type, ncol = 5) + 
-  scale_colour_gradient(low = "#CC6142", high = "#6395CC",
-  space = "Lab", na.value = "grey50", guide = "colourbar",
-  aesthetics = "colour")
+  scale_colour_gradientn(colors = c("#CC6142", "#6395CC"),
+  guide = "colourbar",
+  values = rescale(c(2000, 8000))) + coord_trans(y="log2")
 
 plot
 ```
