@@ -17,7 +17,8 @@ from modules import seq_gen_lin as sg
 genomes_df = pd.read_csv('dataflow/00-meta/stewart2019_epsilonproteobacteria.csv', low_memory=False)
 genomes = genomes_df['file_unzip'].tolist()
 
-transcriptome = "dataflow/01-fastq/11L2_ACAGTG.1.fastq.gz"
+transcriptome_file = "11L2_ACAGTG.1.fastq.gz"
+transcriptome = "dataflow/01-fastq/" + transcriptome_file
 
 for genome in genomes:
     file = genome
@@ -28,7 +29,7 @@ for genome in genomes:
     file_obj.setOutputLocation('dataflow/01-gff3/')
     file_obj.runprodigal(gff3 = True)
 
-    outputfilename_sam = "dataflow/03-sam/" + transcriptome.split(".f")[0] + '_' + file.split(".f")[0] + ".sam"
+    outputfilename_sam = "dataflow/03-sam/" + transcriptome_file.split(".f")[0] + '_' + file.split(".f")[0] + ".sam"
 
     command = "bbmap.sh threads=60 ambig=random" + " " + "in=" + transcriptome + " " + "out=" + outputfilename_sam + " " + "ref=" + file
 
