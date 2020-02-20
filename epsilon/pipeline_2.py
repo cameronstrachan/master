@@ -37,10 +37,15 @@ for genome in genomes:
 
     outputfilename_count = outputfilename_sam.split(".sam")[0] + ".txt"
 
+
     if not os.path.exists(outputfilename_count):
 
         os.system(command)
 
         command = "htseq-count -s no -t CDS -i ID --additional-attr=ID" + " " + outputfilename_sam + " " + input_gff3 + " > " + outputfilename_count
+
+        os.system(command)
+
+        command = 'rm ' + outputfilename_sam
 
         os.system(command)
