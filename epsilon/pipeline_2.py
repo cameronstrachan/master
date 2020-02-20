@@ -16,21 +16,28 @@ from modules import seq_gen_lin as sg
 
 genomes_df = pd.read_csv('dataflow/00-meta/stewart2019_epsilonproteobacteria.csv', low_memory=False)
 genomes = genomes_df['file_unzip'].tolist()
-#files = [item + "_rename.fasta" for item in genomes]
 
-sg.concat(inputfolder='dataflow/01-nucl/', outputpath='dataflow/01-nucl/rumen_campylobacter.fasta', filenames=genomes)
+transcriptome = "dataflow/01-fastq/11L2_ACAGTG.1.fastq.gz"
 
-file = "rumen_campylobacter.fasta"
+for genome in genomes:
+    file = genome
 
-file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
+    file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
+    outputfilename = file.split(".f")[0] + '.gff3'
+    file_obj.setOutputName(outputfilename)
+    file_obj.setOutputLocation('dataflow/01-gff3/')
+    file_obj.runprodigal(gff3 = True)
 
-# set output name, location
-outputfilename = file.split(".f")[0] + '.gff3'
-file_obj.setOutputName(outputfilename)
-file_obj.setOutputLocation('dataflow/01-gff3/')
+    outputfilename_sam = "dataflow/03-sam/" + transcriptome.split(".f")[0] + '_' + file.split(".f")[0] + ".sam"
 
-# run prodigal
-file_obj.runprodigal(gff3 = True)
+    command = "bbmap.sh threads=60 ambig=random" + " " + "in=" + transcriptome + " " + "out=" + outputfilename_sam + " " + "ref=" + file
 
-os.system("bbmap.sh threads=60 ambig=random in=dataflow/01-fastq/11L2_ACAGTG.1.fastq.gz out=dataflow/03-sam/mann2018_rumen_campylobacter_nonSARA1.sam ref=dataflow/01-nucl/rumen_campylobacter.fasta > dataflow/00-logs/mann2018_rumen_campylobacter.log")
-os.system("htseq-count -s no -t CDS -i ID --additional-attr=ID dataflow/03-sam/mann2018_rumen_campylobacter_nonSARA1.sam dataflow/01-gff3/rumen_campylobacter.gff3 > dataflow/03-sam/mann2018_rumen_campylobacter_nonSARA1.txt")
+    input_gff3 = "dataflow/01-gff3/" + outputfilename
+
+    outputfilename_count = outputfilename_sam.split(".sam")[0] + ".txt"
+
+    os.system(command)
+
+    command = "htseq-count -s no -t CDS -i ID --additional-attr=ID" + " " + outputfilename_sam + " " + input_gff3 + " > " + outputfilename_count
+
+    os.system(command)
