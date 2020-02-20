@@ -31,7 +31,7 @@ for genome in genomes:
 
     outputfilename_sam = "dataflow/03-sam/" + transcriptome_file.split(".f")[0] + '_' + file.split(".f")[0] + ".sam"
 
-    command = "bbmap.sh threads=60 ambig=random" + " " + "in=" + transcriptome + " " + "out=" + outputfilename_sam + " " + "ref=" + file
+    command = "bbmap.sh threads=60 ambig=random" + " " + "in=" + transcriptome + " " + "out=" + outputfilename_sam + " " + "ref=" + "dataflow/01-nucl/" + file
 
     input_gff3 = "dataflow/01-gff3/" + outputfilename
 
