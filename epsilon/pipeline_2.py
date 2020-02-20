@@ -37,7 +37,7 @@ for genome in genomes:
 
     outputfilename_count = outputfilename_sam.split(".sam")[0] + ".txt"
 
-    if os.path.exists(outputfilename_sam):
+    if not os.path.exists(outputfilename_sam):
 
         os.system(command)
 
