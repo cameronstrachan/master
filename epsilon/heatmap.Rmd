@@ -1,0 +1,48 @@
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(ggplot2)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+# read in shared AAI
+df_pi <- read.csv("~/master/epsilon/dataflow/04-analysis-tables/selected_genomes_sharedPI.csv")
+df_pi$X <- NULL
+
+# spread the data frame to fill in the NAs with 100
+df_pi_spread <- df_pi %>%
+  spread(file2, mean_mean_pi)
+
+df_pi_spread [is.na(df_pi_spread )] <- 100
+
+# re melt the dataframe
+df_pi_filled <- melt(df_pi_spread, by = c("mean_mean_pi"))
+colnames(df_pi_filled) <- c("file1", "file2", "mean_mean_pi")
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7.5, fig.width=6}
+df_pi_filled$dataset <- "AAI"
+
+# plot a heatmap, with the legend seperate
+heatmap.plot <- ggplot(data = df_pi_filled, aes(x = file2, y = file1)) +
+  geom_tile(aes(fill = mean_mean_pi)) +
+      theme(axis.ticks.y = element_blank(), line = element_blank()) +
+  scale_fill_gradient2() +
+    scale_colour_manual(values = c("red","yellow", "green"))+
+    scale_fill_gradient(low = "yellow",  high = "darkgreen") +
+  facet_wrap(. ~ dataset) + scale_fill_distiller(type = "div", palette = 1, direction = 1,
+  aesthetics = "fill") 
+
+heatmap.plot
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7.5, fig.width=6}
+
+row.names(df_pi_spread) <- df_pi_spread$file1
+df_pi_spread$file1 <- NULL
+
+df_matrix <- as.matrix(df_pi_spread)
+
+library("gplots")
+heatmap(df_matrix, scale = "none")
+```
