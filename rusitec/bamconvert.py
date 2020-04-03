@@ -23,7 +23,7 @@ for bam in bam_files:
     sort_in = bam_dir + bam
     sort_out = bam_dir + prefix + '.sort.bam'
     command = 'samtools sort -n' + ' ' + sort_in + ' ' + '-o' + ' ' + sort_out
-    os.command(command)
+    os.system(command)
 
 # convert sorted bam files to fastqs
 
@@ -38,4 +38,4 @@ for bam in bam_files_sorted:
     convert_out_pair1 = fastq_dir + sample_id + '_' + 'S' + str(count) + '_L001_R1_001.fastq'
     convert_out_pair2 = fastq_dir + sample_id + '_' + 'S' + str(count) + '_L001_R2_001.fastq'
     command = 'bedtools bamtofastq -i' + ' ' + convert_in + ' -fq ' + convert_out_pair1 + ' -fq2 ' + convert_out_pair2
-    os.command(command)
+    os.system(command)
