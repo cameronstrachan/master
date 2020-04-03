@@ -40,3 +40,19 @@ for bam in bam_files_sorted:
     command = 'bedtools bamtofastq -i' + ' ' + convert_in + ' -fq ' + convert_out_pair1 + ' -fq2 ' + convert_out_pair2
     count = count + 1
     os.system(command)
+
+dirs = ['paired', 'forward', 'reverse']
+
+for dir in dirs:
+	dir_to_make = 'dataflow/01-fastq/' + dir
+
+	if os.path.exists(dir_to_make) == False:
+		os.mkdir(dir_to_make)
+
+os.system('cp dataflow/01-fastq/*.fastq dataflow/01-fastq/paired')
+os.system('mv dataflow/01-fastq/*R1_001.fastq dataflow/01-fastq/forward')
+os.system('mv dataflow/01-fastq/*R2_001.fastq dataflow/01-fastq/reverse')
+
+os.system('gzip dataflow/01-fastq/paired/*.fastq')
+os.system('gzip dataflow/01-fastq/forward/*.fastq')
+os.system('gzip dataflow/01-fastq/reverse/*.fastq')
