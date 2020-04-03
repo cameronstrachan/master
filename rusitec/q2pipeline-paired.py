@@ -25,7 +25,7 @@ for dir in dirs:
 
 print('\n' + CRED + 'DATA IMPORT' + CEND + '\n')
 
-os.system('q2pipeline/q2_import-single.sh')
+os.system('q2pipeline/q2_import-paired.sh')
 
 print('\n' + CGREEN + 'Visualize dataflow/02-qiime-viz/demux-trimmed.qzv at https://view.qiime2.org/' + CEND + '\n')
 
@@ -35,22 +35,23 @@ print('\n' + CRED + 'DADA2' + CEND + '\n')
 
 cores = str(input('\n' + 'Number of cores to use with DADA2 (interger):'))
 
-cut_off1 = str(input("\n" + "Left Cutoff? (interger):"))
+cut_off1 = str(input("\n" + "Left Cutoff, Forward? (interger):"))
+cut_off2 = str(input("\n" + "Left Cutoff, Reverse? (interger):"))
+cut_off3 = str(input("\n" + "Length Cutoff, Forward? (interger):"))
+cut_off4 = str(input("\n" + "Length Cutoff, Reverse? (interger):"))
 
-cut_off2 = str(input("\n" + "Length Cutoff? (interger):"))
 
-
-command = 'q2pipeline/q2_dada2-single.sh ' + cut_off1 + ' ' + cut_off2  + ' ' + cores
+command = 'q2pipeline/q2_dada2-paired.sh ' + cut_off1 + ' ' + cut_off2  + ' ' + cut_off3  + ' ' + cut_off4  + ' ' + cores
 print('\n')
 os.system(command)
 
-data_params = {'Left Cutoff':cut_off1, "Length Cutoff":cut_off2}
+data_params = {'Left Cutoff Forward':cut_off1, 'Left Cutoff Reverse':cut_off2, "Length Cutoff Forward":cut_off3, "Length Cutoff Reverse":cut_off4}
 
 # STEP 3. Save parameters to the log directory
 
 df_data_params = pd.DataFrame.from_dict(data_params, orient="index")
-df_data_params.to_csv("dataflow/00-logs/selected_cutoffs_single.csv")
+df_data_params.to_csv("dataflow/00-logs/selected_cutoffs_paired.csv")
 
 # STEP 4. Export tables and seqs
 
-os.system('q2pipeline/q2_export-single.sh')
+os.system('q2pipeline/q2_export-paired.sh')
