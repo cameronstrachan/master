@@ -64,7 +64,7 @@ df_differential <- df_counts %>%
 ```{r}
 df_metrics <- df_counts %>%
   inner_join(df_differential) %>%
-  inner_join(df_taxa) %>%
+  inner_join(df_taxa) #%>%
   filter(Type == 'epithelial') %>%
   mutate(detected = if_else(count > 0, 1, 0)) %>%
   group_by(asv) %>%
@@ -89,7 +89,7 @@ df_phylum_before <- df_metrics %>%
 
 df_phylum_after <- df_metrics %>%
   filter(fold_change_cat > 10) %>%
-  filter(per_samples_detected > 0.5) %>%
+  #filter(per_samples_detected > 0.5) %>%
   select(mean_counts_normalized, phylum) %>%
   distinct() %>%
   group_by(phylum) %>%
@@ -156,6 +156,7 @@ df_metrics_after <- df_metrics %>%
 
 
 ```{r}
-qplot(df_metrics_after $phylum, df_metrics_after$mean_counts_normalized) + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+library(ggthemes)
+qplot(df_metrics_after $phylum, df_metrics_after$mean_counts_normalized)  + theme_clean() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) 
 ```

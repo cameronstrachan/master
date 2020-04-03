@@ -1,0 +1,121 @@
+---
+title: "Phylum distribution and differential abundance"
+author: "Cameron Strachan"
+date: '2019-10-29'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r}
+library(tidyverse)
+library(rRDP)
+library(RColorBrewer)
+```
+
+```{r}
+# seq <- readDNAStringSet("~/master/wolffaeces/dataflow/03-asv-seqs/dna-sequences-decontam.fasta")
+# pred <- predict(rdp(), seq)
+# conf <- attr(pred, "confidence")
+# 
+# pred$asv_id <- row.names(pred)
+# conf <- as.data.frame(conf)
+# colnames(conf) <- paste(colnames(conf), "conf", sep = "_")
+# conf$asv_id <- row.names(conf)
+# 
+# df_taxa <- inner_join(pred, conf) %>%
+#   select(asv_id, domain, domain_conf, phylum, phylum_conf, class, class_conf, order, order_conf, family, family_conf, genus, genus_conf)
+# 
+# write.csv(df_taxa, '~/master/wolffaeces/dataflow/04-exported-tables/classification.csv')
+```
+
+```{r}
+df_taxa <- read.csv('~/master/wolffaeces/dataflow/04-exported-tables/classification.csv')
+df_taxa$X <- NULL
+
+df_counts <- read.csv("~/master/wolffaeces/dataflow/03-asv-table/feature-table-decontam.txt", sep = '\t', skip = 1)
+colnames(df_counts)[1] <- "asv_id"
+
+df_counts_phylum <- df_counts %>%
+  gather(samples, counts, -asv_id) %>%
+  filter(counts > 0) %>%
+  inner_join(df_taxa) %>%
+  group_by(samples) %>%
+  mutate(sum = sum(counts)) %>%
+  ungroup() %>%
+  mutate(norm = counts / sum) %>%
+  group_by(samples, phylum) %>% 
+  mutate(norm_phylum = sum(norm)) %>%
+  ungroup() %>%
+  select(samples, phylum, norm_phylum) %>%
+  distinct() 
+
+
+df_top_phyla <- df_counts_phylum %>%
+  group_by(phylum) %>%
+  mutate(sum_norm = sum(norm_phylum)) %>%
+  select(phylum, sum_norm) %>%
+  distinct() %>%
+  filter(sum_norm > 0.1) 
+  
+df_top_phyla_vec <- unique(df_top_phyla$phylum)
+
+df_counts_phylum$phylum <- as.character(df_counts_phylum$phylum)
+
+df_counts_phylum <- df_counts_phylum %>%
+  mutate(phylum_clean = if_else(phylum %in% df_top_phyla_vec, phylum, 'Other'))
+
+df_counts_phylum$samples <- gsub("f", "", df_counts_phylum$samples)
+
+order <- c("H6", "H8", "H9", "H10", "H1", "H5", "H11", "H12", "H7", "H4", "H2", "H3", 
+"PD1", "PD2" , "PD3" , "PD4" , "PD5" , "PD6",  "PD7" , "PD8" , "PD9" ,"PD10" ,"PD11", "PD12",
+"D1", "D2" , "D4"  , "D5"  , "D6"  , "D7"  , "D8"  , "D9" , "D10" , "D11" , "D12" , "D13" , "D14" , "D15", 
+ "W1", "W2" ,  "W3" ,  "W4" , "W5"  , "W6"  , "W7" ,  "W8"  , "W9" , "W10" , "W11", "W12" ,  "W13" , "W14", "W15" , "W16") 
+
+df_counts_phylum$samples <- factor(df_counts_phylum$samples, levels = order)
+
+df_counts_phylum <- df_counts_phylum %>%
+  separate(samples, into = c("category", "num"), sep = 1, remove = FALSE) %>%
+  mutate(samples2 = if_else(samples == "H4" | samples == "H2" | samples == "H3", "Human Close", 
+                    if_else(category == "H", "Humans Not Close", 
+                    if_else(category == "W", "Wolf",  
+                    if_else(category == "P", "Pet Dog", 
+                    if_else(category == "D", "Outdoor Dog", "NA"))))))
+
+df_counts_phylum$samples2 <- factor(df_counts_phylum$samples2, levels = c("Humans Not Close", "Human Close", "Pet Dog", "Outdoor Dog", "Wolf"))
+```
+
+```{r, fig.width=12, fig.height=4}
+getPalette = colorRampPalette(brewer.pal(12, "Set3"))
+plevels <- c("Proteobacteria", "Acidobacteria" , "Verrucomicrobia", "Cyanobacteria/Chloroplast", "Bacteroidetes", "Firmicutes", "Actinobacteria", "Planctomycetes", "Chloroflexi",  "Fusobacteria", "Crenarchaeota", "Other", "Not Available")
+df_counts_phylum$phylum_clean <- as.character(df_counts_phylum$phylum_clean)
+df_counts_phylum$phylum_clean[is.na(df_counts_phylum$phylum_clean)] <- "Not Available"
+df_counts_phylum$phylum_clean <- factor(df_counts_phylum$phylum_clean, levels = plevels)
+
+plot <- ggplot() + geom_bar(
+  aes(y = norm_phylum, x = samples, fill = phylum_clean, order = norm_phylum),
+  data = df_counts_phylum,
+  stat = "identity" ,
+  position = "fill"
+)  + labs(x="Category" , y= "Percentage (%)")+
+  theme_minimal() +
+  theme(strip.text = element_text(size = 16),
+          plot.title = element_text(size = 16),
+          axis.text.x = element_text(angle = 90, hjust = 1, size = 14),
+          axis.text.y = element_text(size = 14),
+          axis.title.x = element_text(size = 16),
+          axis.title.y = element_text(size = 16)) + 
+  theme(legend.text=element_text(size=14)) +
+  theme(legend.title=element_text(size=14)) +
+  ylab("Percentage of Sample") +
+  xlab("Individual Sample") +
+  scale_fill_manual(values = c(getPalette(12), "#000000"))
+
+
+plot
+```
+

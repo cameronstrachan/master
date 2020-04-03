@@ -1,8 +1,0 @@
-TODO:
-
-1. Finish online blast of ref seq
-2. Analyze single fosmid blast output
-3. Reanalyze the fosDB blast output
-4. Figure out if I can map the headers from fosDB back to the environments
-5. end sequencing data incorporate. this can be used to figure out which environment clones clones come form.
-6. add in environment metadata. 

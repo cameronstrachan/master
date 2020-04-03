@@ -1,0 +1,81 @@
+---
+title: "Decontamination"
+author: "Cameron Strachan"
+date: '2019-03-14'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+```
+
+
+```{r}
+# load feature table with both control and normal sampes
+df_phlycounts_counts <- read.csv("~/master/wolfcombined/dataflow/03-asv-table/feature-table.txt", sep = '\t', skip = 1)
+colnames(df_phlycounts_counts)[1] <- "asv_id"
+
+df_phlycounts_counts <- df_phlycounts_counts[order(df_phlycounts_counts$asv_id),] 
+
+# this removes every OTU in the negative control except 1 that is abundant in several human samples
+# all samples that are in the negative control are removed, except those that are over 3% abundance in the negative control 
+
+df_negative_control <- df_phlycounts_counts %>%
+  filter(NTCs > 0 | NTCf > 0) %>%
+  mutate(total_negs = sum(NTCs)) %>%
+  mutate(total_negf = sum(NTCf)) %>%
+  gather(sample, count, -asv_id, -NTCs, -NTCf, -total_negs, -total_negf) %>%
+  filter(count > 0) %>%
+  group_by(asv_id) %>%
+  mutate(prev = length(unique(sample))) %>%
+  ungroup() %>%
+  mutate(rel_negs = (NTCs/ total_negs)*100) %>%
+  mutate(rel_negf = (NTCf/ total_negf)*100) %>%
+  filter(rel_negs > 3) %>%
+  filter(rel_negf > 3) 
+
+neg_asvs <- unique(df_negative_control$asv_id)  
+
+df_phlycounts_counts <- df_phlycounts_counts %>%
+  select(-NTCs, -NTCf, -LK)
+
+df_phlycounts_counts <- df_phlycounts_counts[!(df_phlycounts_counts$asv_id %in% neg_asvs), ]
+
+numsamples <- length(df_phlycounts_counts)
+
+otumat <- as.matrix(df_phlycounts_counts[,2:numsamples])
+rownames(otumat) <- as.data.frame(df_phlycounts_counts)[,1]
+```
+
+```{r}
+library("phyloseq")
+library("ape")
+library(plyr)
+
+# load phyloseq obect
+OTU = otu_table(otumat, taxa_are_rows = TRUE)
+```
+
+```{r}
+# save decontaminated table with only wild animals feces
+df_physeq_decontam <- as.data.frame(OTU)
+
+df_physeq_decontam <- cbind(rownames(df_physeq_decontam), df_physeq_decontam)
+
+colnames(df_physeq_decontam)[1] <- "OTU ID"
+
+features_noheader <- df_physeq_decontam[1:nrow(df_physeq_decontam),]
+
+mat <- as.matrix(features_noheader)
+mat <- matrix(mat, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat2 <- t(as.matrix(colnames(features_noheader)))
+mat2 <- matrix(mat2, ncol = ncol(features_noheader), dimnames = NULL)
+
+mat_final <- rbind(mat2, mat)
+
+write.table(mat_final, '~/master/wolfcombined/dataflow/03-asv-table/feature-table-decontam.txt', col.names = FALSE, quote = FALSE, row.names = FALSE, sep = "\t")
+```

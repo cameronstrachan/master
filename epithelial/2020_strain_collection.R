@@ -45,7 +45,7 @@ colnames(df_blast_goat)[1] <- 'isolate'
 
 library(rRDP)
 
-seq <- readDNAStringSet("~/master/epithelial/dataflow/01-nucl/2020_strain_collection.fasta")
+seq <- readDNAStringSet("~/master/epithelial/dataflow/01-nucl/campy_1_assembled_16s_oneLine.fasta")
 pred <- predict(rdp(), seq)
 conf <- attr(pred, "confidence")
 

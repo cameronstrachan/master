@@ -29,5 +29,10 @@ ls -1 | wc -l
 
 # Scratch
 
-scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/wolfskin/dataflow/02-qiime-viz/beta-sig-bray.qzv /Users/cameronstrachan/master/wolfskin/dataflow/02-qiime-viz/beta-sig-bray.qzv
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/epsilon/dataflow/02-classification/*.fasta /Users/cameronstrachan/master/epsilon/dataflow/02-classification/
 
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/epsilon/dataflow/02-classification/gtdbtk.bac120.summary.tsv /Users/cameronstrachan/master/epsilon/dataflow/02-classification/
+
+
+
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/wolskin/dataflow/02-qiime-viz/demux-trimmed.qzv /Users/cameronstrachan/Desktop/

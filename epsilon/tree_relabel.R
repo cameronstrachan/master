@@ -26,5 +26,4 @@ for (x in 1:nrow(df_label)){
   tree <- gsub(tree_label, new_label, tree)
 }
 
-df_A <- df_label %>%
-  filter(L6 == "Campylobacter_A")
+df_16s_blast <- read.delim("~/master/epsilon/dataflow/02-blast/novel_campy16s_campylobacter_genomes_mapped", header=FALSE)
