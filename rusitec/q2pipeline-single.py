@@ -11,9 +11,9 @@ CEND = '\033[0m'
 if os.path.exists('dataflow') == False:
 	os.mkdir('dataflow')
 
-check = input("\n" + 'Single end amplicon pipeline' + '\n' + '\n' + 'Hit any key to continue')
+check = input("\n" + 'Single end amplicon pipeline using the forward reads' + '\n' + '\n' + 'Hit any key to continue')
 
-dirs = ['01-fastq', '00-meta', '02-qiime', '02-qiime-viz', '03-asv-seqs', '03-asv-table', '00-logs']
+dirs = ['02-qiime', '02-qiime-viz', '03-asv-seqs', '03-asv-table', '00-logs']
 
 for dir in dirs:
 	dir_to_make = 'dataflow/' + dir
