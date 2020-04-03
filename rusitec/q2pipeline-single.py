@@ -53,15 +53,15 @@ df_data_params.to_csv("dataflow/00-logs/selected_cutoffs_single.csv")
 
 # STEP 4. Export seqs and table
 
-qiime tools export \
-  --input-path dataflow/02-qiime/forward-table.qza \
-  --output-path dataflow/03-asv-table
-
-biom convert -i dataflow/03-asv-table/feature-table.biom \
--o dataflow/03-asv-table/feature-table.txt --to-tsv
-
-rm dataflow/03-asv-table/feature-table.biom
-
-qiime tools export \
-  --input-path dataflow/02-qiime/forward-rep-seqs.qza \
-  --output-path dataflow/03-asv-seqs
+# qiime tools export \
+#   --input-path dataflow/02-qiime/forward-table.qza \
+#   --output-path dataflow/03-asv-table
+#
+# biom convert -i dataflow/03-asv-table/feature-table.biom \
+# -o dataflow/03-asv-table/feature-table.txt --to-tsv
+#
+# rm dataflow/03-asv-table/feature-table.biom
+#
+# qiime tools export \
+#   --input-path dataflow/02-qiime/forward-rep-seqs.qza \
+#   --output-path dataflow/03-asv-seqs
