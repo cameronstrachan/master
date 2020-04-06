@@ -1,0 +1,184 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r}
+library(tidyverse)
+library(rRDP)
+library(RColorBrewer)
+```
+
+```{r}
+df_compiled <- read.csv("~/master/rusitec/dataflow/04-exported-tables/df_forward_compiled.csv")
+df_compiled$X <- NULL
+```
+
+```{r}
+df_compiled <- df_compiled %>%
+  filter(counts > 0) %>%
+  mutate(rel_abundance = counts / non.chimeric) %>%
+  filter(reactor != 'NC') %>%
+  #filter(day != 0) %>%
+  #filter(non.chimeric > 20000) %>%
+  
+  group_by(run, time, day, treatment) %>%
+  mutate(n = length(unique(sample))) %>%
+  ungroup() %>%
+  
+  filter(n > 2)
+
+df_compiled$phylum <- as.character(df_compiled$phylum)  
+
+df_phylum <- df_compiled %>%
+  
+  group_by(run, time, day, treatment) %>%
+  mutate(reads_group = sum(counts)) %>% 
+  ungroup() %>%
+  
+  group_by(run, time, day, treatment, phylum) %>%
+  mutate(reads_phylum_group = sum(counts)) %>%
+  ungroup() %>%
+  
+  group_by(phylum) %>%
+  mutate(reads_phylum = sum(counts)) %>%
+  ungroup() %>%
+  
+  mutate(rel_abundance_phylum = (reads_phylum_group / reads_group)*100) %>%
+  select(run, time, day, treatment, phylum, rel_abundance_phylum, reads_phylum) %>%
+  distinct() 
+```
+
+```{r, fig.height=15, fig.width=10}
+df_phylum_48 <- df_phylum %>%
+  filter(run == 48) %>%
+  filter(reads_phylum > 5000)
+
+plot <- ggplot() + geom_bar(
+  aes(y = rel_abundance_phylum, x = treatment, fill = phylum, order = rel_abundance_phylum),
+  data = df_phylum_48,
+  stat = "identity" 
+)  + labs(x="Category" , y= "Percentage (%)")+
+  theme_minimal() +
+  theme(strip.text = element_text(size = 8),
+          plot.title = element_text(size = 16),
+          axis.text.x = element_text(angle = 90, hjust = 1, size = 14),
+          axis.text.y = element_text(size = 12),
+          axis.title.x = element_text(size = 16),
+          axis.title.y = element_text(size = 16)) + 
+  theme(legend.text=element_text(size=14)) +
+  theme(legend.title=element_text(size=14)) +
+  ylab("Percentage of Sample") +
+  xlab("Individual Sample") +
+  facet_grid(phylum ~ day,  scales = "free_y") +
+  ggtitle("48 - top phyla")
+
+plot
+```
+
+```{r, fig.height=15, fig.width=10}
+df_phylum_49 <- df_phylum %>%
+  filter(run == 49) %>%
+  filter(reads_phylum > 5000)
+
+plot <- ggplot() + geom_bar(
+  aes(y = rel_abundance_phylum, x = treatment, fill = phylum, order = rel_abundance_phylum),
+  data = df_phylum_49,
+  stat = "identity" 
+)  + labs(x="Category" , y= "Percentage (%)")+
+  theme_minimal() +
+  theme(strip.text = element_text(size = 8),
+          plot.title = element_text(size = 16),
+          axis.text.x = element_text(angle = 90, hjust = 1, size = 14),
+          axis.text.y = element_text(size = 12),
+          axis.title.x = element_text(size = 16),
+          axis.title.y = element_text(size = 16)) + 
+  theme(legend.text=element_text(size=14)) +
+  theme(legend.title=element_text(size=14)) +
+  ylab("Percentage of Sample") +
+  xlab("Individual Sample") +
+  facet_grid(phylum ~ day,  scales = "free_y") +
+  ggtitle("49 top phyla")
+
+plot
+```
+
+
+```{r}
+df_family <- df_compiled %>%
+  
+  group_by(run, time, day, treatment) %>%
+  mutate(reads_group = sum(counts)) %>% 
+  ungroup() %>%
+  
+  group_by(run, time, day, treatment, family) %>%
+  mutate(reads_family_group = sum(counts)) %>%
+  ungroup() %>%
+  
+  group_by(family) %>%
+  mutate(reads_family= sum(counts)) %>%
+  ungroup() %>%
+  
+  mutate(rel_abundance_family= (reads_family_group / reads_group)*100) %>%
+  select(run, time, day, treatment, family, rel_abundance_family, reads_family) %>%
+  distinct() 
+```
+
+```{r, fig.height=15, fig.width=10}
+df_family_48 <- df_family %>%
+  filter(run == 48) %>%
+  filter(reads_family > 36559)
+
+plot <- ggplot() + geom_bar(
+  aes(y = rel_abundance_family, x = treatment, fill = family, order = rel_abundance_family),
+  data = df_family_48,
+  stat = "identity" 
+)  + labs(x="Category" , y= "Percentage (%)")+
+  theme_minimal() +
+  theme(strip.text = element_text(size = 6),
+          plot.title = element_text(size = 16),
+          axis.text.x = element_text(angle = 90, hjust = 1, size = 14),
+          axis.text.y = element_text(size = 12),
+          axis.title.x = element_text(size = 16),
+          axis.title.y = element_text(size = 16)) + 
+  theme(legend.text=element_text(size=14)) +
+  theme(legend.title=element_text(size=14)) +
+  ylab("Percentage of Sample") +
+  xlab("Individual Sample") +
+  facet_grid(family ~ day,  scales = "free_y") +
+  ggtitle("48 - top family")
+
+plot
+```
+
+```{r, fig.height=15, fig.width=10}
+df_family_49 <- df_family %>%
+  filter(run == 49) %>%
+  filter(reads_family > 36559)
+
+plot <- ggplot() + geom_bar(
+  aes(y = rel_abundance_family, x = treatment, fill = family, order = rel_abundance_family),
+  data = df_family_49,
+  stat = "identity" 
+)  + labs(x="Category" , y= "Percentage (%)")+
+  theme_minimal() +
+  theme(strip.text = element_text(size = 6),
+          plot.title = element_text(size = 16),
+          axis.text.x = element_text(angle = 90, hjust = 1, size = 14),
+          axis.text.y = element_text(size = 12),
+          axis.title.x = element_text(size = 16),
+          axis.title.y = element_text(size = 16)) + 
+  theme(legend.text=element_text(size=14)) +
+  theme(legend.title=element_text(size=14)) +
+  ylab("Percentage of Sample") +
+  xlab("Individual Sample") +
+  facet_grid(family ~ day,  scales = "free_y") +
+  ggtitle("49 top family")
+
+plot
+```

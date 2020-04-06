@@ -51,6 +51,8 @@ data_params = {'Left Cutoff':cut_off1, "Length Cutoff":cut_off2}
 df_data_params = pd.DataFrame.from_dict(data_params, orient="index")
 df_data_params.to_csv("dataflow/00-logs/selected_cutoffs_single.csv")
 
-# STEP 4. Export tables and seqs
+# STEP 4. Cluster from 99 to 95
+os.system('q2pipeline/q2_cluster-single.sh')
 
+# STEP 5. Export tables and seqs
 os.system('q2pipeline/q2_export-single.sh')
