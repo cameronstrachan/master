@@ -10,7 +10,7 @@ if system == 'S':
 else:
     sys.path.insert(0, '/Users/cameronstrachan/master/')
 
-from modules import seq_scrape ss
+from modules import seq_scrape as ss
 ### Environment: source activate anaconda to dowload data
 
 downloaddata = input("\n" + "Download test data? (y or n):")
