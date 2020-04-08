@@ -1,0 +1,129 @@
+---
+title: "Novel betaproteobacteria abundance"
+author: "Cameron Strachan"
+date: '2019-08-27'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+library(tidyverse)
+```
+
+
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+#Summarize the cow epithelial data from Vicki
+df_blast <- read.delim("~/master/strain_collection/02-blast/strains_to_neubauer.txt", header=FALSE)
+colnames(df_blast)[1:13] <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+
+df_blast <- df_blast %>%
+  filter(pident > 97) %>%
+  select(qseqid, sseqid, pident, length)
+
+
+df_count <- read.delim("~/master/strain_collection/03-tables/neubauer_et_al_epithelial.txt", skip = 1)
+names(df_count)[1] <- 'sseqid'
+
+df_meta <- read.csv("~/master/strain_collection/00-meta/neubauaer_mapping.csv")
+df_meta$sample <- paste("P", df_meta$ID, sep = "")
+
+df_classification <- read.csv("~/master/strain_collection/03-tables/bacterial_classification.csv")
+df_classification$X <- NULL
+names(df_classification)[1] <- c("qseqid")
+
+df_final_neubauer <- df_count %>%
+  gather(sample, count, -sseqid) %>%
+  group_by(sample) %>%
+  mutate(total_reads = sum(count)) %>%
+  ungroup() %>%
+  full_join(df_blast) %>%
+  filter(count > 0) %>%
+  mutate(percent_sample = (count / total_reads) * 100) %>%
+  filter(qseqid != 'NA') %>%
+  inner_join(df_meta) %>%
+  inner_join(df_classification) %>%
+  select(sseqid, sample, count, total_reads, qseqid, pident, length, percent_sample, Phase, CowName, order, family, genus)
+
+df_final_neubauer$Study <- "Neubauer"
+```
+
+
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+# Summarize the cow epithelial data from Peffi, and standardize the column names so that I can combine the data
+df_blast <- read.delim("~/master/strain_collection/02-blast/strains_to_wetzels.txt", header=FALSE)
+colnames(df_blast)[1:13] <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+
+df_blast <- df_blast %>%
+  filter(pident > 97) %>%
+  select(qseqid, sseqid, pident, length)
+
+
+df_count <- read.delim("~/master/strain_collection/03-tables/wetzels_et_al_epithelial.txt", skip = 1)
+names(df_count)[1] <- 'sseqid'
+
+df_meta <- read.csv("~/master/strain_collection/00-meta/wetzels_epithelial.csv")
+df_meta$sample <- paste("X", df_meta$ID, sep = "")
+
+df_classification <- read.csv("~/master/strain_collection/03-tables/bacterial_classification.csv")
+df_classification$X <- NULL
+names(df_classification)[1] <- c("qseqid")
+
+df_final_wetzels <- df_count %>%
+  gather(sample, count, -sseqid) %>%
+  group_by(sample) %>%
+  mutate(total_reads = sum(count)) %>%
+  ungroup() %>%
+  full_join(df_blast) %>%
+  filter(count > 0) %>%
+  mutate(percent_sample = (count / total_reads) * 100) %>%
+  filter(qseqid != 'NA') %>%
+  inner_join(df_meta) %>%
+  inner_join(df_classification) %>%
+  select(sseqid, sample, count, total_reads, qseqid, pident, length, percent_sample, Time, Model, Run, Cow, order, family, genus) %>%
+  unite(Phase, c("Model", "Time"), sep = "") %>%
+  rename(CowName = Cow) %>%
+  select(-Run)
+
+df_final_wetzels$Phase <- gsub("L1", "Baseline", df_final_wetzels$Phase)
+df_final_wetzels$Phase <- gsub("L2", "SARA_I", df_final_wetzels$Phase)
+df_final_wetzels$Phase <- gsub("L3", "SARA_II", df_final_wetzels$Phase)
+df_final_wetzels$Phase <- gsub("L4", "Baseline_return", df_final_wetzels$Phase)
+df_final_wetzels$Phase <- gsub("S1", "Baseline", df_final_wetzels$Phase)
+df_final_wetzels$Phase <- gsub("S2", "SARA_I", df_final_wetzels$Phase)
+df_final_wetzels$Phase <- gsub("S3", "SARA_II", df_final_wetzels$Phase)
+df_final_wetzels$Phase <- gsub("S4", "SARA_III", df_final_wetzels$Phase)
+df_final_wetzels$Phase <- gsub("S5", "Baseline_return", df_final_wetzels$Phase)
+
+df_final_wetzels$Study <- "Wetzels"
+```
+
+
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+#Combine the 2 datasets and select the betaproteobacteria
+df_beta <- bind_rows(df_final_neubauer, df_final_wetzels) %>%
+  filter(order == "Neisseriales") %>%
+  select(-order, -family, -genus) %>%
+  select(-qseqid) %>%
+  distinct() %>%
+  filter(sseqid == '6faf464780b148292a976d6f7d7e296a' | 
+         sseqid == '611dbaf5cc9a89e698f66556b29db249') %>%
+  separate(Phase, into = c("Phase_simple", "rm"), sep = "_", remove = FALSE) %>%
+  group_by(sseqid, Phase_simple, CowName, Study) %>%
+  mutate(mean_cow_percent = mean(percent_sample)) %>%
+  ungroup()
+
+
+
+```
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+plot <- ggplot(df_beta, aes(x=Phase_simple, y=mean_cow_percent, group=CowName)) + 
+  geom_point(aes(colour=CowName)) + 
+  facet_wrap(sseqid~Study, scales = "free_y") +
+  geom_smooth(aes(colour = CowName))
+plot
+```

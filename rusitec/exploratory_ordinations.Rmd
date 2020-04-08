@@ -1,8 +1,10 @@
 ---
 title: "Untitled"
 author: "Cameron Strachan"
-date: '2020-04-06'
-output: html_document
+date: '2020-04-07'
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -11,7 +13,6 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
 ```{r}
 library(tidyverse)
-library(cowplot)
 ```
 
 ```{r}
@@ -41,95 +42,83 @@ df_runs$reactor <- as.character(df_runs$reactor)
 df_meta <- inner_join(df_dada2, df_vbc_map) %>%
   left_join(df_tp) %>%
   left_join(df_runs) %>%
-  separate(treatment, into=c("ph", "myco"), sep = "_") %>%
   filter(treatment != "NC") %>%
   filter(time != "0") %>%
-  filter(!(run == "48" & time == "288"))
+  filter(time != "288")
 
 df_meta$sample <- paste("X", df_meta$sample, sep = "")
-```
 
-```{r}
 row.names(df_meta) <- df_meta[,1]
 df_meta$treatment <- as.character(df_meta$treatment)
 selected_samples <- row.names(df_meta)
 ```
 
 ```{r}
-df_counts <- read.csv("~/master/rusitec/dataflow/03-asv-table/forward-feature-table.txt", sep = '\t', skip = 1)
-df_counts <- cbind(df_counts[,1], df_counts[,names(df_counts) %in% selected_samples])
-colnames(df_counts)[1] <- "asv_id"
-df_counts <- df_counts[order(df_counts$asv_id),] 
-
-numsamples <- length(df_counts)
-
-otumat <- as.matrix(df_counts[,2:numsamples])
-rownames(otumat) <- as.data.frame(df_counts)[,1]
-```
-
-```{r}
 library("phyloseq")
 library("ape")
 library(plyr)
-
-# load phyloseq obect
-
-OTU = otu_table(otumat, taxa_are_rows = TRUE)
-
-samplesdata <- sample_data(df_meta)
-physeq = phyloseq(OTU, samplesdata)
-```
-
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=4, fig.width=6}
-set.seed(3)
-library(ggplot2)
-library(ggpubr)
-library(RColorBrewer)
-library(ggthemes)
-
-#physeq_norm = transform_sample_counts(physeq, function(x) sqrt(x))
-
-physeq_norm = transform_sample_counts(physeq, function(x) x / sum(x))
-
-#getPalette = colorRampPalette(brewer.pal(9, "Set1"))
-#colourCount = length(unique(df_phylocounts_meta$sample))
-```
-
-```{r}
 library(tsnemicrobiota)
-
-
-#t-SNE plot bray
-set.seed(3)
-t_SNE <- tsne_phyloseq(physeq_norm, distance = "bray", perplexity = 25, 
-  precomputed_distance = NULL, pseudocounts = 1, verbose = 1,
-  rng_seed = NULL, philr_options = list(), control = list())
-
-
-
-tsne_plot <- plot_tsne_phyloseq(physeq_norm, t_SNE,
-    color = 'treatment', title='t-SNE (bray)',shape="time") +
-    geom_point(size=1.5) +
-  theme_classic()
-
-tsne_plot
+library(cowplot)
 ```
-
 
 ```{r}
-#t-SNE plot jsd
-set.seed(3)
-t_SNE <- tsne_phyloseq(physeq_norm, distance = "jsd", perplexity = 25,
-  precomputed_distance = NULL, pseudocounts = 1, verbose = 1,
-  rng_seed = NULL, philr_options = list(), control = list())
+files <- c("forward-feature-table.txt", "forward-feature-table-99.txt", "forward-feature-table-98.txt", "forward-feature-table-97.txt", "forward-feature-table-96.txt", "forward-feature-table-95.txt")
+
+otu_table_list <- list()
+i <- 1
 
 
-tsne_plot <- plot_tsne_phyloseq(physeq_norm, t_SNE,
-    color = 'treatment', title='t-SNE (bray)',shape="time") +
-    geom_point(size=1.5) +
-  theme_classic()
-
-tsne_plot
+for (file in files){
+  input_table <- paste("~/master/rusitec/dataflow/03-asv-table/", file, sep = "")
+  df_counts <- read.csv(input_table, sep = '\t', skip = 1)
+  df_counts <- cbind(df_counts[,1], df_counts[,names(df_counts) %in% selected_samples])
+  colnames(df_counts)[1] <- "asv_id"
+  df_counts <- df_counts[order(df_counts$asv_id),] 
+  numsamples <- length(df_counts)
+  otumat <- as.matrix(df_counts[,2:numsamples])
+  rownames(otumat) <- as.data.frame(df_counts)[,1]
+  otu_table_list[[i]] <- otumat
+  i <- i + 1
+}
 ```
 
+
+  
+```{r}
+clustering <- 100
+i <- 1
+plots_list <- list()
+
+for (j in 1:6){
+  OTU = otu_table(otu_table_list[[j]], taxa_are_rows = TRUE)
+  
+  samplesdata <- sample_data(df_meta)
+  physeq = phyloseq(OTU, samplesdata)
+  
+  physeq_trim = filter_taxa(physeq, function(x) sum(x > 3) > 3, TRUE)
+  #physeq_norm = transform_sample_counts(physeq_trim, function(x) sqrt(x))
+  physeq_norm = transform_sample_counts(physeq_trim, function(x) x / sum(x))
+  
+  t_SNE <- tsne_phyloseq(physeq_norm, distance = "bray", perplexity = 25, 
+                         precomputed_distance = NULL, pseudocounts = 1, verbose = 1,
+                         rng_seed = NULL, philr_options = list(), control = list())
+  
+  plot_header = paste("TSNE (bray) at", as.character(clustering), sep = " ")
+  
+  set.seed(3)
+  
+  tsne_plot <- plot_tsne_phyloseq(physeq_norm, t_SNE,
+                                  color = 'treatment', title=plot_header,shape="time") +
+    geom_point(size=1.5) +
+    theme_classic()
+  
+  plots_list[[i]] <- tsne_plot
+  
+  clustering <- clustering - 1
+  i <- i + 1
+}
+```
+
+```{r, fig.width=11, fig.height=11}
+plot_grid(plotlist=plots_list)
+```

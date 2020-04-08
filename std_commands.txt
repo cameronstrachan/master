@@ -36,3 +36,13 @@ scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/epsilon/dataf
 
 
 scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/wolskin/dataflow/02-qiime-viz/demux-trimmed.qzv /Users/cameronstrachan/Desktop/
+
+strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rusitec/dataflow/02-qiime-viz/forward-demux-trimmed.qzv /Users/cameronstrachan/master/rusitec/dataflow/02-qiime-viz/
+
+
+forward 
+20 / 280
+
+reverse
+20/280
+20 / 190

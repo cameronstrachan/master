@@ -39,10 +39,12 @@ df_dada2$sample <- as.character(df_dada2$sample)
 
 df_vbc_map <- read.csv("~/master/rusitec/dataflow/00-meta/vbc_sample_map.csv")
 df_vbc_map$run <- as.character(df_vbc_map$run)
-df_vbc_map$reactor<- as.character(df_vbc_map$reactor)
-df_vbc_map$sample<- as.character(df_vbc_map$sample)
+df_vbc_map$reactor <- as.character(df_vbc_map$reactor)
+df_vbc_map$sample <- as.character(df_vbc_map$sample)
+df_vbc_map$time <- as.character(df_vbc_map$time)
 
 df_tp <- read.csv("~/master/rusitec/dataflow/00-meta/meta_TP.csv")
+df_tp$time <- as.character(df_tp$time)
 
 df_t48 <- read.csv("~/master/rusitec/dataflow/00-meta/meta_T48.csv")
 df_t48$run <- '48'
@@ -57,8 +59,6 @@ df_runs$reactor <- as.character(df_runs$reactor)
 df_meta <- inner_join(df_dada2, df_vbc_map) %>%
   left_join(df_tp) %>%
   left_join(df_runs)
-
-
 
 ## FINAL DATA FRAME
 
