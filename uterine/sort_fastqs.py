@@ -28,7 +28,7 @@ for fq in fq_files:
 
     if pair == '1':
         input = fq_dir + fq
-        output = fq_dir + 'forward/' + acc + '_' + 'S' + str(count) + '_L001_R1_001.fastq'
+        output = fq_dir + 'forward/' + acc + '_' + 'S' + str(count) + '_L001_R1_001.fastq.gz'
         command = 'cp ' + input + ' ' + output
         os.system(command)
 
