@@ -15,7 +15,7 @@ from modules import seq_core_lin as sc
 from modules import seq_gen_lin as sg
 from modules import seq_scrape as ss
 
-ss.srafastqdownlaod('SRX848536', outputdir='dataflow/01-fastq/')
+ss.srafastqdownlaod('SRX848535', outputdir='dataflow/01-fastq/')
 
 fq_dir = 'dataflow/01-fastq/'
 fq_files = [f for f in os.listdir(fq_dir) if f.endswith(".fastq.gz")]
