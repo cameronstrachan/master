@@ -13,6 +13,7 @@ else:
 
 from modules import seq_core_lin as sc
 from modules import seq_gen_lin as sg
+from modules import seq_scrape as ss
 
 ss.srafastqdownlaod('SRX848536', outputdir='dataflow/01-fastq/')
 
