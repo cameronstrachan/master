@@ -1,0 +1,184 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r}
+library(tidyverse)
+library(printr)
+library(knitr)
+```
+
+```{r}
+df_compiled <- read.csv("~/master/rusitec/dataflow/04-exported-tables/df_forward_compiled.csv")
+df_compiled$X <- NULL
+```
+
+```{r}
+df_compiled <- df_compiled %>%
+  filter(counts > 0) %>%
+  mutate(rel_abundance = (counts / non.chimeric)*100) %>%
+  filter(reactor != 'NC') %>%
+  filter(time != "0") %>%
+  filter(!(time == "288" & run == "48")) %>%
+  
+  group_by(run, time, day, treatment) %>%
+  mutate(n = length(unique(sample))) %>%
+  ungroup() %>%
+  
+  filter(n > 2) %>%
+  
+  group_by(sample) %>%
+  mutate(total_reads = sum(counts)) %>%
+  ungroup()
+
+df_compiled$phylum <- as.character(df_compiled$phylum)  
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(pwr)
+
+df_compiled$run <- as.character(df_compiled$run)
+
+df_ttest <- df_compiled %>%
+  
+  group_by(sample, phylum) %>%
+  mutate(mean_rel_abundance_sample = mean(rel_abundance)) %>%
+  ungroup() %>%
+  
+  select(sample, run, time, day, treatment, phylum, mean_rel_abundance_sample) %>%
+  distinct() %>%
+  filter(!is.na(phylum)) %>%
+  
+  group_by(phylum) %>%
+  mutate(sample_phylum = length(unique((sample)))) %>%
+  ungroup() %>%
+  filter(sample_phylum > 10)
+
+df_ttest$phylum <- as.character(df_ttest$phylum)
+phys <- unique(df_ttest$phylum)
+
+i <- 1
+df_pairpval_list <- list()
+df_pairpval_list_temp <- list()
+
+for (phy in phys){
+  for (run_num in c("48", "49")){
+    for (day_num in c("6", "8", "10")){
+    
+      df_phylum_single <- df_ttest %>%
+        filter(phylum == phy) %>%
+        filter(run == run_num) %>%
+        filter(day == day_num) %>%
+        select(day, run, treatment, mean_rel_abundance_sample, phylum)
+      
+      pairwise_test <- pairwise.t.test(df_phylum_single$mean_rel_abundance_sample, df_phylum_single$treatment, p.adjust.method = "none")
+      
+      df_pairwise_test <- as.data.frame(pairwise_test$p.value)
+      df_pairwise_test$treatment1 <- rownames(df_pairwise_test)
+      
+      pairwise_values <- c(pairwise_test$p.value)
+      pairwise_values  <- pairwise_values[!is.na(pairwise_values)]
+      num_sig_tests <- sum(pairwise_values < 0.05)
+      
+      if (num_sig_tests >= 1) {
+        df_pairwise_test <- df_pairwise_test %>%
+          gather(treatment2, pvalue, -treatment1) %>%
+          filter(!is.na(pvalue)) %>%
+          filter(pvalue < 0.05) %>%
+          unite(comparison, c("treatment1", "treatment2"), sep = ":")
+        df_pairwise_test$run <- run_num
+        df_pairwise_test$day_num <- day_num
+        df_pairpval_list_temp[[i]]<- df_pairwise_test
+        i <- i + 1
+      }
+}
+}
+df_pairpval_list[[phy]] <- bind_rows(df_pairpval_list_temp)
+i <- 1
+}
+```
+
+```{r}
+df_phylum <- df_compiled %>%
+  
+  group_by(sample, phylum) %>%
+  mutate(mean_rel_abundance_sample = mean(rel_abundance)) %>%
+  ungroup() %>%
+  select(sample, run, time, day, treatment, phylum, mean_rel_abundance_sample) %>%
+  distinct() %>%
+  
+  group_by(day, time, run, treatment, phylum) %>%
+  mutate(mean_mean_rel_abundance_sample = mean(mean_rel_abundance_sample)) %>%
+  mutate(sd_mean_rel_abundance_sample = sd(mean_rel_abundance_sample)) %>%
+  ungroup() %>%
+  
+  group_by(phylum) %>%
+  mutate(sample_phylum = length(unique((sample)))) %>%
+  ungroup() %>%
+  
+  select(run, time, day, treatment, phylum, mean_mean_rel_abundance_sample, sd_mean_rel_abundance_sample, sample_phylum) %>%
+  distinct() %>%
+  arrange(desc(mean_mean_rel_abundance_sample)) %>%
+  filter(!is.na(phylum)) %>%
+  filter(!is.na(sd_mean_rel_abundance_sample)) %>%
+  filter(sample_phylum > 10)
+
+
+df_phylum$phylum <- as.character(df_phylum$phylum)
+phys <- unique(df_phylum$phylum)
+```
+
+```{r}
+plot_list <- list()
+i <- 1
+
+for (phy in phys){
+
+df_plot <- df_phylum %>%
+  filter(phylum == phy)
+
+plot <- ggplot(df_plot, aes(y = mean_mean_rel_abundance_sample, x = treatment, fill = treatment)) + geom_bar(stat = "identity", color="black", alpha=0.5,
+  position=position_dodge()
+)  +
+  geom_errorbar(aes(ymin=mean_mean_rel_abundance_sample-sd_mean_rel_abundance_sample, ymax=mean_mean_rel_abundance_sample+sd_mean_rel_abundance_sample), width=.2,
+                 position=position_dodge(.9)) +
+ labs(x="Category" , y= "Percentage (%)")+
+  theme_minimal() +
+  theme(strip.text = element_text(size = 6),
+          plot.title = element_text(size = 16),
+          axis.text.x = element_text(angle = 90, hjust = 1, size = 14),
+          axis.text.y = element_text(size = 12),
+          axis.title.x = element_text(size = 16),
+          axis.title.y = element_text(size = 16)) + 
+  theme(legend.position = "none") +
+  theme(legend.title=element_text(size=14)) +
+  ylab("Percentage of Sample") +
+  xlab("Individual Sample") +
+  facet_grid(run ~ day,  scales = "free_y") +
+  ggtitle(phy) 
+
+  plot_list[[i]] <- plot
+  i <- i + 1
+}
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=5, fig.height=4, results='asis'}
+for (i in 1:length(plot_list)) {
+  plot <- plot_list[[i]]
+  phy <- unique(plot$data$phylum)
+  df <- df_pairpval_list[[phy]]
+  print(kable(df, digits = 4, caption = phy))
+  
+  cat("\r\n\r\n")
+  
+  plot(plot)
+  
+  cat("\n\n\\pagebreak\n")
+}
+```

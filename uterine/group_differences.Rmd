@@ -1,0 +1,287 @@
+---
+title: "Exploratory analysis of Knudsen et al. - Group Differences"
+author: "Cameron Strachan"
+date: '2020-04-08'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r}
+library(tidyverse)
+library(printr)
+library(knitr)
+```
+
+```{r}
+df_compiled <- read.csv("~/master/uterine/dataflow/04-exported-tables/df_forward_compiled.csv")
+df_compiled$X <- NULL
+```
+
+```{r}
+df_compiled_trim <- df_compiled %>%
+  filter(counts > 0) %>%
+  filter(non.chimeric > 10000) %>%
+  mutate(counts_norm = (counts / (non.chimeric/10000))) %>%
+  
+  group_by(sample_type, time, disease_state) %>%
+  mutate(n = length(unique(accession))) %>%
+  ungroup()  %>%
+  
+  filter(time != "46_53") %>%
+  filter(counts_norm > 1) 
+
+df_compiled_trim$disease_state <- factor(df_compiled_trim$disease_state , levels = c("Normal", "Endometritis", "Metritis"))
+
+df_compiled_trim$time <- factor(df_compiled_trim$time, levels = c("4_12", "24_32"))
+
+
+```
+
+The data from Knudsen et al. was not nearly as deep in sequencing depth as claimed in the paper, but after trimming above 10000 reads, there is still an n > 7 for the for the first two sampling days. 
+
+```{r}
+replication <- df_compiled_trim %>%
+  select(sample_type, time, disease_state, n) %>%
+  distinct() %>%
+  arrange(sample_type, time, disease_state)
+
+replication
+```
+
+Because I am biased towards Campylobacter, I first plotted only the ASVs classified as Campylobacter. Each colour is a unique ASV. At the first sampling time point (4 - 12 days), there is a clear loss of many campylobacter classified ASVs in the metritis sample. Then, a few campylobacter classified ASVs (the orange ones) show up, which might be diagnostic of the metritis desease state (but in only a few replicates, since there is n =7 here). What I find more interesting is that in the endometritis state (for days 24-32), there in potentially a small increase in the campylobacter classified ASVs in the biopsies but they become completely absent in the flush state. The different between the flush and biopsy sample might be essential to understanding the ecology. For example, is there an increase in colonization for specific ASVs? A last strange observation is that in a single healthy flush sample, two campylobacter classified ASVs make up almost the entire community. 
+  
+Again, this is a biased look at the Campylobacter, but I was surprised that there were some interesting patterns that were not noticed in the paper. 
+
+```{r}
+library(RColorBrewer)
+getPalette = colorRampPalette(brewer.pal(12, "Paired"))
+
+df_campylobacter <- df_compiled_trim %>%
+  filter(genus == "Campylobacter") %>%
+  mutate(counts_norm_log = log2(counts_norm))
+  
+
+plot <- ggplot(df_campylobacter, aes(x=disease_state, y=counts_norm_log, colour = asv_id)) + 
+  geom_point() +
+  facet_grid(sample_type ~ time, scales = "free") +
+  theme(legend.position = "none") +
+  scale_colour_manual(values = getPalette(20)) +
+  ylab("Normalized Reads per 10K (Log10)") +
+  xlab("Desease State") + 
+  ggtitle("Campylobacter")
+
+plot
+```
+
+I'll start now looking at some of the general differences between heathy and disease. To do this, I will look at only ASVs that are found in at least 3 samples (per type, time point and disease state) with a relative abundance of more than 0.01. I will also remove ASVs that cannot be classified to the family level, as it seems that we are interested in only those that can be classified to some degree. 
+
+As a first plot, I will look at differences at the family leve, removing some of the families with low abundance or prevalence. 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12, fig.width=9}
+df_compiled_trim2 <- df_compiled_trim %>%
+  filter(counts_norm > 1) %>%
+  group_by(asv_id, sample_type, time, disease_state) %>%
+  mutate(n_obvs = length(unique(accession))) %>%
+  ungroup() %>%
+  filter(n_obvs >= 3) %>%
+  filter(!is.na(family)) %>%
+  
+  group_by(family) %>%
+  mutate(n_obs_family = length(unique(accession))) %>%
+  mutate(family_mean_counts_norm = mean(counts_norm)) %>%
+  ungroup() 
+
+df_family_trim <- df_compiled_trim2 %>%
+  filter(n_obs_family > 5) %>%
+  filter(family_mean_counts_norm > 5) 
+
+plot <- ggplot(df_family_trim, aes(fill=family, y=counts_norm, x=disease_state)) + 
+    geom_bar(position="fill", stat="identity") +
+  facet_grid(sample_type ~ time, scales = "free") +
+  theme(legend.position = "bottom") +
+scale_fill_manual(values = getPalette(39))  + 
+  theme(legend.title = element_blank()) 
+
+plot
+```
+
+\newpage
+
+To look at groups specific to normal or endometritis, I will do ttests between the two states for each ASV. An ASV with a pvalue lower than 0.05 will be plotted. I will only look at those which a genera can be assigned to a genera. If there is a plot where there doesn't look to me much of a difference, the sig test was likely caused by having lots of observations at 0 reads. I will plot each ASV for the biopsies first and then the flush samples, so that these can be skimmed through for interesting ASVs. 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(pwr)
+
+df_rel_asvs <- df_compiled_trim2 %>%
+  select(asv_id) %>%
+  distinct()
+
+df_ttest <- df_compiled %>%
+  inner_join(df_rel_asvs) %>%
+  filter(non.chimeric > 10000) %>%
+  filter(time != "46_53") %>%
+  filter(!is.na(genus)) %>%
+  
+  mutate(counts_norm = if_else(counts > 0,  (counts / (non.chimeric/10000)), 0)) %>%
+  
+  select(accession, asv_id, sample_type, time, disease_state, counts_norm, genus) %>%
+  group_by(asv_id, sample_type, time) %>%
+  mutate(sum_counts_norm = sum(counts_norm)) %>%
+  mutate(num_counts_norm = sum(counts_norm > 0)) %>%
+  ungroup() %>%
+  filter(sum_counts_norm > 20)%>%
+  filter(num_counts_norm > 3) 
+
+df_ttest$asv_id <- as.character(df_ttest$asv_id)
+df_ttest$sample_type <- as.character(df_ttest$sample_type)
+df_ttest$time <- as.character(df_ttest$time)
+
+species <- unique(df_ttest$asv_id)
+
+i <- 1
+df_pairpval_list <- list()
+df_pairpval_list_asv <- list()
+df_pairpval_list_temp <- list()
+
+for (spec in species){
+  for (sample_type_num in c("bovine endometrial biopsy", "bovine uterine flush sample")){
+    for (time_num in c("4_12", "24_32")){
+    
+      df_asv_id_single <- df_ttest %>%
+        filter(asv_id == spec) %>%
+        filter(sample_type == sample_type_num) %>%
+        filter(time == time_num) %>%
+        select(time, sample_type, disease_state, counts_norm, asv_id)
+      
+      pairwise_test <- pairwise.t.test(df_asv_id_single$counts_norm, df_asv_id_single$disease_state, p.adjust.method = "none")
+      
+      df_pairwise_test <- as.data.frame(pairwise_test$p.value)
+      df_pairwise_test$disease_state1 <- rownames(df_pairwise_test)
+      
+      pairwise_values <- c(pairwise_test$p.value)
+      pairwise_values  <- pairwise_values[!is.na(pairwise_values)]
+      num_sig_tests <- sum(pairwise_values < 0.05)
+      
+      if (num_sig_tests >= 1) {
+        df_pairwise_test <- df_pairwise_test %>%
+          gather(disease_state2, pvalue, -disease_state1) %>%
+          filter(!is.na(pvalue)) %>%
+          filter(pvalue < 0.05) %>%
+          unite(comparison, c("disease_state1", "disease_state2"), sep = ":")
+        df_pairwise_test$sample_type <- sample_type_num
+        df_pairwise_test$time <- time_num
+        df_pairpval_list_temp[[i]]<- df_pairwise_test
+        i <- i + 1
+      }
+    }
+  }
+  
+df_pairpval_list_asv[[spec]] <- bind_rows(df_pairpval_list_temp)
+df_pvalues_asv <- bind_rows(df_pairpval_list_temp)
+
+if (length(df_pvalues_asv) >= 1) {
+  df_pvalues_asv$asv_id <- spec
+  df_pairpval_list[[spec]] <- df_pvalues_asv
+}
+
+i <- 1
+
+}
+
+
+```
+
+\newpage
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=6, fig.width=6}
+df_pvalues_compiled <- bind_rows(df_pairpval_list) %>%
+  inner_join(df_ttest) %>%
+  filter(comparison == "Normal:Endometritis") %>%
+  filter(sample_type == "bovine endometrial biopsy") %>%
+  arrange(genus)
+
+asvs <- unique(df_pvalues_compiled$asv_id)
+
+plot_list <- list()
+
+for (asv in asvs){
+
+df_plot <- df_pvalues_compiled %>%
+  filter(asv_id == asv)
+
+genus <- unique(df_plot$genus)
+title <- paste("bovine endometrial biopsy:", genus)
+
+plot <- ggplot(df_plot, aes(x=disease_state, y=counts_norm)) + 
+  geom_point() +
+  theme(legend.position = "none") +
+  ylab("Normalized Reads per 10K") +
+  xlab("Desease State") + 
+  ggtitle(title)
+
+plot
+
+  plot_list[[asv]] <- plot
+}
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=5, fig.height=4, results='asis'}
+for (asv in asvs){
+  
+  plot <- plot_list[[asv]]
+  
+  plot(plot)
+  
+  cat("\n\n\n")
+}
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=6, fig.width=6}
+df_pvalues_compiled <- bind_rows(df_pairpval_list) %>%
+  inner_join(df_ttest) %>%
+  filter(comparison == "Normal:Endometritis") %>%
+  filter(sample_type == "bovine uterine flush sample") %>%
+  arrange(genus)
+
+asvs <- unique(df_pvalues_compiled$asv_id)
+plot_list <- list()
+
+for (asv in asvs){
+
+df_plot <- df_pvalues_compiled %>%
+  filter(asv_id == asv)
+
+genus <- unique(df_plot$genus)
+title <- paste("bovine endometrial biopsy:", genus)
+
+plot <- ggplot(df_plot, aes(x=disease_state, y=counts_norm)) + 
+  geom_point() +
+  theme(legend.position = "none") +
+  ylab("Normalized Reads per 10K") +
+  xlab("Desease State") + 
+  ggtitle(title)
+
+plot
+
+  plot_list[[asv]] <- plot
+}
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=5, fig.height=4, results='asis'}
+for (asv in asvs){
+  
+  plot <- plot_list[[asv]]
+  
+  plot(plot)
+  
+  cat("\n\n\n")
+}
+```
+

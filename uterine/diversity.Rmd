@@ -1,0 +1,67 @@
+---
+title: "Exploratory analysis of Knudsen et al. - Diversity"
+author: "Cameron Strachan"
+date: '2020-04-07'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+A quick look at the Shannon and Simpson indexes for the normal vs endometritis state. Several samples decrease in diveresity with the disease. 
+
+```{r, fig.height=6, fig.width=6}
+df_dada2 <- read.csv("~/master/uterine/dataflow/00-meta/dada2_stats.csv")
+df_dada2$accession <- as.character(df_dada2$accession)
+
+df_map <- read.csv("~/master/uterine/dataflow/00-meta/knudsen_meta.csv")
+df_map$accession <- as.character(df_map$accession)
+df_map$sample_type <- as.character(df_map$sample_type)
+df_map$time <- as.character(df_map$time)
+df_map$disease_state <- as.character(df_map$disease_state)
+
+df_meta <- inner_join(df_map, df_dada2) %>%
+  filter(time == "24_32") %>%
+  filter(non.chimeric > 10000)
+
+row.names(df_meta) <- df_meta[,1]
+selected_samples <- row.names(df_meta)
+```
+
+```{r}
+library("phyloseq")
+library("ape")
+library(plyr)
+library(tsnemicrobiota)
+library(cowplot)
+```
+
+```{r}
+df_counts <- read.csv("~/master/uterine/dataflow/03-asv-table/forward-feature-table.txt", sep = '\t', skip = 1)
+df_counts <- cbind(df_counts[,1], df_counts[,names(df_counts) %in% selected_samples])
+colnames(df_counts)[1] <- "asv_id"
+df_counts <- df_counts[order(df_counts$asv_id),] 
+numsamples <- length(df_counts)
+otumat <- as.matrix(df_counts[,2:numsamples])
+rownames(otumat) <- as.data.frame(df_counts)[,1]
+
+OTU = otu_table(otumat, taxa_are_rows = TRUE)
+  
+samplesdata <- sample_data(df_meta)
+physeq = phyloseq(OTU, samplesdata)
+
+physeq_trim <- prune_species(speciesSums(physeq) > 0, physeq)
+```
+
+```{r}
+plot_richness(physeq_trim, x="disease_state", color="sample_type", measures=c("Simpson", "Shannon"))
+```
+  

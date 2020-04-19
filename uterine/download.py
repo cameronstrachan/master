@@ -13,12 +13,9 @@ else:
 from modules import seq_scrape as ss
 ### Environment: source activate anaconda to dowload data
 
-downloaddata = input("\n" + "Download test data? (y or n):")
 
-if downloaddata == 'y':
+accession_nums = list(range(374, 536, 1))
+accession_list = ['SRX848' + str(x) for x in accession_nums]
 
-    accession_nums = list(range(374, 535, 1))
-    accession_list = ['SRX848' + str(x) for x in accession_nums]
-
-    for acc in accession_list:
-        ss.srafastqdownlaod(acc, outputdir='dataflow/01-fastq/')
+for acc in accession_list:
+    ss.srafastqdownlaod(acc, outputdir='dataflow/01-fastq/')
