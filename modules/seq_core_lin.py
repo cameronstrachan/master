@@ -90,6 +90,9 @@ class File(object):
 
     def outputexists(self):
         return os.path.exists(self.outputlocation + self.outputname)
+        
+    def deleteoutput(self):
+        os.remove(self.outputlocation + self.outputname)
 
 class Fasta(File):
 
@@ -166,7 +169,7 @@ class Fasta(File):
 
         return self.headers
 
-    def saveonelinefasta(self, header='number'):
+    def saveonelinefasta(self, type='number'):
 
         '''
         Calling this function will simply save a new fasta file where all the sequences
@@ -181,8 +184,9 @@ class Fasta(File):
             for k,v in fastadic.items():
                 header = k.replace(':', '')
                 seq = v.rstrip()
-                if header == 'number':
-                    outputfile.write(">" + header + '_' + str(j) + '\n')
+                print(header)
+                if type == 'number':
+                    outputfile.write(">" + header + '_' + str(j) + '_' + str(len(v)) + '\n')
                     outputfile.write(v + '\n')
                 else:
                     outputfile.write(">" + header + '\n')

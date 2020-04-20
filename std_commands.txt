@@ -40,6 +40,8 @@ scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/wolskin/dataf
 strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/rusitec/dataflow/02-qiime-viz/forward-demux-trimmed.qzv /Users/cameronstrachan/master/rusitec/dataflow/02-qiime-viz/
 
 
+scp strachan@biodatascience.tulln.fhwn.ac.at:/home/strachan/master/campy/dataflow/00-meta/gtdbtk_Campylobacter_D_contig_lengths.csv /Users/cameronstrachan/master/campy/dataflow/00-meta/gtdbtk_Campylobacter_D_contig_lengths.csv
+
 forward 
 20 / 280
 
