@@ -48,7 +48,7 @@ for index, row in df_genomes.iterrows():
             contigs.update({contig_name:len(v)})
             full_genomes_count = full_genomes_count + 1
 
-    if full_genomes_count > 0:
+    if full_genomes_count = 0:
         file_obj.deleteoutput()
 
     plasmids_genomes_count = 0
@@ -65,7 +65,7 @@ for index, row in df_genomes.iterrows():
             contigs.update({contig_name:len(v)})
             plasmids_genomes_count = plasmids_genomes_count + 1
 
-    if plasmids_genomes_count > 0:
+    if plasmids_genomes_count = 0:
         file_obj.deleteoutput()
 
 df_contig_lengths = pd.DataFrame.from_dict(contigs, orient="index")
