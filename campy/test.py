@@ -19,7 +19,7 @@ contigs = dict()
 df_contig_lengths_output = 'dataflow/00-meta/gtdbtk_Campylobacter_D_contig_lengths.csv'
 
 for index, row in df_genomesiterrows():
-    
+
     file = row['file']
     acc = row['accession']
 
@@ -27,11 +27,13 @@ for index, row in df_genomesiterrows():
     file_minor_cotigs = file.replace('_genomic', '_minor_cotigs')
 
     file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
-    file_obj.setOutputLocation('dataflow/01-nucl/')
+    file_obj.setOutputLocation('dataflow/01-nucl/selected_genomes/')
 
     fastadic = file_obj.fasta2dict()
+
     file_obj.setOutputName(file_major_contig)
     outputfile = file_obj.openwritefile()
+    file_obj.setOutputLocation('dataflow/01-nucl/selected_genomes/')
 
     for k,v in fastadic.items():
         header = k.replace(':', '')
@@ -43,6 +45,7 @@ for index, row in df_genomesiterrows():
 
     file_obj.setOutputName(file_minor_cotigs)
     outputfile = file_obj.openwritefile()
+    file_obj.setOutputLocation('dataflow/01-nucl/selected_small_contigs/')
 
     for k,v in fastadic.items():
         if len(v) < 1000000:
