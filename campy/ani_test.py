@@ -7,7 +7,8 @@ files = [f for f in os.listdir('dataflow/01-nucl/selected_genomes/') if f.endswi
 
 with open('dataflow/genomes_list.txt', 'w') as f:
     for file in files:
-        f.write("%s\n" % file)
+        file1 = input_file + file
+        f.write("%s\n" % file1)
 
 for file in files:
   file1 = input_file + file
@@ -15,7 +16,6 @@ for file in files:
   output = output_file + file1_name + '.txt'
   command = 'fastANI -t 70 -q ' + file1 + ' --rl ' + 'dataflow/genomes_list.txt' + ' -o ' + output
   os.system(command)
-  break
 
 os.remove('dataflow/genomes_list.txt')
 
