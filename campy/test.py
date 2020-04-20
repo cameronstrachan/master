@@ -44,8 +44,9 @@ for index, row in df_genomes.iterrows():
             contigs.update({contig_name:len(v)})
 
     file_obj.setOutputName(file_minor_cotigs)
-    outputfile = file_obj.openwritefile()
     file_obj.setOutputLocation('dataflow/01-nucl/selected_small_contigs/')
+    outputfile = file_obj.openwritefile()
+
 
     for k,v in fastadic.items():
         if len(v) < 1000000:
