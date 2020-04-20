@@ -5,16 +5,18 @@ output_file = 'dataflow/02-ani/'
 
 files = [f for f in os.listdir('dataflow/01-nucl/selected_genomes/') if f.endswith(".fna")]
 
+with open('dataflow/genomes_list.txt', 'w') as f:
+    for file in files:
+        f.write("%s\n" % file)
+
 for file in files:
   file1 = input_file + file
   file1_name = file.split('.fn')[0]
-  for file in files:
-    file2 = input_file + file
-    file2_name = file.split('.fn')[0]
+  output = output_file + file1_name + '.txt'
+  command = 'fastANI -t 70 -q ' + file1 + ' --rl ' + 'dataflow/genomes_list.txt' + ' -o ' + output
+  os.system(command)
 
-    output = output_file + file1_name + '_' + file2_name
-    command = 'fastANI -t 40 -q ' + file1 + ' -r ' + file2 + ' -o ' + output
-    os.system(command)
-    
+os.remove('dataflow/genomes_list.txt')
+
 #command = 'cat *.txt > compiled.txt'
 #os.system(command)
