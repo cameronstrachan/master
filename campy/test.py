@@ -18,7 +18,7 @@ df_genomes = pd.read_csv('dataflow/00-meta/gtdbtk_Campylobacter_D.csv', low_memo
 contigs = dict()
 df_contig_lengths_output = 'dataflow/00-meta/gtdbtk_Campylobacter_D_contig_lengths.csv'
 
-for index, row in df_genomesiterrows():
+for index, row in df_genomes.iterrows():
 
     file = row['file']
     acc = row['accession']
