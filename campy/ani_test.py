@@ -13,8 +13,9 @@ for file in files:
   file1 = input_file + file
   file1_name = file.split('.fn')[0]
   output = output_file + file1_name + '.txt'
-  command = 'fastANI -t 70 -q ' + file1_name + ' --rl ' + 'dataflow/genomes_list.txt' + ' -o ' + output
+  command = 'fastANI -t 70 -q ' + file1 + ' --rl ' + 'dataflow/genomes_list.txt' + ' -o ' + output
   os.system(command)
+  break
 
 os.remove('dataflow/genomes_list.txt')
 
