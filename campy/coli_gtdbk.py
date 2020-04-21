@@ -16,7 +16,8 @@ for index, row in df_selected_species.iterrows():
     command = 'cp ' + input_file + ' ' + output_dir
     os.system(command)
 
-command = 'cp dataflow/01-nucl/GCF_000816385.2_ASM81638v2_genomic.fna ' + output_dir + 'Clari_outgroup.fna'
+command = 'cp dataflow/01-nucl/GCF_001457695.1_NCTC11351_genomic.fna ' + output_dir + 'Cjejuni_outgroup.fna'
 os.system(command)
 
-#os.system("gtdbtk classify_wf --genome_dir dataflow/01-nucl/selected_genomes_coli --out_dir dataflow/02-classification/selected_genomes_coli --extension fa --cpus 60")
+#gtdbtk identify --genome_dir dataflow/01-nucl/selected_genomes_coli --out_dir dataflow/01-nucl/selected_genomes_coli/identify --cpus 60
+#gtdbtk align --identify_dir dataflow/01-nucl/selected_genomes_coli/identify --out_dir dataflow/01-nucl/selected_genomes_coli/align --skip_gtdb_refs --skip_trimming --cpus 60 
