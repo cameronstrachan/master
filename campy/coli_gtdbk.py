@@ -1,5 +1,6 @@
 import os, sys
-import subprocess
+import pandas as pd
+
 
 input_selected_genus = 'dataflow/00-meta/ani_drep_ccoli_trim.csv'
 df_selected_genus = pd.read_csv(input_selected_species)
