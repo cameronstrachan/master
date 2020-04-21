@@ -5,7 +5,7 @@ import pandas as pd
 input_selected_species = 'dataflow/00-meta/ani_drep_ccoli_trim.csv'
 df_selected_species = pd.read_csv(input_selected_species)
 
-input_dir = 'dataflow/01-nucl/'
+input_dir = 'dataflow/01-nucl/selected_genomes/'
 output_dir = 'dataflow/01-nucl/selected_genomes_coli/'
 classification_dir = 'dataflow/02-classification/selected_genomes_coli/'
 
@@ -14,5 +14,9 @@ for index, row in df_selected_species.iterrows():
     file = row['genome1']
     input_file = input_dir + file
     command = 'cp ' + input_file + ' ' + output_dir
+    os.system(command)
 
-os.system("gtdbtk classify_wf --genome_dir dataflow/01-nucl/selected_genomes_coli --out_dir dataflow/02-classification/selected_genomes_coli --extension fa --cpus 60")
+command = 'cp dataflow/01-nucl/GCF_000816385.2_ASM81638v2_genomic.fna ' + output_dir + 'Clari_outgroup.fna'
+os.system(command)
+
+#os.system("gtdbtk classify_wf --genome_dir dataflow/01-nucl/selected_genomes_coli --out_dir dataflow/02-classification/selected_genomes_coli --extension fa --cpus 60")
