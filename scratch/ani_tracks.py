@@ -21,8 +21,12 @@ ap.add_argument("-o", "--output_file", required=True,
    help="location and name for the output file, ex. 'output/fragment_ani_analysis.csv")
 ap.add_argument("-f", "--fragment_length", required=True,
    help="value to be used for the fragment length, ex. 3000.")
+ap.add_argument("-e", "--fragment_step", required=True,
+   help="genome step size during fragmentation ex. 3000")
 ap.add_argument("-e", "--file_extension", required=True,
    help="extension for the genome files, ex. '.fasta'")
+ap.add_argument("-e", "--cont_dist", required=True,
+   help="distance allowed in mataining sequence continuity, ex. 1")
 ap.add_argument("-t", "--threads", required=True,
    help="number of threads to use.")
 
@@ -31,7 +35,9 @@ args = vars(ap.parse_args())
 input_folder = str(args['input_folder'])
 output_file = str(args['output_file'])
 fragment_length = int(args['fragment_length'])
+fragment_step = int(args['fragment_step'])
 genome_extension = str(args['file_extension'])
+dist = int(args['cont_dist'])
 threads = int(args['threads'])
 
 output_file_regions = os.path.splitext(output_file)[0] + '_regions.csv'
@@ -74,7 +80,7 @@ for input_file in genome_file_list:
     # fragment the input genome
     genome1_obj = pc.Fasta(input_file, input_folder)
     genome1_obj.setOutputLocation(temp_folder_fragments)
-    genome1_obj.split_up_genome(fragment_size=fragment_length, write_to='multiple')
+    genome1_obj.split_up_genome(fragment_size=fragment_length, step=fragment_step, write_to='multiple')
 
     # list of fragmented genomes
     fragment_file_list = [f for f in os.listdir(temp_folder_fragments) if f.endswith(".fasta")]
@@ -88,6 +94,7 @@ for input_file in genome_file_list:
     # clean up output
     df_fragment_output['genome1'] = input_file_name
     df_fragment_output['fragment_size'] = fragment_length
+    df_fragment_output['fragment_step'] = fragment_step
     df_fragment_output["seq1"] = pd.to_numeric(df_fragment_output["seq1"])
 
     # save output
@@ -95,7 +102,7 @@ for input_file in genome_file_list:
     df_final_output_genome = pd.merge(left=df_output, right=df_fragment_output, on=["genome1", "seq2"])
     df_final_output_genome = df_final_output_genome.sort_values(by=['seq1'])
     df_final_output_genome = df_final_output_genome[["genome1", "seq1", "fragment_size", "seq2", "ani", "genome_wide_ani"]]
-    df_final_output_genome.rename(columns={'seq1': 'fragment1', 'fragment_size': 'fragment_size1', 'seq2': 'genome2','ani': 'fragment_ani'}, inplace=True)
+    df_final_output_genome.rename(columns={'seq1': 'fragment1', 'fragment_size': 'fragment_size1', 'fragment_step': 'fragment_step1', 'seq2': 'genome2','ani': 'fragment_ani'}, inplace=True)
 
     dataframes_list.append(df_final_output_genome)
 
@@ -105,7 +112,7 @@ df_final = pd.concat(dataframes_list)
 ### Export continous regions
 
 df_snp = cx.calculate_snp_decrease_df(df_final, dec_places = num_dec)
-df_final_regions = cx.extract_continuous_regions(df_snp, distance = 1)
+df_final_regions = cx.extract_continuous_regions(df_snp, distance = dist)
 
 ### Save files
 

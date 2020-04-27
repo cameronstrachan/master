@@ -113,7 +113,7 @@ class Fasta(File):
 
         return self.fastadict
 
-    def split_up_genome(self, fragment_size=100, write_to='multiple'):
+    def split_up_genome(self, fragment_size=1000, step=1000, write_to='multiple'):
 
         '''
         BLAH BLAH
@@ -147,8 +147,8 @@ class Fasta(File):
                         outputfile.write(">" + header + '_' + str(contig) + '_' + str(frag_num) + '_' + str(start) + '_' + str(end) + '\n')
                         outputfile.write(seq_fragment + '\n')
 
-                    start = start + fragment_size
-                    end = end + fragment_size
+                    start = start + step
+                    end = end + step
                     frag_num = frag_num + 1
 
                 contig = contig + 1
