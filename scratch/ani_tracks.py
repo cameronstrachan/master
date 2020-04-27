@@ -41,7 +41,7 @@ dist = int(args['cont_dist'])
 threads = int(args['threads'])
 
 output_file_regions = os.path.splitext(output_file)[0] + '_regions.csv'
-num_dec = len(str(fragment_length)) - 1
+#num_dec = len(str(fragment_length)) - 1
 
 # list of final dataframes
 dataframes_list = list()
@@ -111,7 +111,7 @@ df_final = pd.concat(dataframes_list)
 
 ### Export continous regions
 
-df_snp = cx.calculate_snp_decrease_df(df_final, dec_places = num_dec)
+df_snp = cx.calculate_snp_decrease_df(df_final, dec_places = 3)
 df_final_regions = cx.extract_continuous_regions(df_snp, distance = dist)
 
 ### Save files
