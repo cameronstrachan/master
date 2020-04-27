@@ -19,9 +19,9 @@ def calculate_snp_decrease_df(df, dec_places = 3):
     df_snp = df_snp.assign(fragment_snps = (1 - (df_snp['fragment_ani']/100))*df_snp['fragment_size1']  )
     df_snp = df_snp.assign(genome_wide_snps = (1 - (df_snp['genome_wide_ani']/100))*df_snp['fragment_size1']  )
     df_snp = df_snp.assign(snp_diff = df_snp['genome_wide_snps'] - df_snp['fragment_snps'])
-    df_snp = df_snp[df_snp['snp_diff'] >= 0]
+    df_snp_dec = df_snp[df_snp['snp_diff'] >= 0]
 
-    return df_snp
+    return df_snp_dec
 
 
 # This is slow and needs to be parralized
