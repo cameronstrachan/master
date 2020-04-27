@@ -57,6 +57,7 @@ Thumbs.db
 *.Rhistory
 *.txt
 *.gff
+*.csv
 
 # Folders #
 ###########
