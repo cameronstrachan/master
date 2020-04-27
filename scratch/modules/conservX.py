@@ -47,7 +47,7 @@ def extract_continuous_regions(df_snp, distance =1):
 
             for region in cont_regions:
                 # currently only for multiple regions over 1kB
-                if len(region) > 1:
+                if len(region) > 0:
                     df_region = pd.DataFrame(region, columns = ['fragment1'])
                     df_region['n_continuous_frags'] = len(region)
                     df_region['genome1'] = genome1
