@@ -110,7 +110,7 @@ df_final = pd.concat(dataframes_list)
 
 ### Export continous regions
 
-df_snp = cx.calculate_snp_decrease_df(df_final, dec_places = 3)
+df_snp = cx.calculate_snp_decrease_df(df_final, dec_places = 1)
 df_final_regions = cx.extract_continuous_regions(df_snp, distance = dist)
 
 ### Save files
