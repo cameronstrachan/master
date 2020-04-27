@@ -1,0 +1,17 @@
+file,contig,accession,biosample,host,attributes
+GCF_010232325.1_ASM1023232v1_major_contig.fna,NZ_CP038868.1_1728473,GCF_010232325.1,SAMN11316573,chicken,16SHKX65C | Chicken | cecum | 2016-10-12 | China: Shanghai | Intestinal sample
+GCF_009730395.1_ASM973039v1_major_contig.fna,NZ_CP046317.1_1678432,GCF_009730395.1,SAMN11056450,human,USA:VA | BEI Resources/American Type and Culture Collection (ATCC) | gastrointestinal tract | FDAARGOS_735 | FDAARGOS_735 | Phenotypic and Molecular Methods | Homo sapiens | FDA:FDAARGOS_735 | HM-296D | gastrointestinal tract | HM-296D
+GCF_005517455.1_ASM551745v1_major_contig.fna,NZ_CP040239.1_1713481,GCF_005517455.1,SAMN11618583,cattle,Ahmed Saeedi | 2018-04-12 | United Kingdom: Sutton Bonington | cattle slurry | 52.83 N 1.24 W | S9
+GCF_002407145.1_ASM240714v1_major_contig.fna,NZ_CP023545.1_1670005,GCF_002407145.1,SAMN03580886,chicken,CFSAN032805 | CVM | 2012-07 | chicken breast | USA:CA | N41652 | DBBS16.0007 | DBBK02.0042
+GCF_002024185.1_ASM202418v1_major_contig.fna,NZ_CP019977.1_2033919,GCF_002024185.1,SAMN06456893,chicken,aerotolerant OR12 | Ian Connerton | 2003 | United Kingdom: Lincolnshire | organic chicken farm | 53.17 N 0.37999999999999545 W | 34 passagees on blood agar plates
+GCF_001936355.1_ASM193635v1_major_contig.fna,NZ_CP018900.1_1718974,GCF_001936355.1,SAMN06177343,chicken,"YH502 | Yiping He | Mar-2014 | USA: Wyndmoor, Pennsylvania | Retail chichen | 40.08 N 75.19 W"
+GCF_001865515.1_ASM186551v1_major_contig.fna,NZ_CP017873.1_1841551,GCF_001865515.1,SAMN05942178,chicken,chicken liver | Mohamed Fakhr | 36.154 N 95.9928 W | USA: Tulsa | 2009 | WA333
+GCF_001865475.1_ASM186547v1_major_contig.fna,NZ_CP017868.1_1665146,GCF_001865475.1,SAMN05942182,chicken,chicken liver | Mohamed Fakhr | 36.154 N 95.9928 W | USA: Tulsa | 2009 | MG1116
+GCF_001865455.1_ASM186545v1_major_contig.fna,NZ_CP017865.1_1687232,GCF_001865455.1,SAMN05942180,chicken,chicken liver | Mohamed Fakhr | 36.154 N 95.9928 W | USA: Tulsa | 2009 | YF2105
+GCF_001639125.1_ASM163912v1_major_contig.fna,NZ_CP015528.1_1668523,GCF_001639125.1,SAMN04883459,chicken,"YH501 | Yiping He | 25-Mar-2014 | USA: Wyndmoor, Pennsylvania | retail chicken | 40.08 N 75.19 W"
+GCF_001417635.1_ASM141763v1_major_contig.fna,NZ_CP013034.1_1663782,GCF_001417635.1,SAMN04202590,cattle,HC2-48 | Mohamed fakhr | 2009 | USA: Tulsa | beef liver | 36.1314 N 95.9372 W
+GCF_001305715.1_ASM130571v1_major_contig.fna,NZ_CP011777.1_1720506,GCF_001305715.1,SAMN03754337,chicken,"BFR-CA-9557 | chicken | heart of a broiler carcass | 2011 | Germany: Berlin | whole organism | Federal Institute for Risk Assessment (BfR), FGr 42 - NRL for Campylobacter, D-12277 Berlin, Germany | Federal Institut for Risk assessment Germany | DSM:100395 | MLST CC-828, ST-1589 | Kerstin Stingl | 1 | 42"
+GCF_000954195.1_ASM95419v1_major_contig.fna,NZ_CP011015.1_1658607,GCF_000954195.1,SAMN03381357,human,FB1 | PL Connerton | 1992-07-08 | United Kingdom: Cambridge | feces | Homo sapiens | 52.205 N 0.119 E | Isolation on mCCDA and one passage on blood agar
+GCF_000583795.1_ASM58379v1_major_contig.fna,NZ_CP007179.1_1684743,GCF_000583795.1,SAMN02743854,cattle,RM5611 | bovine | Sophia Kathariou
+GCF_000494775.2_ASM49477v2_major_contig.fna,NC_022660.2_1658752,GCF_000494775.2,SAMN02603390,human,15-537360 | Homo sapiens | 42-year old female
+GCF_000465235.1_ASM46523v1_major_contig.fna,NC_022347.1_1673221,GCF_000465235.1,SAMN02603234,chicken,CVM N29710
