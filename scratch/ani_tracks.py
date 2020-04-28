@@ -19,8 +19,6 @@ ap.add_argument("-i", "--input_folder", required=True,
    help="input folder with genomes, ex. 'genomes/'.")
 ap.add_argument("-o", "--output_file", required=True,
    help="location and name for the output file, ex. 'output/fragment_ani_analysis.csv")
-ap.add_argument("-f", "--fragment_length", required=True,
-   help="value to be used for the fragment length, ex. 3000.")
 ap.add_argument("-s", "--fragment_step", required=True,
    help="genome step size during fragmentation ex. 3000")
 ap.add_argument("-e", "--file_extension", required=True,
@@ -30,17 +28,25 @@ ap.add_argument("-d", "--cont_dist", required=True,
 ap.add_argument("-t", "--threads", required=True,
    help="number of threads to use.")
 
+
+
 args = vars(ap.parse_args())
 
 input_folder = str(args['input_folder'])
 output_file = str(args['output_file'])
-fragment_length = int(args['fragment_length'])
 fragment_step = int(args['fragment_step'])
 genome_extension = str(args['file_extension'])
 dist = int(args['cont_dist'])
 threads = int(args['threads'])
 
 output_file_regions = os.path.splitext(output_file)[0] + '_regions.csv'
+
+## hardcode fragment length
+#ap.add_argument("-f", "--fragment_length", required=True,
+#   help="value to be used for the fragment length, ex. 3000.")
+#fragment_length = int(args['fragment_length'])
+fragment_length = 1000
+decimals = 1
 
 # list of final dataframes
 dataframes_list = list()
@@ -110,7 +116,7 @@ df_final = pd.concat(dataframes_list)
 
 ### Export continous regions
 
-df_snp = cx.calculate_snp_decrease_df(df_final, dec_places = 1)
+df_snp = cx.calculate_snp_decrease_df(df_final, dec_places = decimals)
 df_final_regions = cx.extract_continuous_regions(df_snp, distance = dist)
 
 ### Save files
