@@ -8,7 +8,7 @@ import numpy as np
 def splitvec(vector,distance) :
     return list(map(list,np.split(vector,np.flatnonzero(np.diff(vector)>distance)+1)))
 
-def calculate_snp_decrease_df(df, dec_places = 3):
+def calculate_snp_decrease_df(df, dec_places = 1):
 
     # Calculate SNP difference between fragment and genome average
     # SNP difference must be equal or greater than 0
@@ -26,7 +26,7 @@ def calculate_snp_decrease_df(df, dec_places = 3):
 
 # This is slow and needs to be parralized
 
-def extract_continuous_regions(df_snp, distance =1):
+def extract_continuous_regions(df_snp, distance=1):
 
     genomes1 = df_snp.genome1.unique()
 
@@ -47,7 +47,7 @@ def extract_continuous_regions(df_snp, distance =1):
 
             for region in cont_regions:
                 # currently only for multiple regions over 1kB
-                if len(region) > 0:
+                if len(region) > 1:
                     df_region = pd.DataFrame(region, columns = ['fragment1'])
                     df_region['n_continuous_frags'] = len(region)
                     df_region['genome1'] = genome1

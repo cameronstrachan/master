@@ -99,8 +99,8 @@ for input_file in genome_file_list:
     # save output
 
     df_final_output_genome = pd.merge(left=df_output, right=df_fragment_output, on=["genome1", "seq2"])
-    df_final_output_genome = df_final_output_genome.sort_values(by=['seq1'])
-    df_final_output_genome_colrename = df_final_output_genome[["genome1", "seq1", "fragment_size", "seq2", "ani", "genome_wide_ani"]]
+    df_final_output_genome_sort = df_final_output_genome.sort_values(by=['seq1'])
+    df_final_output_genome_colrename = df_final_output_genome_sort[["genome1", "seq1", "fragment_size", "seq2", "ani", "genome_wide_ani"]]
     df_final_output_genome_colrename.rename(columns={'seq1': 'fragment1', 'fragment_size': 'fragment_size1', 'fragment_step': 'fragment_step1', 'seq2': 'genome2','ani': 'fragment_ani'}, inplace=True)
 
     dataframes_list.append(df_final_output_genome_colrename)
