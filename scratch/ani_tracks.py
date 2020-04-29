@@ -38,10 +38,10 @@ output_file_regions = output_folder + 'conserved_regions_output.csv'
 output_file_map = output_folder + 'frament_map.csv'
 
 # Hardcoded parameters
-fragment_step = 500
+fragment_step = 100
 fragment_length = 1000
 decimals = 1
-dist = 5
+dist = 10
 cont = 10
 
 # List of final dataframes
