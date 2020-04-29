@@ -26,7 +26,7 @@ def calculate_snp_decrease_df(df, dec_places = 1):
 
 # This is slow and needs to be parralized
 
-def extract_continuous_regions(df_snp, distance=1):
+def extract_continuous_regions(df_snp, distance=1, n_continuous=1):
 
     genomes1 = df_snp.genome1.unique()
 
@@ -46,13 +46,14 @@ def extract_continuous_regions(df_snp, distance=1):
             c = 1
 
             for region in cont_regions:
-                df_region = pd.DataFrame(region, columns = ['fragment1'])
-                df_region['n_continuous_frags'] = len(region)
-                df_region['genome1'] = genome1
-                df_region['genome2'] = genome2
-                df_region['region_num'] = c
-                list_df_regions.append(df_region)
-                c = c + 1
+                if len(region) > n_continuous:
+                    df_region = pd.DataFrame(region, columns = ['fragment1'])
+                    df_region['n_continuous_frags'] = len(region)
+                    df_region['genome1'] = genome1
+                    df_region['genome2'] = genome2
+                    df_region['region_num'] = c
+                    list_df_regions.append(df_region)
+                    c = c + 1
 
     df_regions = pd.merge(left=pd.concat(list_df_regions), right=df_snp, on=["genome1", "fragment1", "genome2"])
 

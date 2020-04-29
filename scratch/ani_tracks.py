@@ -19,39 +19,36 @@ ap.add_argument("-i", "--input_folder", required=True,
    help="input folder with genomes, ex. 'genomes/'.")
 ap.add_argument("-o", "--output_folder", required=True,
    help="output folder, ex. 'output/")
-ap.add_argument("-s", "--fragment_step", required=True,
-   help="genome step size during fragmentation ex. 3000")
 ap.add_argument("-e", "--file_extension", required=True,
    help="extension for the genome files, ex. '.fasta'")
-ap.add_argument("-d", "--cont_dist", required=True,
-   help="distance allowed in mataining sequence continuity, ex. 1")
 ap.add_argument("-t", "--threads", required=True,
    help="number of threads to use.")
 
 args = vars(ap.parse_args())
 
+# User defined arguments
 input_folder = str(args['input_folder'])
 output_folder = str(args['output_folder'])
-fragment_step = int(args['fragment_step'])
 genome_extension = str(args['file_extension'])
-dist = int(args['cont_dist'])
 threads = int(args['threads'])
 
-output_file_final = output_folder + 'output.csv'
+# Outputs
+output_file_ani = output_folder + 'ani_output.csv'
+output_file_regions = output_folder + 'conserved_regions_output.csv'
 output_file_map = output_folder + 'frament_map.csv'
 
-## hardcode fragment length
-#ap.add_argument("-f", "--fragment_length", required=True,
-#   help="value to be used for the fragment length, ex. 3000.")
-#fragment_length = int(args['fragment_length'])
+# Hardcoded parameters
+fragment_step = 500
 fragment_length = 1000
 decimals = 1
+dist = 5
+cont = 10
 
-# list of final dataframes
+# List of final dataframes
 dataframes_list = list()
 dataframes_map_list = list()
 
-# set up temporary folders
+# Set up temporary folders
 temp_folder = 'temp/'
 temp_folder_fragments = 'temp_fragments/'
 temp_folders = [temp_folder, temp_folder_fragments]
@@ -119,15 +116,16 @@ for input_file in genome_file_list:
 df_compiled_ani = pd.concat(dataframes_list)
 df_compiled_fragment_map = pd.concat(dataframes_map_list)
 
-### Export continous regions
+### Get continous conserved regions
 
 df_snp = cx.calculate_snp_decrease_df(df_compiled_ani, dec_places = decimals)
-df_final_regions = cx.extract_continuous_regions(df_snp, distance = dist)
+df_compiled_regions = cx.extract_continuous_regions(df_snp, distance = dist, n_continuous = cont)
 
 ### Save files
 
+df_compiled_ani.to_csv(output_file_ani, index=False)
+df_compiled_regions.to_csv(output_file_regions, index=False)
 df_compiled_fragment_map.to_csv(output_file_map, index=False)
-df_final_regions.to_csv(output_file_final, index=False)
 
 # clean up
 for folder in temp_folders:
