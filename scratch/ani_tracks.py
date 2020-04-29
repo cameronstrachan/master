@@ -17,8 +17,8 @@ ap = argparse.ArgumentParser()
 # Add the arguments to the parser
 ap.add_argument("-i", "--input_folder", required=True,
    help="input folder with genomes, ex. 'genomes/'.")
-ap.add_argument("-o", "--output_file", required=True,
-   help="location and name for the output file, ex. 'output/fragment_ani_analysis.csv")
+ap.add_argument("-o", "--output_folder", required=True,
+   help="output folder, ex. 'output/")
 ap.add_argument("-s", "--fragment_step", required=True,
    help="genome step size during fragmentation ex. 3000")
 ap.add_argument("-e", "--file_extension", required=True,
@@ -28,18 +28,17 @@ ap.add_argument("-d", "--cont_dist", required=True,
 ap.add_argument("-t", "--threads", required=True,
    help="number of threads to use.")
 
-
-
 args = vars(ap.parse_args())
 
 input_folder = str(args['input_folder'])
-output_file = str(args['output_file'])
+output_folder = str(args['output_folder'])
 fragment_step = int(args['fragment_step'])
 genome_extension = str(args['file_extension'])
 dist = int(args['cont_dist'])
 threads = int(args['threads'])
 
-output_file_regions = os.path.splitext(output_file)[0] + '_regions.csv'
+output_file_final = output_folder + 'output.csv'
+output_file_map = output_folder + 'frament_map.csv'
 
 ## hardcode fragment length
 #ap.add_argument("-f", "--fragment_length", required=True,
@@ -50,6 +49,7 @@ decimals = 1
 
 # list of final dataframes
 dataframes_list = list()
+dataframes_map_list = list()
 
 # set up temporary folders
 temp_folder = 'temp/'
@@ -86,6 +86,9 @@ for input_file in genome_file_list:
     genome1_obj = pc.Fasta(input_file, input_folder)
     genome1_obj.setOutputLocation(temp_folder_fragments)
     genome1_obj.split_up_genome(fragment_size=fragment_length, step=fragment_step, write_to='multiple')
+    df_fragment_map = genome1_obj.split_up_genome_map(fragment_size=fragment_length, step=fragment_step)
+    df_fragment_map['genome1'] = input_file_name
+    df_fragment_map_colrename = df_fragment_map[["genome1", 'header', 'contig', 'fragment_num', 'start', 'stop', 'fragment_size', 'fragment_step']]
 
     # list of fragmented genomes
     fragment_file_list = [f for f in os.listdir(temp_folder_fragments) if f.endswith(".fasta")]
@@ -109,20 +112,22 @@ for input_file in genome_file_list:
     df_final_output_genome_colrename = df_final_output_genome_sort[["genome1", "seq1", "fragment_size", "seq2", "ani", "genome_wide_ani"]]
     df_final_output_genome_colrename.rename(columns={'seq1': 'fragment1', 'fragment_size': 'fragment_size1', 'fragment_step': 'fragment_step1', 'seq2': 'genome2','ani': 'fragment_ani'}, inplace=True)
 
+    dataframes_map_list.append(df_fragment_map_colrename)
     dataframes_list.append(df_final_output_genome_colrename)
 
 
-df_final = pd.concat(dataframes_list)
+df_compiled_ani = pd.concat(dataframes_list)
+df_compiled_fragment_map = pd.concat(dataframes_map_list)
 
 ### Export continous regions
 
-df_snp = cx.calculate_snp_decrease_df(df_final, dec_places = decimals)
+df_snp = cx.calculate_snp_decrease_df(df_compiled_ani, dec_places = decimals)
 df_final_regions = cx.extract_continuous_regions(df_snp, distance = dist)
 
 ### Save files
 
-df_final.to_csv(output_file, index=False)
-df_final_regions.to_csv(output_file_regions, index=False)
+df_compiled_fragment_map.to_csv(output_file_map, index=False)
+df_final_regions.to_csv(output_file_final, index=False)
 
 # clean up
 for folder in temp_folders:
