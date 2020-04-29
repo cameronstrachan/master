@@ -167,7 +167,7 @@ class Fasta(File):
 
             fastadic = self.fasta2dict()
 
-            df_frament_locations = pd.DataFrame(columns=['header', 'contig', 'fragment_num', 'start', 'stop', 'fragment_size', 'fragment_step'])
+            df_frament_locations = pd.DataFrame(columns=['header', 'contig', 'fragment1', 'start', 'stop', 'fragment_size', 'fragment_step'])
 
             for k,v in fastadic.items():
 
@@ -181,7 +181,7 @@ class Fasta(File):
 
                 while end < len(seq):
 
-                    df_frament_locations = df_frament_locations.append({'header': header, 'contig': contig, 'fragment_num':frag_num, 'start': start, 'stop': end, 'fragment_size': fragment_size, 'fragment_step': step}, ignore_index=True)
+                    df_frament_locations = df_frament_locations.append({'header': header, 'contig': contig, 'fragment1':frag_num, 'start': start, 'stop': end, 'fragment_size': fragment_size, 'fragment_step': step}, ignore_index=True)
 
                     start = start + step
                     end = end + step

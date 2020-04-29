@@ -35,11 +35,12 @@ threads = int(args['threads'])
 # Outputs
 output_file_ani = output_folder + 'ani_output.csv'
 output_file_regions = output_folder + 'conserved_regions_output.csv'
-output_file_map = output_folder + 'frament_map.csv'
+output_file_map = output_folder + 'fragment_map.csv'
 
 # Hardcoded parameters
 fragment_step = 100
 fragment_length = 1000
+
 decimals = 1
 dist = 10
 cont = 10
@@ -85,7 +86,7 @@ for input_file in genome_file_list:
     genome1_obj.split_up_genome(fragment_size=fragment_length, step=fragment_step, write_to='multiple')
     df_fragment_map = genome1_obj.split_up_genome_map(fragment_size=fragment_length, step=fragment_step)
     df_fragment_map['genome1'] = input_file_name
-    df_fragment_map_colrename = df_fragment_map[["genome1", 'header', 'contig', 'fragment_num', 'start', 'stop', 'fragment_size', 'fragment_step']]
+    df_fragment_map_colrename = df_fragment_map[["genome1", 'header', 'contig', 'fragment1', 'start', 'stop', 'fragment_size', 'fragment_step']]
 
     # list of fragmented genomes
     fragment_file_list = [f for f in os.listdir(temp_folder_fragments) if f.endswith(".fasta")]
