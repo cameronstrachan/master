@@ -42,8 +42,8 @@ fragment_step = 100
 fragment_length = 1000
 
 decimals = 1
-dist = 10
-cont = 10
+dist = 9
+cont = 2
 
 # List of final dataframes
 dataframes_list = list()

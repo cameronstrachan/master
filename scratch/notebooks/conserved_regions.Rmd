@@ -1,0 +1,67 @@
+---
+title: "Untitled"
+author: "Cameron Strachan"
+date: '2020-04-29'
+output:
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+df <- read_csv("~/master/scratch/output/conserved_regions_output.csv")
+```
+
+```{r}
+meta <- read.csv("~/master/scratch/meta.csv", colClasses = "character")
+
+meta1 <- meta %>% select(file, host)
+meta1$host1 <- meta1$host
+meta1$host <- NULL
+meta1$genome1 <- gsub(".fna", "", meta1$file)
+meta1$file <- NULL
+
+meta2 <- meta1
+colnames(meta2) <- c('host2', 'genome2')
+```
+
+```{r}
+df_pos <- read_csv("~/master/scratch/output/fragment_map.csv")
+colnames(df_pos)[4] <- "fragment1"
+
+df_pos <- df_pos %>%
+  mutate(position = (start + stop) /2)
+```
+
+```{r}
+df_trim <- df %>%
+  filter(n_continuous_frags >= 50) 
+```
+
+```{r}
+df_plot <- df_trim  %>%
+  inner_join(meta1) %>%
+  inner_join(meta2) %>%
+  inner_join(df_pos) %>%
+  filter(host1 == "cattle" | host1 == "human")
+
+df_plot$host2 <- factor(df_plot$host2, levels = c("chicken", "human", "cattle"))
+```
+
+```{r, fig.height=12, fig.width=12}
+p1 <- ggplot(df_plot, aes(x = fragment1, y = snp_diff, colour = host2)) +
+  geom_point() +
+  facet_wrap(host1 ~ genome1) +
+  theme_minimal()
+
+p1
+```
+
+

@@ -1,9 +1,39 @@
+---
+title: "Untitled"
+author: "Cameron Strachan"
+date: '2020-04-29'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r}
 library(tidyverse)
+library(scales)
+library(cowplot)
+```
 
-df_regions <- read.csv("~/master/scratch/fragment_ani_1000_500_2_regions.csv")
+```{r}
+df <- read_csv("~/master/scratch/output/conserved_regions_output.csv")
+```
 
+```{r}
+meta <- read.csv("~/master/scratch/meta.csv", colClasses = "character")
 
-df_distance <- df_regions %>%
+meta1 <- meta %>% select(file, host)
+meta1$host1 <- meta1$host
+meta1$host <- NULL
+meta1$genome1 <- gsub(".fna", "", meta1$file)
+meta1$file <- NULL
+
+meta2 <- meta1
+colnames(meta2) <- c('host2', 'genome2')
+```
+
+```{r}
+df_distance <- df %>%
   filter(snp_diff != 0) %>%
   group_by(genome1, genome2, snp_diff) %>%
   mutate(n_frags = length(unique(fragment1))) %>%
@@ -21,7 +51,9 @@ df_distance <- df_regions %>%
   select(genome1, genome2, distance) %>%
   
   distinct() 
+```
 
+```{r}
 df_distance_spread <- df_distance %>%
   spread(genome2, distance)
 
@@ -33,12 +65,14 @@ row.names(df_distance_matrix) <- df_distance_spread$genome1
 distance <- dist(df_distance_matrix) # method="man" # is a bit better
 hclust <- hclust(distance, method = "complete")
 ord <- hclust$order
+```
 
-# plotting
+```{r}
+df_distance <- df_distance %>%
+  inner_join(meta2)
+```
 
-library(cowplot)
-library(scales)
-
+```{r, fig.height=4, fig.width=8}
 df_distance$genome1 <- factor(df_distance$genome1, levels = rownames(df_distance_matrix)[ord])
 df_distance$genome2 <- factor(df_distance$genome2, levels = colnames(df_distance_matrix)[ord])
 df_distance$x_holder <- "X"
@@ -55,6 +89,14 @@ heatmap_ani <- ggplot(df_distance, aes(genome1, genome2) ) +
                        guide = "colourbar",
                        values = rescale(c(0, max(df_distance$distance)))) 
 
-heatmap_ani
+heatmap_host <- ggplot(df_distance, aes(x_holder, genome2) ) +
+  geom_tile(aes(fill = host2)) +
+  theme(axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.ticks.y=element_blank(), 
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank()) 
 
-
+plot_grid(heatmap_ani, heatmap_host, rel_widths = c(4,1))
+```

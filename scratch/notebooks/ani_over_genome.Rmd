@@ -1,0 +1,63 @@
+---
+title: "Untitled"
+author: "Cameron Strachan"
+date: '2020-04-29'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+df <- read_csv("master/scratch/output/ani_output.csv")
+```
+
+```{r}
+df <- df %>%
+  mutate(ani_diff = fragment_ani - genome_wide_ani)
+```
+
+```{r}
+meta <- read.csv("~/master/scratch/meta.csv", colClasses = "character")
+
+meta1 <- meta %>% select(file, host)
+meta1$host1 <- meta1$host
+meta1$host <- NULL
+meta1$genome1 <- gsub(".fna", "", meta1$file)
+meta1$file <- NULL
+
+meta2 <- meta1
+colnames(meta2) <- c('host2', 'genome2')
+```
+
+```{r}
+df_pos <- read_csv("master/scratch/output/fragment_map.csv")
+colnames(df_pos)[4] <- "fragment1"
+
+df_pos <- df_pos %>%
+  mutate(position = (start + stop) /2)
+```
+
+```{r}
+df_trim <- df %>%
+  filter(genome1 == "GCF_001417635.1_ASM141763v1_major_contig") %>%
+  filter(genome2 == "GCF_002024185.1_ASM202418v1_major_contig" | genome2 == "GCF_000583795.1_ASM58379v1_major_contig") 
+```
+
+```{r}
+df_plot <- df_trim  %>%
+  inner_join(meta1) %>%
+  inner_join(meta2) %>%
+  inner_join(df_pos)
+```
+
+```{r, fig.height=6, fig.width=12}
+ggplot(df_plot, aes(x=start, y=ani_diff, colour=host2)) +
+  geom_line(size=0.5, alpha=0.9, linetype=2) +
+  ylim(-5, 1)
+```
