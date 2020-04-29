@@ -69,7 +69,7 @@ genome_file_list_file = temp_folder + 'genomes.txt'
 fa.savefiles2list(genome_file_list, input_folder, genome_file_list_file)
 
 ### first get genome wide ANI
-df_output = fa.allvall_fastani(genome_file_list_file, genome_file_list_file, threads=threads, extension=".fasta")
+df_output = fa.allvall_fastani(genome_file_list_file, genome_file_list_file, threads=threads, fragment_length=fragment_length, extension=".fasta")
 
 # modify columns to merge with fragmented files
 df_output.rename(columns={'seq1': 'genome1', 'ani': 'genome_wide_ani'}, inplace=True)
