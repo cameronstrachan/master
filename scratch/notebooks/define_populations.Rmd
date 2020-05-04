@@ -1,5 +1,5 @@
 ---
-title: "Untitled"
+title: "Clustering of populations based on ANI and continuous SNPs"
 author: "Cameron Strachan"
 date: '2020-04-29'
 output: pdf_document
@@ -97,6 +97,8 @@ df_distance <- bind_rows(df_distance, df_add_distance)
 ```
 
 ```{r, fig.height=4, fig.width=8}
+genomes_order <- rownames(df_distance_matrix)[ord_distance]
+
 df_distance$genome1 <- factor(df_distance$genome1, levels = rownames(df_distance_matrix)[ord_distance])
 df_distance$genome2 <- factor(df_distance$genome2, levels = colnames(df_distance_matrix)[ord_distance])
 df_distance$x_holder <- "X"
@@ -110,23 +112,9 @@ heatmap_distance <- ggplot(df_distance, aes(genome1, genome2) ) +
         axis.title.y=element_blank()) +
   scale_fill_viridis(direction = 1)  + 
   theme(legend.title = element_blank()) + 
-  theme(legend.position = "none") 
+  theme(legend.position = "none") +
+  ggtitle("Consistent SNP regions")
 
-heatmap_host_distance <- ggplot(df_distance, aes(x_holder, genome2) ) +
-  geom_tile(aes(fill = host2)) +
-  theme(axis.text.x=element_blank(),
-        axis.text.y=element_blank(),
-        axis.ticks.x=element_blank(),
-        axis.ticks.y=element_blank(), 
-        axis.title.x=element_blank(),
-        axis.title.y=element_blank()) + 
-  scale_fill_viridis(discrete = TRUE, option = "D") + 
-  theme(legend.title = element_blank())
-
-plot_grid(heatmap_distance, heatmap_host_distance, rel_widths = c(4,1))
-```
-
-```{r, fig.height=4, fig.width=8}
 df_ani$genome1 <- factor(df_ani$genome1, levels = rownames(df_ani_matrix)[ord_distance])
 df_ani$genome2 <- factor(df_ani$genome2, levels = colnames(df_ani_matrix)[ord_distance])
 df_ani$x_holder <- "X"
@@ -134,15 +122,17 @@ df_ani$x_holder <- "X"
 heatmap_ani <- ggplot(df_ani, aes(genome1, genome2) ) +
   geom_tile(aes(fill = genome_wide_ani)) +
   theme(axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
         axis.ticks.x=element_blank(),
         axis.ticks.y=element_blank(), 
         axis.title.x=element_blank(),
         axis.title.y=element_blank()) +
   scale_fill_viridis(direction = -1) + 
   theme(legend.title = element_blank()) + 
-  theme(legend.position = "none") 
+  theme(legend.position = "none") +
+  ggtitle("ANI")
 
-heatmap_host_ani <- ggplot(df_ani, aes(x_holder, genome2) ) +
+heatmap_host <- ggplot(df_distance, aes(x_holder, genome2) ) +
   geom_tile(aes(fill = host2)) +
   theme(axis.text.x=element_blank(),
         axis.text.y=element_blank(),
@@ -151,7 +141,10 @@ heatmap_host_ani <- ggplot(df_ani, aes(x_holder, genome2) ) +
         axis.title.x=element_blank(),
         axis.title.y=element_blank()) + 
   scale_fill_viridis(discrete = TRUE, option = "D") + 
-  theme(legend.title = element_blank())
+  theme(legend.title = element_blank()) +
+  ggtitle("Host")
 
-plot_grid(heatmap_ani, heatmap_host_ani, rel_widths = c(4,1))
+plot_grid(heatmap_distance, heatmap_ani, heatmap_host, rel_widths = c(5,3.5,1), ncol = 3)
 ```
+
+When using the distance metric based on most conserved regions with a continuous SNP level, two of the cattle genomes appear to group better with the bottom left cluster. 

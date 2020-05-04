@@ -33,7 +33,7 @@ genome_extension = str(args['file_extension'])
 threads = int(args['threads'])
 
 # Outputs
-output_file_ani = output_folder + 'ani_output.csv'
+output_file_ani = output_folder + 'all_fragments_output.csv'
 output_file_regions_decrease = output_folder + 'conserved_regions_output.csv'
 output_file_regions_increase = output_folder + 'nonconserved_regions_output.csv'
 output_file_map = output_folder + 'fragment_map.csv'
@@ -118,18 +118,23 @@ for input_file in genome_file_list:
 df_compiled_ani = pd.concat(dataframes_list)
 df_compiled_fragment_map = pd.concat(dataframes_map_list)
 
+### Conver ani to snps per fragment length
+
+df_snp = df_compiled_ani[df_compiled_ani['genome1'] != df_compiled_ani['genome2']]
+df_snp.fragment_ani = df_snp.fragment_ani.round(decimals)
+df_snp.genome_wide_ani = df_snp.genome_wide_ani.round(decimals)
+df_snp = df_snp.assign(fragment_snps = (1 - (df_snp['fragment_ani']/100))*df_snp['fragment_size1'])
+df_snp = df_snp.assign(genome_wide_snps = (1 - (df_snp['genome_wide_ani']/100))*df_snp['fragment_size1'])
+df_snp = df_snp.assign(snp_diff = df_snp['genome_wide_snps'] - df_snp['fragment_snps'])
+
 ### Get continous conserved regions
 
-df_snp_decrease = cx.calculate_snp_diff_df(df_compiled_ani, dec_places = decimals, dir='decrease')
-df_snp_increase = cx.calculate_snp_diff_df(df_compiled_ani, dec_places = decimals, dir='increase')
-
-
-df_compiled_regions_decrease = cx.extract_continuous_regions(df_snp_decrease, distance = dist, n_continuous = cont)
-df_compiled_regions_increase = cx.extract_continuous_regions(df_snp_increase, distance = dist, n_continuous = cont)
+df_compiled_regions_decrease = cx.extract_continuous_regions(df_snp, distance = dist, n_continuous = cont, dir='decrease')
+df_compiled_regions_increase = cx.extract_continuous_regions(df_snp, distance = dist, n_continuous = cont, dir='increase')
 
 ### Save files
 
-df_compiled_ani.to_csv(output_file_ani, index=False)
+df_snp.to_csv(output_file_ani, index=False)
 df_compiled_regions_decrease.to_csv(output_file_regions_decrease, index=False)
 df_compiled_regions_increase.to_csv(output_file_regions_increase, index=False)
 df_compiled_fragment_map.to_csv(output_file_map, index=False)

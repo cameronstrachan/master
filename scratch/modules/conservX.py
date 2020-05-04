@@ -8,17 +8,10 @@ import numpy as np
 def splitvec(vector,distance) :
     return list(map(list,np.split(vector,np.flatnonzero(np.diff(vector)>distance)+1)))
 
-def calculate_snp_diff_df(df, dec_places = 1, dir = 'decrease'):
 
-    # Calculate SNP difference between fragment and genome average
-    # SNP difference must be equal or greater than 0
+# This is slow and needs to be parralized
 
-    df_snp = df[df['genome1'] != df['genome2']]
-    df_snp.fragment_ani = df_snp.fragment_ani.round(dec_places)
-    df_snp.genome_wide_ani = df_snp.genome_wide_ani.round(dec_places)
-    df_snp = df_snp.assign(fragment_snps = (1 - (df_snp['fragment_ani']/100))*df_snp['fragment_size1']  )
-    df_snp = df_snp.assign(genome_wide_snps = (1 - (df_snp['genome_wide_ani']/100))*df_snp['fragment_size1']  )
-    df_snp = df_snp.assign(snp_diff = df_snp['genome_wide_snps'] - df_snp['fragment_snps'])
+def extract_continuous_regions(df_snp, distance=1, n_continuous=1, dir = 'decrease'):
 
     if  dir == 'decrease':
         df_snp_dec = df_snp[df_snp['snp_diff'] >= 0]
@@ -26,13 +19,6 @@ def calculate_snp_diff_df(df, dec_places = 1, dir = 'decrease'):
         df_snp_dec = df_snp[df_snp['snp_diff'] <= 0]
     else:
         pass
-    
-    return df_snp_dec
-
-
-# This is slow and needs to be parralized
-
-def extract_continuous_regions(df_snp, distance=1, n_continuous=1):
 
     genomes1 = df_snp.genome1.unique()
 
