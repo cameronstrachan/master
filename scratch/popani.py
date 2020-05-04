@@ -34,7 +34,8 @@ threads = int(args['threads'])
 
 # Outputs
 output_file_ani = output_folder + 'ani_output.csv'
-output_file_regions = output_folder + 'conserved_regions_output.csv'
+output_file_regions_decrease = output_folder + 'conserved_regions_output.csv'
+output_file_regions_increase = output_folder + 'nonconserved_regions_output.csv'
 output_file_map = output_folder + 'fragment_map.csv'
 
 # Hardcoded parameters
@@ -119,13 +120,18 @@ df_compiled_fragment_map = pd.concat(dataframes_map_list)
 
 ### Get continous conserved regions
 
-df_snp = cx.calculate_snp_decrease_df(df_compiled_ani, dec_places = decimals)
-df_compiled_regions = cx.extract_continuous_regions(df_snp, distance = dist, n_continuous = cont)
+df_snp_decrease = cx.calculate_snp_diff_df(df_compiled_ani, dec_places = decimals, dir='decrease')
+df_snp_increase = cx.calculate_snp_diff_df(df_compiled_ani, dec_places = decimals, dir='increase')
+
+
+df_compiled_regions_decrease = cx.extract_continuous_regions(df_snp_decrease, distance = dist, n_continuous = cont)
+df_compiled_regions_increase = cx.extract_continuous_regions(df_snp_increase, distance = dist, n_continuous = cont)
 
 ### Save files
 
 df_compiled_ani.to_csv(output_file_ani, index=False)
-df_compiled_regions.to_csv(output_file_regions, index=False)
+df_compiled_regions_decrease.to_csv(output_file_regions_decrease, index=False)
+df_compiled_regions_increase.to_csv(output_file_regions_increase, index=False)
 df_compiled_fragment_map.to_csv(output_file_map, index=False)
 
 # clean up

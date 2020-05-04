@@ -37,27 +37,32 @@ df_pos <- read_csv("~/master/scratch/output/fragment_map.csv")
 colnames(df_pos)[4] <- "fragment1"
 
 df_pos <- df_pos %>%
-  mutate(position = (start + stop) /2)
+  mutate(position = (start + stop) / 2)
 ```
 
 ```{r}
 df_trim <- df %>%
-  filter(n_continuous_frags >= 50) 
+  filter(n_continuous_frags >= 10) 
 ```
 
 ```{r}
 df_plot <- df_trim  %>%
   inner_join(meta1) %>%
   inner_join(meta2) %>%
-  inner_join(df_pos) %>%
-  filter(host1 == "cattle" | host1 == "human")
-
+  filter(genome1 != "GCF_010232325.1_ASM1023232v1_major_contig") %>%
+  filter(genome1 != "GCF_002407145.1_ASM240714v1_major_contig") %>%
+  filter(genome1 != "GCF_001305715.1_ASM130571v1_major_contig") %>%
+  
+  filter(genome2 != "GCF_010232325.1_ASM1023232v1_major_contig") %>%
+  filter(genome2 != "GCF_002407145.1_ASM240714v1_major_contig") %>%
+  filter(genome2 != "GCF_001305715.1_ASM130571v1_major_contig")
+  
 df_plot$host2 <- factor(df_plot$host2, levels = c("chicken", "human", "cattle"))
 ```
 
-```{r, fig.height=12, fig.width=12}
+```{r, fig.height=8, fig.width=8}
 p1 <- ggplot(df_plot, aes(x = fragment1, y = snp_diff, colour = host2)) +
-  geom_point() +
+  geom_point(size = 0.5) +
   facet_wrap(host1 ~ genome1) +
   theme_minimal()
 

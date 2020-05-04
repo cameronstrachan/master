@@ -14,12 +14,14 @@ library(tidyverse)
 ```
 
 ```{r}
-df <- read_csv("master/scratch/output/ani_output.csv")
+df <- read_csv("~/master/scratch/output/ani_output.csv")
 ```
 
 ```{r}
 df <- df %>%
-  mutate(ani_diff = fragment_ani - genome_wide_ani)
+  mutate(fragment_snp = 1000 - ((round(fragment_ani, 1) / 100) * fragment_size1)) %>%
+  mutate(genome_wide_snp = 1000 - ((round(genome_wide_ani, 1) / 100) * fragment_size1)) %>%
+  mutate(snp_diff = fragment_snp - genome_wide_snp)
 ```
 
 ```{r}
@@ -36,7 +38,7 @@ colnames(meta2) <- c('host2', 'genome2')
 ```
 
 ```{r}
-df_pos <- read_csv("master/scratch/output/fragment_map.csv")
+df_pos <- read_csv("~/master/scratch/output/fragment_map.csv")
 colnames(df_pos)[4] <- "fragment1"
 
 df_pos <- df_pos %>%
@@ -44,20 +46,19 @@ df_pos <- df_pos %>%
 ```
 
 ```{r}
-df_trim <- df %>%
-  filter(genome1 == "GCF_001417635.1_ASM141763v1_major_contig") %>%
-  filter(genome2 == "GCF_002024185.1_ASM202418v1_major_contig" | genome2 == "GCF_000583795.1_ASM58379v1_major_contig") 
-```
-
-```{r}
-df_plot <- df_trim  %>%
+df_plot <- df  %>%
   inner_join(meta1) %>%
   inner_join(meta2) %>%
-  inner_join(df_pos)
+  inner_join(df_pos) %>%
+  filter(host1 == "cattle") %>%
+  arrange(genome2) %>%
+  arrange(host2)
+
+df_plot$genome2 <- factor(df_plot$genome2, levels = as.character(unique(df_plot$genome2)))
 ```
 
-```{r, fig.height=6, fig.width=12}
-ggplot(df_plot, aes(x=start, y=ani_diff, colour=host2)) +
-  geom_line(size=0.5, alpha=0.9, linetype=2) +
-  ylim(-5, 1)
+```{r, fig.height=12, fig.width=7}
+ggplot(df_plot, aes(x=position, y=snp_diff, colour=host2)) +
+  geom_line(size=0.5, alpha=0.9, linetype=2) + 
+  facet_grid(genome2 ~ .)
 ```
