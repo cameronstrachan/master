@@ -113,6 +113,9 @@ for input_file in genome_file_list:
     dataframes_map_list.append(df_fragment_map_colrename)
     dataframes_list.append(df_final_output_genome_colrename)
 
+    for folder in temp_folders:
+        shutil.rmtree(folder)
+        os.mkdir(folder)
 
 df_compiled_ani = pd.concat(dataframes_list)
 df_compiled_fragment_map = pd.concat(dataframes_map_list)
