@@ -35,7 +35,6 @@ threads = int(args['threads'])
 # Outputs
 output_file_ani = output_folder + 'all_fragments_output.csv'
 output_file_regions_decrease = output_folder + 'conserved_regions_output.csv'
-output_file_regions_increase = output_folder + 'nonconserved_regions_output.csv'
 output_file_map = output_folder + 'fragment_map.csv'
 
 # Hardcoded parameters
@@ -84,8 +83,8 @@ for input_file in genome_file_list:
     # fragment the input genome
     genome1_obj = pc.Fasta(input_file, input_folder)
     genome1_obj.setOutputLocation(temp_folder_fragments)
-    genome1_obj.split_up_genome(fragment_size=fragment_length, step=fragment_step, write_to='multiple')
-    df_fragment_map = genome1_obj.split_up_genome_map(fragment_size=fragment_length, step=fragment_step)
+    df_fragment_map = genome1_obj.split_up_genome(fragment_size=fragment_length, step=fragment_step, write_to='multiple', return_map=True)
+
     df_fragment_map['genome1'] = input_file_name
     df_fragment_map_colrename = df_fragment_map[["genome1", 'header', 'contig', 'fragment1', 'start', 'stop', 'fragment_size', 'fragment_step']]
 
@@ -130,13 +129,11 @@ df_snp = df_snp.assign(snp_diff = df_snp['genome_wide_snps'] - df_snp['fragment_
 ### Get continous conserved regions
 
 df_compiled_regions_decrease = cx.extract_continuous_regions(df_snp, distance = dist, n_continuous = cont, dir='decrease')
-df_compiled_regions_increase = cx.extract_continuous_regions(df_snp, distance = dist, n_continuous = cont, dir='increase')
 
 ### Save files
 
 df_snp.to_csv(output_file_ani, index=False)
 df_compiled_regions_decrease.to_csv(output_file_regions_decrease, index=False)
-df_compiled_regions_increase.to_csv(output_file_regions_increase, index=False)
 df_compiled_fragment_map.to_csv(output_file_map, index=False)
 
 # clean up

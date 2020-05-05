@@ -1,0 +1,63 @@
+---
+title: "SNPs per kB across genome"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r}
+library(tidyverse)
+library(viridis)
+```
+
+```{r}
+df <- read_csv("~/master/scratch/output/all_fragments_output.csv")
+df$genome1 <- gsub("\\..*", "", df$genome1)
+df$genome2 <- gsub("\\..*", "", df$genome2)
+```
+
+```{r}
+meta <- read.csv("~/master/scratch/meta.csv", colClasses = "character")
+meta$file <- gsub("\\..*", "", meta$file)
+
+meta1 <- meta %>% select(file, host)
+meta1$host1 <- meta1$host
+meta1$host <- NULL
+meta1$genome1 <- gsub(".fna", "", meta1$file)
+meta1$file <- NULL
+
+meta2 <- meta1
+colnames(meta2) <- c('host2', 'genome2')
+```
+
+
+
+```{r}
+ma <- function(x, n = 3){stats::filter(x, rep(1 / n, n), sides = 2)}
+
+df_plot <- df  %>%
+  inner_join(meta1) %>%
+  inner_join(meta2) %>%
+  filter(genome1 == "GCF_001417635") %>%
+  arrange(genome2) %>%
+  arrange(host2) %>%
+  mutate(ma_snp_diff = ma(snp_diff))
+
+df_plot$genome2 <- factor(df_plot$genome2, levels = as.character(unique(df_plot$genome2)))
+```
+
+```{r, fig.height=14, fig.width=11}
+ggplot(df_plot, aes(x=fragment1, y=ma_snp_diff, colour=host2)) +
+  geom_line(size=1, alpha=0.9, linetype=2) + 
+  facet_grid(genome2 ~ .) +
+  ylab("Difference in SNPs per kB")  +
+  theme(strip.text.x = element_text(size = 2.5)) + 
+  scale_colour_viridis(discrete = TRUE, option = "D") +
+  theme_minimal()
+```
+
+There are regions that have big drops in conservation, which may be due to a lack of selection etc etc. 

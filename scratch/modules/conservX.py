@@ -14,9 +14,9 @@ def splitvec(vector,distance) :
 def extract_continuous_regions(df_snp, distance=1, n_continuous=1, dir = 'decrease'):
 
     if  dir == 'decrease':
-        df_snp_dec = df_snp[df_snp['snp_diff'] >= 0]
+        df_snp = df_snp[df_snp['snp_diff'] >= 0]
     elif dir == 'increase':
-        df_snp_dec = df_snp[df_snp['snp_diff'] <= 0]
+        df_snp = df_snp[df_snp['snp_diff'] <= 0]
     else:
         pass
 

@@ -114,7 +114,7 @@ class Fasta(File):
 
         return self.fastadict
 
-    def split_up_genome(self, fragment_size=1000, step=1000, write_to='multiple'):
+    def split_up_genome(self, fragment_size=1000, step=1000, write_to='multiple', return_map=True):
 
         '''
         BLAH BLAH
@@ -123,6 +123,8 @@ class Fasta(File):
         if not self.outputexists():
             fastadic = self.fasta2dict()
             output_folder = self.outputlocation
+
+            df_frament_locations = pd.DataFrame(columns=['header', 'contig', 'fragment1', 'start', 'stop', 'fragment_size', 'fragment_step'])
 
             for k,v in fastadic.items():
 
@@ -134,6 +136,8 @@ class Fasta(File):
                 end = fragment_size
                 frag_num = 1
 
+
+
                 while end < len(seq):
 
                     seq_fragment = seq[start:end]
@@ -143,16 +147,24 @@ class Fasta(File):
                         with open(output_folder + file_name, 'w') as f:
                             f.write('>' + header + '\n')
                             f.write(seq_fragment)
+
+                        df_frament_locations = df_frament_locations.append({'header': header, 'contig': contig, 'fragment1':frag_num, 'start': start, 'stop': end, 'fragment_size': fragment_size, 'fragment_step': step}, ignore_index=True)
+
                     else:
                         output_file = self.openwritefile()
                         output_file.write(">" + header + '_' + str(contig) + '_' + str(frag_num) + '_' + str(start) + '_' + str(end) + '\n')
                         output_file.write(seq_fragment + '\n')
+
+                        df_frament_locations = df_frament_locations.append({'header': header, 'contig': contig, 'fragment1':frag_num, 'start': start, 'stop': end, 'fragment_size': fragment_size, 'fragment_step': step}, ignore_index=True)
 
                     start = start + step
                     end = end + step
                     frag_num = frag_num + 1
 
                 contig = contig + 1
+
+                if return_map==True:
+                    return df_frament_locations
         else:
             print("\n" + 'Ouput file already exists: ' + self.outputlocation + self.outputname)
 
