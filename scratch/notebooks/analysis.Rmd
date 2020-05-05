@@ -1,6 +1,8 @@
 ---
-title: "Clustering of populations based on ANI and continuous SNPs"
-output: pdf_document
+title: "SNPs per kB across genome"
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -9,35 +11,72 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
 ```{r}
 library(tidyverse)
-library(scales)
-library(cowplot)
 library(viridis)
+library(cowplot)
 ```
 
 ```{r}
+df_wg <- read_csv("~/master/scratch/output/all_fragments_output.csv")
+df_wg$genome1 <- gsub("\\..*", "", df_wg$genome1)
+df_wg$genome2 <- gsub("\\..*", "", df_wg$genome2)
+
 df_regions <- read_csv("~/master/scratch/output/conserved_regions_output.csv")
 df_regions$genome1 <- gsub("\\..*", "", df_regions$genome1)
 df_regions$genome2 <- gsub("\\..*", "", df_regions$genome2)
-
-df_ani <- read_csv("~/master/scratch/output/all_fragments_output.csv")
-df_ani$genome1 <- gsub("\\..*", "", df_ani$genome1)
-df_ani$genome2 <- gsub("\\..*", "", df_ani$genome2)
-
 ```
 
 ```{r}
 meta <- read.csv("~/master/scratch/meta.csv", colClasses = "character")
 meta$file <- gsub("\\..*", "", meta$file)
 
-meta2 <- meta %>% select(file, host)
-meta2$host2 <- meta2$host
-meta2$host <- NULL
-meta2$genome2 <- gsub(".fna", "", meta2$file)
-meta2$file <- NULL
+meta1 <- meta %>% select(file, host)
+meta1$host1 <- meta1$host
+meta1$host <- NULL
+meta1$genome1 <- gsub(".fna", "", meta1$file)
+meta1$file <- NULL
+
+meta2 <- meta1
+colnames(meta2) <- c('host2', 'genome2')
+
+df_pos <- read.csv("~/master/scratch/output/fragment_map.csv") %>%
+  select(genome1, fragment1, start, stop)
+df_pos$genome1 <- gsub("\\..*", "", df_pos$genome1)
+
+df_pos <- df_pos %>%
+  mutate(position = (start + stop) / 2)
 ```
 
 ```{r}
-df_ani <- df_ani %>%
+ma <- function(x, n = 5){stats::filter(x, rep(1 / n, n), sides = 2)}
+
+df_plot <- df_wg  %>%
+  inner_join(meta1) %>%
+  inner_join(meta2) %>%
+  inner_join(df_pos) %>%
+  filter(genome1 == "GCF_001417635") %>%
+  arrange(genome2) %>%
+  arrange(host2) %>%
+  mutate(ma_snp_diff = ma(snp_diff)) 
+
+df_plot$genome2 <- factor(df_plot$genome2, levels = as.character(unique(df_plot$genome2)))
+```
+
+```{r, fig.height=14, fig.width=11}
+plot_wg <- ggplot(df_plot, aes(x=position, y=ma_snp_diff, colour=host2)) +
+  geom_line(size=1, alpha=0.9, linetype=2) + 
+  facet_grid(genome2 ~ .) +
+  ylab("Difference in SNPs per kB")  +
+  theme(strip.text.x = element_text(size = 2.5)) + 
+  scale_colour_viridis(discrete = TRUE, option = "D") +
+  theme_minimal()
+
+plot_wg
+```
+
+There are regions that have big drops in conservation, which may be due to a lack of selection etc etc. 
+
+```{r}
+df_ani <- df_wg %>%
   select(genome1, genome2, genome_wide_ani) %>%
   distinct()
 
@@ -47,7 +86,7 @@ df_ani_spread <- df_ani %>%
 df_ani_matrix <- as.matrix(df_ani_spread[,2:ncol(df_ani_spread)])  
 row.names(df_ani_matrix) <- df_ani_spread$genome1
 
-ani_distance <- dist(df_ani_matrix) # method="man" # is a bit better
+ani_distance <- dist(df_ani_matrix)
 ani_hclust <- hclust(ani_distance, method = "complete")
 ord_ani <- ani_hclust$order
 ```
@@ -80,7 +119,7 @@ df_distance_spread[is.na(df_distance_spread)] <- 0
 df_distance_matrix <- as.matrix(df_distance_spread[,2:ncol(df_distance_spread)])  
 row.names(df_distance_matrix) <- df_distance_spread$genome1
 
-distance <- dist(df_distance_matrix) # method="man" # is a bit better
+distance <- dist(df_distance_matrix) 
 hclust <- hclust(distance, method = "complete")
 ord_distance <- rev(hclust$order)
 ```
@@ -111,7 +150,7 @@ df_distance$genome1 <- factor(df_distance$genome1, levels = rownames(df_distance
 df_distance$genome2 <- factor(df_distance$genome2, levels = colnames(df_distance_matrix)[ord_distance])
 df_distance$x_holder <- "X"
 
-heatmap_distance <- ggplot(df_distance, aes(genome1, genome2) ) +
+plot_heatmap_distance <- ggplot(df_distance, aes(genome1, genome2) ) +
   geom_tile(aes(fill = distance)) +
   theme(axis.text.x=element_blank(),
         axis.text.y=element_blank(),
@@ -128,7 +167,7 @@ df_ani$genome1 <- factor(df_ani$genome1, levels = rownames(df_ani_matrix)[ord_di
 df_ani$genome2 <- factor(df_ani$genome2, levels = colnames(df_ani_matrix)[ord_distance])
 df_ani$x_holder <- "X"
 
-heatmap_ani <- ggplot(df_ani, aes(genome1, genome2) ) +
+plot_heatmap_ani <- ggplot(df_ani, aes(genome1, genome2) ) +
   geom_tile(aes(fill = genome_wide_ani)) +
   theme(axis.text.x=element_blank(),
         axis.text.y=element_blank(),
@@ -141,7 +180,7 @@ heatmap_ani <- ggplot(df_ani, aes(genome1, genome2) ) +
   theme(legend.position = "none") +
   ggtitle("ANI")
 
-heatmap_host <- ggplot(df_distance, aes(x_holder, genome2) ) +
+plot_heatmap_host <- ggplot(df_distance, aes(x_holder, genome2) ) +
   geom_tile(aes(fill = host2)) +
   theme(axis.text.x=element_blank(),
         axis.text.y=element_text(size = 6),
@@ -153,83 +192,81 @@ heatmap_host <- ggplot(df_distance, aes(x_holder, genome2) ) +
   theme(legend.title = element_blank()) +
   ggtitle("Host")
 
-plot_grid(heatmap_ani, heatmap_distance,  heatmap_host, rel_widths = c(3,3,2), ncol = 3)
+plot_grid(plot_heatmap_ani, plot_heatmap_distance,  plot_heatmap_host, rel_widths = c(3,3,2), ncol = 3)
 ```
+
 
 When using the distance metric based on most conserved regions with a continuous SNP level, two of the cattle genomes appear to group better with the bottom left cluster. 
 
 ```{r}
-new_population1 <- rev(levels(df_ani$genome1))[6:16]
-new_population2 <- rev(levels(df_ani$genome1))[1:5]
-```
-
-
-```{r}
-df_trim <- df_regions %>%
-  filter(n_continuous_frags >= 50) 
+new_population1 <- rev(levels(df_ani$genome1))[1:11]
 ```
 
 ```{r}
-meta <- read.csv("~/master/scratch/meta.csv", colClasses = "character")
-meta$file <- gsub("\\..*", "", meta$file)
-
-meta1 <- meta %>% select(file, host)
-meta1$host1 <- meta1$host
-meta1$host <- NULL
-meta1$genome1 <- gsub(".fna", "", meta1$file)
-meta1$file <- NULL
-
-meta2 <- meta1
-colnames(meta2) <- c('host2', 'genome2')
-```
-
-```{r}
-df_plot <- df_trim  %>%
+df_plot <- df_regions  %>%
   inner_join(meta1) %>%
   inner_join(meta2) %>%
-  mutate(population = if_else(genome1 %in% new_population1, "Population1", "Population2")) %>%
-  filter(fragment1 > 25) 
+  inner_join(df_pos) %>%
+  mutate(population1 = if_else(genome1 %in% new_population1, "Pop1", "Other")) %>%
+  mutate(population2 = if_else(genome2 %in% new_population1, "Pop1", "Other")) %>%
+  mutate(pupulation = if_else(population1 == "Pop1" & population2 == "Pop1", "same", "different")) %>%
+  filter(host1 != 'chicken') %>%
+  filter(n_continuous_frags > 5) %>%
   
-df_plot$host2 <- factor(df_plot$host2, levels = c("chicken", "human", "cattle"))
+  group_by(genome1, fragment1) %>%
+  mutate(fragment_n_genomes = length(unique(genome2))) %>%
+  ungroup()  
+  
+#df_plot$host2 <- factor(df_plot$host2, levels = c("chicken", "human", "cattle"))
 ```
 
-```{r, fig.height=8, fig.width=8}
-p1 <- ggplot(df_plot, aes(x = fragment1, y = snp_diff, colour = host2)) +
+```{r, fig.height=10, fig.width=7.5}
+p1 <- ggplot(df_plot, aes(x = position, y = snp_diff, colour = pupulation)) +
   geom_point(size = 0.5) +
-  facet_wrap(host1 ~ genome1 + population) +
+  facet_wrap(host1 ~ genome1) +
   theme(strip.text.x = element_text(size = 2.5)) + 
   scale_colour_viridis(discrete = TRUE, option = "D") +
-  theme_minimal() 
+  theme_minimal() +
+  geom_hline(yintercept = 6.5, color='coral', size=1)
 
 p1
 ```
 
-```{r}
-df_pos <- read_csv("~/master/scratch/output/fragment_map.csv")
-colnames(df_pos)[4] <- "fragment1"
-
-df_pos$genome1 <- gsub("\\..*", "", df_pos$genome1)
-
-df_pos <- df_pos %>%
-  mutate(position = (start + stop) /2) %>%
-  select(genome1, fragment1, start, stop, position)
-```
 
 ```{r}
-df_select <- df_plot  %>%
-  filter(snp_diff >= 8) %>%
-  inner_join(df_pos)
+df_plot <- df_regions  %>%
+  inner_join(meta1) %>%
+  inner_join(meta2) %>%
+  inner_join(df_pos) %>%
+  mutate(population = if_else(genome1 %in% new_population1, "Population1", "Population2")) %>%
+  
+  filter(host1 != 'chicken') %>%
+  filter(host2 != 'chicken') %>%
+  
+  filter(snp_diff >= 7) %>%
+  filter(n_continuous_frags > 5) %>%
+  
+  group_by(genome1, fragment1) %>%
+  mutate(fragment_n_genomes = length(unique(genome2))) %>%
+  ungroup() %>%
+ 
+  filter(fragment_n_genomes > 4)
+  
+df_plot$host2 <- factor(df_plot$host2, levels = c("chicken", "human", "cattle", "NA"))
+
 ```
 
+```{r, fig.height=5, fig.width=7.5}
+df_plot$fragment1 <- as.factor(df_plot$fragment1)
 
-
-```{r, fig.height=8, fig.width=8}
-p2 <- ggplot(df_select, aes(x = fragment1, y = snp_diff, colour = host2)) +
+p1 <- ggplot(df_plot, aes(x = fragment1, y = snp_diff, colour = host2, shape = genome2)) +
   geom_point(size = 0.5) +
-  facet_wrap(host1 ~ genome1 + population, scales = "fixed", ncol = 1) +
+  facet_wrap(host1 ~ genome1 + population) +
   theme(strip.text.x = element_text(size = 2.5)) + 
   scale_colour_viridis(discrete = TRUE, option = "D") +
-  theme_minimal() 
+  theme_minimal() +
+  geom_jitter(position = position_jitter(width = 0, height = 0.05)) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
-p2
+p1
 ```
