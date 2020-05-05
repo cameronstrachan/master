@@ -136,8 +136,6 @@ class Fasta(File):
                 end = fragment_size
                 frag_num = 1
 
-
-
                 while end < len(seq):
 
                     seq_fragment = seq[start:end]
@@ -163,45 +161,8 @@ class Fasta(File):
 
                 contig = contig + 1
 
-                if return_map==True:
-                    return df_frament_locations
-        else:
-            print("\n" + 'Ouput file already exists: ' + self.outputlocation + self.outputname)
-
-
-    def split_up_genome_map(self, fragment_size=1000, step=1000):
-
-        '''
-        BLAH BLAH
-        '''
-
-        if not self.outputexists():
-
-            fastadic = self.fasta2dict()
-
-            df_frament_locations = pd.DataFrame(columns=['header', 'contig', 'fragment1', 'start', 'stop', 'fragment_size', 'fragment_step'])
-
-            for k,v in fastadic.items():
-
-                header = k
-                seq = v.rstrip()
-                contig = 1
-
-                start = 0
-                end = fragment_size
-                frag_num = 1
-
-                while end < len(seq):
-
-                    df_frament_locations = df_frament_locations.append({'header': header, 'contig': contig, 'fragment1':frag_num, 'start': start, 'stop': end, 'fragment_size': fragment_size, 'fragment_step': step}, ignore_index=True)
-
-                    start = start + step
-                    end = end + step
-                    frag_num = frag_num + 1
-
-                contig = contig + 1
-
-            return df_frament_locations
+            if return_map==True:
+                return df_frament_locations
 
         else:
             print("\n" + 'Ouput file already exists: ' + self.outputlocation + self.outputname)
