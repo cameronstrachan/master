@@ -19,7 +19,8 @@ for pathogen in pathogens:
 
     output_folder = df_folder + pathogen.replace(' ', '_') + '/'
 
-    os.mkdir(output_folder)
+    if os.path.exists(output_folder) == False:
+        os.mkdir(output_folder)
 
     for line in lines:
 
