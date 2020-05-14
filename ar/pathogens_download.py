@@ -10,7 +10,7 @@ for pathogen in pathogens:
 
     pathogen_string = '\'' + pathogen + '\''
 
-    command = 'esearch -db assembly -query ' + pathogen + ' | esummary | xtract -pattern DocumentSummary -element FtpPath_GenBank'
+    command = 'esearch -db assembly -query ' + pathogen_string + ' | esummary | xtract -pattern DocumentSummary -element FtpPath_GenBank'
 
     process = subprocess.Popen(command, universal_newlines=True, stdout=subprocess.PIPE, shell=True)
     output, error = process.communicate()
