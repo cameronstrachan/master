@@ -7,9 +7,9 @@ import pandas as pd
 system = str(input('\n' + 'Local or Server (L or S):'))
 
 if system == 'S':
-    sys.path.insert(0, '/home/strachan/master/')
+    sys.path.insert(0, '/home/strachan/master/ar/')
 else:
-    sys.path.insert(0, '/Users/cameronstrachan/master/')
+    sys.path.insert(0, '/Users/cameronstrachan/master/ar/')
 
 from modules import seq_core as sc
 
@@ -25,6 +25,6 @@ for file in genome_files:
 
     file_obj.setOutputLocation('dataflow/02-prots/')
     file_obj.runprodigal(type = 'prot')
-    
+
     file_obj.setOutputLocation('dataflow/02-genes/')
     file_obj.runprodigal(type = 'nucl')
