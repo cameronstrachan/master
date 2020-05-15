@@ -16,10 +16,10 @@ from modules import seq_core as sc
 file = "card_db.fasta"
 output_db = "card"
 input_database_file = 'dataflow/01-dbs/CARD/'
-blastdbdir = 'dataflow/01-dbs/'
+blastdbdir = 'dataflow/01-dbs/blastdbs/'
 
 file_obj = sc.Fasta(file, input_database_file)
-file_obj.setOutputName(file)
+file_obj.setOutputName(output_db)
 file_obj.setOutputLocation(blastdbdir)
 file_obj.runmakeblastdb(dbtype='prot')
 
