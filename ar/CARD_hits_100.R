@@ -1,4 +1,5 @@
 library(data.table)
+setDTthreads(10)
 
 folder <- "~/master/ar/dataflow/03-blast/CARD/"
 files <- list.files(folder, pattern = "\\.txt$")
