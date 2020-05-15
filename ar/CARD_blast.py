@@ -11,6 +11,8 @@ if system == 'S':
 else:
     sys.path.insert(0, '/Users/cameronstrachan/master/ar/')
 
+from modules import seq_core as sc
+
 file = "card_db.fasta"
 output_db = "card"
 input_database_file = 'dataflow/01-dbs/CARD/'
