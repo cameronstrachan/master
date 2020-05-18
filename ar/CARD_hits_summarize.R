@@ -1,8 +1,13 @@
+### SELECT HITS AGAINST CARD DATABASE ABOVE A SPECIFIC CUTOFF AND SUMMARIZE RESULTS WITH CARD META DATA
+
 library(data.table)
 library(stringr)
 library(stringi)
 
+# set data.table threads
 setDTthreads(10)
+
+# allow for provide cutoff argument
 args = commandArgs(trailingOnly=TRUE)
 
 if (length(args)==0) {
@@ -69,4 +74,4 @@ df_final  <- merge(x=df_hit_summary,y=df_card_meta,by="card_accession",all.x=TRU
 
 # save the file with the cutoff applied in the file name
 save_file <- paste("dataflow/04-tables/CARD_hits_", as.character(cutoff), ".csv", sep = "")
-write.csv(df_fina, save_file, row.names = FALSE)
+write.csv(df_final, save_file, row.names = FALSE)
