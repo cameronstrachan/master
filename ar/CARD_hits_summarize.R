@@ -36,6 +36,6 @@ for (file in files){
 
 df_complete <- rbindlist(df_list)
 
-save_file <- paste("CARD_hits_", as.character(cutoff), ".csv", sep = "")
+save_file <- paste("dataflow/04-tables/CARD_hits_", as.character(cutoff), ".csv", sep = "")
 
 write.csv(df_complete, save_file)
