@@ -1,4 +1,7 @@
 library(data.table)
+library(stringr)
+library(stringi)
+
 setDTthreads(10)
 
 args = commandArgs(trailingOnly=TRUE)
@@ -11,7 +14,7 @@ if (length(args)==0) {
   stop("Only provide one argument!", call.=FALSE)
 }
 
-
+# combine all hits above the set cutoff for all blast outputs
 
 folder <- "~/master/ar/dataflow/03-blast/CARD/"
 files <- list.files(folder, pattern = "\\.txt$")
@@ -34,8 +37,23 @@ for (file in files){
   
 }
 
-df_complete <- rbindlist(df_list)
+df_hit_summary <- rbindlist(df_list)
+colnames(df_hit_summary) <- c("query_id", "card_id", "percent_identity", "query_length", "alignment_length")
+
+# calcuate alignment percent
+
+df[, alignment_percent := (alignment_length/query_length)*100]
+
+# split query id into the gene id, contig id and genome file name
+
+for (i in 1:nrow(df_hit_summary)){
+  df_hit_summary[i,"gene_id"] <- stri_reverse(str_split_fixed(stri_reverse(df_hit_summary[i,"query_id"]), "_", 3)[[1]])
+  df_hit_summary[i,"contig_id"] <- stri_reverse(str_split_fixed(stri_reverse(df_hit_summary[i,"query_id"]), "_", 3)[[2]])
+  df_hit_summary[i,"genome_file"] <- paste(stri_reverse(str_split_fixed(stri_reverse(df_hit_summary[i,"query_id"]), "_", 3)[[3]]), "_rename.fasta", sep = "")
+}
+
+# save the file with the cutoff applied in the file name
 
 save_file <- paste("dataflow/04-tables/CARD_hits_", as.character(cutoff), ".csv", sep = "")
 
-write.csv(df_complete, save_file)
+write.csv(df_complete, save_file, row.names = FALSE)
