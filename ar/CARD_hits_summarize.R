@@ -38,12 +38,12 @@ for (file in files){
     
     df_select = df[V3 >= cutoff]
     df_select[, V13 := (V12/V11)*100]
-    df_select = df_select[V13 >= cutoff2]
+    df_select2 = df_select[V13 >= cutoff2]
     
-    if (nrow(df_select) > 0){
+    if (nrow(df_select2) > 0){
       
-      df_select = df_select[,.(V1,V2,V3,V13)]
-      df_list[[i]] <- df_select
+      df_select2 = df_select2[,.(V1,V2,V3,V13)]
+      df_list[[i]] <- df_select2
       i <- i + 1
       
     }
