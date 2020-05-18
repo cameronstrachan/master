@@ -42,6 +42,8 @@ colnames(df_hit_summary) <- c("query_id", "card_id", "percent_identity", "query_
 df_hit_summary[, alignment_percent := (alignment_length/query_length)*100]
 
 # split query id into the gene id, contig id and genome file name
+df_hit_summary <- as.data.frame(df_hit_summary)
+
 for (i in 1:nrow(df_hit_summary)){
   # split query id
   df_hit_summary[i,"gene_id"] <- stri_reverse(str_split_fixed(stri_reverse(df_hit_summary[i,"query_id"]), "_", 3)[[1]])
@@ -59,6 +61,7 @@ df_hit_summary$file <- paste(df_hit_summary$genome_id, "_rename.fasta", sep = ""
 # clean up card annotation
 df_hit_summary$card_annotation <- gsub("_$", "", df_hit_summary$card_annotation)
 df_hit_summary$card_annotation <- gsub("_", " ", df_hit_summary$card_annotation)
+df_hit_summary$card_id <- NULL
 
 # save the file with the cutoff applied in the file name
 save_file <- paste("dataflow/04-tables/CARD_hits_", as.character(cutoff), ".csv", sep = "")
