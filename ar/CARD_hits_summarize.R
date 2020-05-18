@@ -35,14 +35,19 @@ for (file in files){
   df <- data.table(df)
   
   if (nrow(df[V3 >= cutoff]) > 0){
+    
     df_select = df[V3 >= cutoff]
     df_select[, V13 := (V12/V11)*100]
     df_select = df[V13 >= cutoff2]
-    df_select = df_select[,.(V1,V2,V3,V13)]
-    df_list[[i]] <- df_select
-    i <- i + 1
+    
+    if (nrow(df_select) > 0){
+      
+      df_select = df_select[,.(V1,V2,V3,V13)]
+      df_list[[i]] <- df_select
+      i <- i + 1
+      
+    }
   }
-  
 }
 
 df_hit_summary <- rbindlist(df_list)
