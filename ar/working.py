@@ -13,18 +13,22 @@ else:
 
 from modules import seq_core as sc
 
-genomes_input_folder = 'dataflow/01-genomes/'
-genome_extension = '.fasta'
+runprodigal = input("\n" + "Run prodigal on rumen genomes? (y or n):")
 
-genome_files = [f for f in os.listdir(genomes_input_folder) if f.endswith(genome_extension)]
+if runprodigal == 'y':
 
-for file in genome_files:
+    genomes_input_folder = 'dataflow/01-genomes/'
+    genome_extension = '.fasta'
 
-    file_obj = sc.Fasta(file, 'dataflow/01-genomes/')
-    file_obj.setOutputName(file)
+    genome_files = [f for f in os.listdir(genomes_input_folder) if f.endswith(genome_extension)]
 
-    file_obj.setOutputLocation('dataflow/02-prots/')
-    file_obj.runprodigal(type = 'prot')
+    for file in genome_files:
 
-    file_obj.setOutputLocation('dataflow/02-genes/')
-    file_obj.runprodigal(type = 'nucl')
+        file_obj = sc.Fasta(file, 'dataflow/01-genomes/')
+        file_obj.setOutputName(file)
+
+        file_obj.setOutputLocation('dataflow/02-prots/')
+        file_obj.runprodigal(type = 'prot')
+
+        file_obj.setOutputLocation('dataflow/02-genes/')
+        file_obj.runprodigal(type = 'nucl')

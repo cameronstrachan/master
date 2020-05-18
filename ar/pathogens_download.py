@@ -2,7 +2,12 @@ import subprocess
 import re
 import os
 
-pathogens = ['mycobacterium tuberculosis', 'staphylococcus aureus', 'campylobacter coli', 'campylobacter jejuni', 'clostridioides difficile', 'acinetobacter baumannii', 'streptococcus pneumoniae', 'escherichia coli', 'pseudomonas aeruginosa', 'klebsiella pneumoniae', 'neisseria gonorrhoeae', 'streptococcus pyogenes']
+#pathogens = ['staphylococcus aureus', 'campylobacter coli', 'campylobacter jejuni', 'clostridioides difficile']
+
+pathogens = ['salmonella enterica']
+
+#pathogens = ['mycobacterium tuberculosis', 'staphylococcus aureus', 'campylobacter coli', 'campylobacter jejuni', 'clostridioides difficile', 'acinetobacter baumannii', 'streptococcus pneumoniae', 'escherichia coli', 'pseudomonas aeruginosa', 'klebsiella pneumoniae', 'neisseria gonorrhoeae', 'streptococcus pyogenes']
+
 
 df_folder = 'dataflow/01-dbs/pathogens/'
 

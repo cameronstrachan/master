@@ -13,8 +13,8 @@ for (file in files){
   df <- read.delim(input_file, header=FALSE)
   df <- data.table(df)
   
-  if (nrow(df[V3 == 100]) > 0){
-    df_select = df[V3 == 100]
+  if (nrow(df[V3 >= 99]) > 0){
+    df_select = df[V3 >= 99]
     df_select = df_select[,.(V1,V2,V3,V11,V12)]
     df_list[[i]] <- df_select
     i <- i + 1
