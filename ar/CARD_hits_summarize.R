@@ -1,4 +1,5 @@
-### SELECT HITS AGAINST CARD DATABASE ABOVE A SPECIFIC CUTOFF AND SUMMARIZE RESULTS WITH CARD META DATA
+### SELECT HITS AGAINST CARD DATABASE ABOVE SPECIFIC CUTOFFS AND SUMMARIZE RESULTS WITH CARD META DATA
+### CUTOFFS ARE PERCENT IDENTITY (FIRST ARGUMENT) AND PERCENT ALIGNMENT (SECOND ARGUMENT)
 
 library(data.table)
 library(stringr)
@@ -12,10 +13,12 @@ args = commandArgs(trailingOnly=TRUE)
 
 if (length(args)==0) {
  cutoff = 95
-} else if (length(args)==1) {
+ cutoff2 = 90
+} else if (length(args)==2) {
   cutoff = as.numeric(args[1])
+  cutoff2 = as.numeric(args[2])
 } else {
-  stop("Only provide one argument!", call.=FALSE)
+  stop("Need two arguments: the percent identity cutoff and the percent alignment cutoff!", call.=FALSE)
 }
 
 # combine all hits above the set cutoff for all blast outputs
@@ -33,7 +36,9 @@ for (file in files){
   
   if (nrow(df[V3 >= cutoff]) > 0){
     df_select = df[V3 >= cutoff]
-    df_select = df_select[,.(V1,V2,V3,V11,V12)]
+    df_hit_summary[, V13 := (V12/V11)*100]
+    df_select = df[V13 >= cutoff2]
+    df_select = df_select[,.(V1,V2,V3,V13)]
     df_list[[i]] <- df_select
     i <- i + 1
   }
@@ -41,10 +46,7 @@ for (file in files){
 }
 
 df_hit_summary <- rbindlist(df_list)
-colnames(df_hit_summary) <- c("query_id", "card_id", "percent_identity", "query_length", "alignment_length")
-
-# calcuate alignment percent
-df_hit_summary[, alignment_percent := (alignment_length/query_length)*100]
+colnames(df_hit_summary) <- c("query_id", "card_id", "percent_identity", "percent_alignment")
 
 # split query id into the gene id, contig id and genome file name
 df_hit_summary <- as.data.frame(df_hit_summary)
@@ -73,5 +75,5 @@ df_card_meta <- read.csv("~/master/ar/dataflow/00-meta/card_meta.csv")
 df_final  <- merge(x=df_hit_summary,y=df_card_meta,by="card_accession",all.x=TRUE)
 
 # save the file with the cutoff applied in the file name
-save_file <- paste("dataflow/04-tables/CARD_hits_", as.character(cutoff), ".csv", sep = "")
+save_file <- paste("dataflow/04-tables/CARD_hits_", as.character(cutoff), "_", as.character(cutoff2), ".csv", sep = "")
 write.csv(df_final, save_file, row.names = FALSE)
