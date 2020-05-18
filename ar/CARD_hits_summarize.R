@@ -36,7 +36,7 @@ for (file in files){
   
   if (nrow(df[V3 >= cutoff]) > 0){
     df_select = df[V3 >= cutoff]
-    df_hit_summary[, V13 := (V12/V11)*100]
+    df_select[, V13 := (V12/V11)*100]
     df_select = df[V13 >= cutoff2]
     df_select = df_select[,.(V1,V2,V3,V13)]
     df_list[[i]] <- df_select
