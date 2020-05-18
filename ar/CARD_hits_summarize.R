@@ -48,9 +48,9 @@ for (i in 1:nrow(df_hit_summary)){
   df_hit_summary[i,"contig_id"] <- stri_reverse(str_split_fixed(stri_reverse(df_hit_summary[i,"query_id"]), "_", 3)[[2]])
   df_hit_summary[i,"genome_id"] <- stri_reverse(str_split_fixed(stri_reverse(df_hit_summary[i,"query_id"]), "_", 3)[[3]])
   # split CARD id
-  df_hit_summary[i,"card_accession"] <- str_split_fixed(df_hit_summary[i,"card_id"], "|", 4)[[2]]
-  df_hit_summary[i,"aro_accession"] <- str_split_fixed(df_hit_summary[i,"card_id"], "|", 4)[[3]]
-  df_hit_summary[i,"card_annotation"] <- str_split_fixed(df_hit_summary[i,"card_id"], "|", 4)[[4]]
+  df_hit_summary[i,"card_accession"] <- str_split_fixed(df_hit_summary[i,"card_id"], "\\|", 4)[[2]]
+  df_hit_summary[i,"aro_accession"] <- str_split_fixed(df_hit_summary[i,"card_id"], "\\|", 4)[[3]]
+  df_hit_summary[i,"card_annotation"] <- str_split_fixed(df_hit_summary[i,"card_id"], "\\|", 4)[[4]]
 }
 
 # add extension for file name
