@@ -56,4 +56,4 @@ for (i in 1:nrow(df_hit_summary)){
 
 save_file <- paste("dataflow/04-tables/CARD_hits_", as.character(cutoff), ".csv", sep = "")
 
-write.csv(df_complete, save_file, row.names = FALSE)
+write.csv(df_hit_summary, save_file, row.names = FALSE)
