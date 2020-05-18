@@ -63,6 +63,10 @@ df_hit_summary$card_annotation <- gsub("_$", "", df_hit_summary$card_annotation)
 df_hit_summary$card_annotation <- gsub("_", " ", df_hit_summary$card_annotation)
 df_hit_summary$card_id <- NULL
 
+# merge with card meta data
+df_card_meta <- read.csv("~/master/ar/dataflow/00-meta/card_meta.csv")
+df_final  <- merge(x=df_hit_summary,y=df_card_meta,by="card_accession",all.x=TRUE)
+
 # save the file with the cutoff applied in the file name
 save_file <- paste("dataflow/04-tables/CARD_hits_", as.character(cutoff), ".csv", sep = "")
-write.csv(df_hit_summary, save_file, row.names = FALSE)
+write.csv(df_fina, save_file, row.names = FALSE)
