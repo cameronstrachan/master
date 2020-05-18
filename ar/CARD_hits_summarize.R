@@ -38,7 +38,7 @@ for (file in files){
     
     df_select = df[V3 >= cutoff]
     df_select[, V13 := (V12/V11)*100]
-    df_select = df[V13 >= cutoff2]
+    df_select = df_select[V13 >= cutoff2]
     
     if (nrow(df_select) > 0){
       
