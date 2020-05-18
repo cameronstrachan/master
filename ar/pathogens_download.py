@@ -4,7 +4,7 @@ import os
 
 #pathogens = ['staphylococcus aureus', 'campylobacter coli', 'campylobacter jejuni', 'clostridioides difficile']
 
-pathogens = ['salmonella enterica']
+pathogens = ['salmonella typhimurium', 'salmonella newport']
 
 #pathogens = ['mycobacterium tuberculosis', 'staphylococcus aureus', 'campylobacter coli', 'campylobacter jejuni', 'clostridioides difficile', 'acinetobacter baumannii', 'streptococcus pneumoniae', 'escherichia coli', 'pseudomonas aeruginosa', 'klebsiella pneumoniae', 'neisseria gonorrhoeae', 'streptococcus pyogenes']
 
