@@ -42,7 +42,7 @@ colnames(df_hit_summary) <- c("query_id", "card_id", "percent_identity", "query_
 
 # calcuate alignment percent
 
-df[, alignment_percent := (alignment_length/query_length)*100]
+df_hit_summary[, alignment_percent := (alignment_length/query_length)*100]
 
 # split query id into the gene id, contig id and genome file name
 
