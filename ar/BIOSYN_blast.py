@@ -25,7 +25,7 @@ file_obj.runmakeblastdb(dbtype='prot')
 
 prots_input_folder = 'dataflow/02-prots/'
 genome_extension = '.fasta'
-blastdb = "card"
+blastdb = "ITPs"
 blast_output_dir = 'dataflow/03-blast/biosynthesis/'
 
 prot_files = [f for f in os.listdir(prots_input_folder) if f.endswith(genome_extension)]
