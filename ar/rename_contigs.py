@@ -22,7 +22,7 @@ if runprodigal == 'y':
 
     for pathogen_folder in pathogen_folders:
 
-        genomes_input_folder = 'dataflow/01-dbs/pathogens/' + pathogen_folder
+        genomes_input_folder = 'dataflow/01-dbs/pathogens/' + pathogen_folder + '/'
         genome_extension = '.fna.gz'
 
         genome_files_zip = [f for f in os.listdir(genomes_input_folder) if f.endswith(genome_extension)]
