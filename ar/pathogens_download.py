@@ -2,35 +2,36 @@ import subprocess
 import re
 import os
 
-#pathogens = ['staphylococcus aureus', 'campylobacter coli', 'campylobacter jejuni', 'clostridioides difficile']
 
-pathogens = ['salmonella typhimurium', 'salmonella newport']
-
+pathogens = ['staphylococcus aureus', 'campylobacter coli', 'campylobacter jejuni', 'clostridioides difficile', 'salmonella typhimurium', 'salmonella newport']
 #pathogens = ['mycobacterium tuberculosis', 'staphylococcus aureus', 'campylobacter coli', 'campylobacter jejuni', 'clostridioides difficile', 'acinetobacter baumannii', 'streptococcus pneumoniae', 'escherichia coli', 'pseudomonas aeruginosa', 'klebsiella pneumoniae', 'neisseria gonorrhoeae', 'streptococcus pyogenes']
-
-
 df_folder = 'dataflow/01-dbs/pathogens/'
 
-for pathogen in pathogens:
+downloadpathogens = input("\n" + "Download pathogen genomes? (y or n):")
+print('Current pathogen search terms: ' + pathogens)
 
-    pathogen_string = '\'' + pathogen + '\''
+if downloadpathogens == 'y':
 
-    command = 'esearch -db assembly -query ' + pathogen_string + ' | esummary | xtract -pattern DocumentSummary -element FtpPath_GenBank'
+    for pathogen in pathogens:
 
-    process = subprocess.Popen(command, universal_newlines=True, stdout=subprocess.PIPE, shell=True)
-    output, error = process.communicate()
+        pathogen_string = '\'' + pathogen + '\''
 
-    lines = output.splitlines()
+        command = 'esearch -db assembly -query ' + pathogen_string + ' | esummary | xtract -pattern DocumentSummary -element FtpPath_GenBank'
 
-    output_folder = df_folder + pathogen.replace(' ', '_') + '/'
+        process = subprocess.Popen(command, universal_newlines=True, stdout=subprocess.PIPE, shell=True)
+        output, error = process.communicate()
 
-    if os.path.exists(output_folder) == False:
-        os.mkdir(output_folder)
+        lines = output.splitlines()
 
-    for line in lines:
+        output_folder = df_folder + pathogen.replace(' ', '_') + '/'
 
-        file_name = 'GCA_' + line.split('GCA_')[1] + '_genomic.fna.gz'
-        ftp = line + '/' + file_name
-        command = 'wget ' + ftp + ' -P ' + output_folder
+        if os.path.exists(output_folder) == False:
+            os.mkdir(output_folder)
 
-        os.system(command)
+        for line in lines:
+
+            file_name = 'GCA_' + line.split('GCA_')[1] + '_genomic.fna.gz'
+            ftp = line + '/' + file_name
+            command = 'wget ' + ftp + ' -P ' + output_folder
+
+            os.system(command)
