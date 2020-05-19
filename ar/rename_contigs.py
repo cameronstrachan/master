@@ -13,7 +13,7 @@ else:
 
 from modules import seq_core as sc
 
-pathogen_folders = ['staphylococcus aureus', 'campylobacter coli', 'campylobacter jejuni', 'clostridioides difficile', 'salmonella typhimurium', 'salmonella newport']
+pathogen_folders = ['staphylococcus_aureus', 'campylobacter_coli', 'campylobacter_jejuni', 'clostridioides_difficile', 'salmonella_typhimurium', 'salmonella_newport']
 
 runprodigal = input("\n" + "Rename pathogen genomes? (y or n):")
 
