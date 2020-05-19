@@ -28,21 +28,25 @@ i <- 1
 for (file in files){
   
   input_file <- paste(folder, file, sep = "")
-  df <- read.delim(input_file, header=FALSE)
-  df <- data.table(df)
   
-  if (nrow(df[V3 >= cutoff]) > 0){
+  if (file.size(input_file) > 0){
+  
+    df <- read.delim(input_file, header=FALSE)
+    df <- data.table(df)
     
-    df_select = df[V3 >= cutoff]
-    df_select[, V13 := (V12/V11)*100]
-    df_select2 = df_select[V13 >= cutoff2]
-    
-    if (nrow(df_select2) > 0){
+    if (nrow(df[V3 >= cutoff]) > 0){
       
-      df_select2 = df_select2[,.(V1,V2,V3,V13)]
-      df_list[[i]] <- df_select2
-      i <- i + 1
+      df_select = df[V3 >= cutoff]
+      df_select[, V13 := (V12/V11)*100]
+      df_select2 = df_select[V13 >= cutoff2]
       
+      if (nrow(df_select2) > 0){
+        
+        df_select2 = df_select2[,.(V1,V2,V3,V13)]
+        df_list[[i]] <- df_select2
+        i <- i + 1
+        
+      }
     }
   }
 }
