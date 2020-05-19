@@ -29,7 +29,7 @@ if runprodigal == 'y':
 
         for file_zip in genome_files_zip:
 
-            os.system('gunzip ' + file_zip)
+            os.system('gunzip ' + genomes_input_folder + file_zip)
 
             file = file_zip.split('.gz')[0]
 
