@@ -24,7 +24,7 @@ if runmakeblastdb == 'y':
         input_folder = 'dataflow/01-dbs/pathogens/'
 
         genomes_input_folder = input_folder + pathogen_folder + '/'
-        command = 'cat ' genomes_input_folder + '* > ' + input_folder + pathogen_folder + '.fasta'
+        command = 'cat ' + genomes_input_folder + '* > ' + input_folder + pathogen_folder + '.fasta'
 
         os.system(command)
 
