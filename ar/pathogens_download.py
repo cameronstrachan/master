@@ -11,7 +11,7 @@ pathogens = ['staphylococcus pseudintermedius', 'streptococcus agalactiae', 'ent
 df_folder = 'dataflow/01-dbs/pathogens/'
 
 downloadpathogens = input("\n" + "Download pathogen genomes? (y or n):")
-print('Current pathogen search terms: ' + pathogens)
+#print('Current pathogen search terms: ' + pathogens)
 
 if downloadpathogens == 'y':
 
