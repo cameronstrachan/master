@@ -13,7 +13,23 @@ else:
 
 from modules import seq_core as sc
 
-pathogen_folders = ['staphylococcus_aureus', 'campylobacter_coli', 'campylobacter_jejuni', 'clostridioides_difficile', 'salmonella_typhimurium', 'salmonella_newport']
+
+def concat(inputfolder='path/to/input/', outputpath='path/to/output/file.txt', filenames=[]):
+
+	if not os.path.exists(outputpath):
+		with open(outputpath, 'w') as outfile:
+		    for file in filenames:
+		        with open(inputfolder + file) as infile:
+		            for line in infile:
+		                outfile.write(line)
+	else:
+		print("\n" + 'File already exists: ' + outputpath)
+
+
+#pathogen_folders = ['staphylococcus_aureus', 'campylobacter_coli', 'campylobacter_jejuni', 'clostridioides_difficile', 'salmonella_typhimurium', 'salmonella_newport']
+pathogen_folders = ['campylobacter_jejuni']
+genome_extension = ['.fasta']
+
 
 runmakeblastdb = input("\n" + "Make blast databases? (y or n):")
 
@@ -22,11 +38,12 @@ if runmakeblastdb == 'y':
     for pathogen_folder in pathogen_folders:
 
         input_folder = 'dataflow/01-dbs/pathogens/'
-
         genomes_input_folder = input_folder + pathogen_folder + '/'
-        command = 'cat ' + genomes_input_folder + '* > ' + input_folder + pathogen_folder + '.fasta'
+        output_file = input_folder + pathogen_folder + '.fasta'
 
-        os.system(command)
+        genome_files = [f for f in os.listdir(genomes_input_folder) if f.endswith(genome_extension)]
+
+        concat(inputfolder=genomes_input_folder, outputpath=output_file, filenames=genome_files)
 
         file = pathogen_folder + '.fasta'
         blastdbdir = 'dataflow/01-dbs/blastdbs/'
