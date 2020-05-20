@@ -27,7 +27,10 @@ def concat(inputfolder='path/to/input/', outputpath='path/to/output/file.txt', f
 
 
 #pathogen_folders = ['staphylococcus_aureus', 'campylobacter_coli', 'campylobacter_jejuni', 'clostridioides_difficile', 'salmonella_typhimurium', 'salmonella_newport']
-pathogen_folders = ['campylobacter_jejuni']
+#pathogen_folders = ['campylobacter_jejuni']
+
+pathogen_folders = ['staphylococcus_pseudintermedius', 'streptococcus_agalactiae', 'enterococcus_faecium', 'erysipelothrix_rhusiopathiae', 'streptococcus_suis']
+
 genome_extension = '.fasta'
 
 runmakeblastdb = input("\n" + "Make blast databases? (y or n):")
