@@ -21,7 +21,7 @@ genes_input_folder = 'dataflow/03-selected-genes/'
 genome_extension = '.fasta'
 blast_output_dir = 'dataflow/03-blast/pathogens/'
 
-gene_files = [f for f in os.listdir(prots_input_folder) if f.endswith(genome_extension)]
+gene_files = [f for f in os.listdir(genes_input_folder) if f.endswith(genome_extension)]
 
 
 for file in gene_files:
