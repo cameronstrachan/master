@@ -26,7 +26,7 @@ for index, row in df_card_selected.iterrows():
     orf = row['query_id']
     file = row['file']
 
-    command = 'cp ' + input_dir + file + ' ' + output_dir_genomes
+    command = 'cp ' + input_dir_genomes + file + ' ' + output_dir_genomes
     os.system(command)
 
     file_obj = sc.Fasta(file, input_dir_genes)
