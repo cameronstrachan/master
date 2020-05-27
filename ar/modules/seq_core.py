@@ -179,7 +179,7 @@ class Fasta(File):
             print("\n" + 'File exists: ' + self.outputlocation + self.outputname)
 
 
-    def subsetfasta(self, seqlist = [], headertag='number', length=0, replace='NA'):
+    def subsetfasta(self, seqlist = []):
 
         '''
 
@@ -189,28 +189,13 @@ class Fasta(File):
         if not self.outputexists():
             fastadic = self.fasta2dict()
             fastadic = {k: fastadic[k] for k in seqlist}
-
             outputfile = self.openwritefile()
-
-            j = 1
 
             for k,v in fastadic.items():
 
-                if length != 0:
-                    k = k[0:length]
-
-                if replace != 'NA':
-                    k = k.replace(replace, '')
-
-                if headertag == 'number':
-                    outputfile.write(">" + k + '_' + str(j) + '\n')
-                    j = j + 1
-                elif headertag == 'none':
-                    outputfile.write(">" + k + '\n')
-                else:
-                    outputfile.write(">" + k + '_' + headertag + '\n')
-
+                outputfile.write(">" + k + '\n')
                 outputfile.write(v + '\n')
+
         else:
             print("\n" + 'File exists: ' + self.outputlocation + self.outputname)
 

@@ -3,10 +3,11 @@ import re
 import os
 
 
-#pathogens = ['staphylococcus aureus', 'campylobacter coli', 'campylobacter jejuni', 'clostridioides difficile', 'salmonella typhimurium', 'salmonella newport']
-#pathogens = ['mycobacterium tuberculosis', 'staphylococcus aureus', 'campylobacter coli', 'campylobacter jejuni', 'clostridioides difficile', 'acinetobacter baumannii', 'streptococcus pneumoniae', 'escherichia coli', 'pseudomonas aeruginosa', 'klebsiella pneumoniae', 'neisseria gonorrhoeae', 'streptococcus pyogenes']
+pathogens = ['staphylococcus aureus', 'campylobacter coli', 'campylobacter jejuni', 'clostridioides difficile', 'salmonella typhimurium', 'salmonella newport', 'staphylococcus pseudintermedius', 'streptococcus agalactiae', 'enterococcus faecium', 'erysipelothrix rhusiopathiae', 'streptococcus suis']
 
-pathogens = ['staphylococcus pseudintermedius', 'streptococcus agalactiae', 'enterococcus faecium', 'erysipelothrix rhusiopathiae', 'streptococcus suis']
+#others
+#pathogens = ['mycobacterium tuberculosis', 'acinetobacter baumannii', 'streptococcus pneumoniae', 'escherichia coli', 'pseudomonas aeruginosa', 'klebsiella pneumoniae', 'neisseria gonorrhoeae', 'streptococcus pyogenes']
+
 
 df_folder = 'dataflow/01-dbs/pathogens/'
 
