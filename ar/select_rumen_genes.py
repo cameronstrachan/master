@@ -11,6 +11,8 @@ if system == 'S':
 else:
     sys.path.insert(0, '/Users/cameronstrachan/master/ar/')
 
+from modules import seq_core as sc
+
 df_card_selected = pd.read_csv('dataflow/04-tables/CARD_hits_95_90.csv', low_memory=False)
 
 input_dir_genomes = 'dataflow/01-genomes/'
