@@ -28,17 +28,15 @@ files <- list.files(folder, pattern = "\\.txt$")
 df_hit_summary <- summarize_blast_output(folder = folder, files = files, cutoff = cutoff, cutoff2 = cutoff2)
 
 # split query id into the gene id, contig id and genome file name
-
-
 for (i in 1:nrow(df_hit_summary)){
   # split query id
   df_hit_summary[i,"gene_id"] <- stri_reverse(str_split_fixed(stri_reverse(df_hit_summary[i,"query_id"]), "_", 3)[[1]])
   df_hit_summary[i,"contig_id"] <- stri_reverse(str_split_fixed(stri_reverse(df_hit_summary[i,"query_id"]), "_", 3)[[2]])
   df_hit_summary[i,"genome_id"] <- stri_reverse(str_split_fixed(stri_reverse(df_hit_summary[i,"query_id"]), "_", 3)[[3]])
   # split CARD id
-  df_hit_summary[i,"card_accession"] <- str_split_fixed(df_hit_summary[i,"card_id"], "\\|", 4)[[2]]
-  df_hit_summary[i,"aro_accession"] <- str_split_fixed(df_hit_summary[i,"card_id"], "\\|", 4)[[3]]
-  df_hit_summary[i,"card_annotation"] <- str_split_fixed(df_hit_summary[i,"card_id"], "\\|", 4)[[4]]
+  df_hit_summary[i,"card_accession"] <- str_split_fixed(df_hit_summary[i,"subject_id"], "\\|", 4)[[2]]
+  df_hit_summary[i,"aro_accession"] <- str_split_fixed(df_hit_summary[i,"subject_id"], "\\|", 4)[[3]]
+  df_hit_summary[i,"card_annotation"] <- str_split_fixed(df_hit_summary[i,"subject_id"], "\\|", 4)[[4]]
 }
 
 # add extension for file name

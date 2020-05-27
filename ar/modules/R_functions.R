@@ -32,7 +32,7 @@ summarize_blast_output <- function(folder = folder, files = files, cutoff = cuto
   }
   
   df_hit_summary <- rbindlist(df_list)
-  colnames(df_hit_summary) <- c("query_id", "card_id", "percent_identity", "percent_alignment", "query_file")
+  colnames(df_hit_summary) <- c("query_id", "subject_id", "percent_identity", "percent_alignment", "query_file")
   df_hit_summary <- as.data.frame(df_hit_summary)
   
   return(df_hit_summary)
