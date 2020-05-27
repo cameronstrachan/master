@@ -1,7 +1,7 @@
 library(data.table)
 
 # set data.table threads
-setDTthreads(10)
+#setDTthreads(10)
 
 summarize_blast_output <- function(folder = folder, files = files, cutoff = cutoff, cutoff2 = cutoff2){
   
