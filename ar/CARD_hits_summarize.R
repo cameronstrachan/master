@@ -25,6 +25,8 @@ if (length(args)==0) {
 folder <- "~/master/ar/dataflow/03-blast/CARD/"
 files <- list.files(folder, pattern = "\\.txt$")
 
+summarize_blast_output <- function(folder = folder, files = files){
+
 df_list <- list()
 i <- 1
 
@@ -43,6 +45,7 @@ for (file in files){
     if (nrow(df_select2) > 0){
       
       df_select2 = df_select2[,.(V1,V2,V3,V13)]
+      df_select2$V14 <- file
       df_list[[i]] <- df_select2
       i <- i + 1
       
@@ -51,10 +54,16 @@ for (file in files){
 }
 
 df_hit_summary <- rbindlist(df_list)
-colnames(df_hit_summary) <- c("query_id", "card_id", "percent_identity", "percent_alignment")
+colnames(df_hit_summary) <- c("query_id", "card_id", "percent_identity", "percent_alignment", "file")
+df_hit_summary <- as.data.frame(df_hit_summary)
+
+return(df_hit_summary)
+}
+
+df_hit_summary <- summarize_blast_output(folder = folder, files = files)
 
 # split query id into the gene id, contig id and genome file name
-df_hit_summary <- as.data.frame(df_hit_summary)
+
 
 for (i in 1:nrow(df_hit_summary)){
   # split query id
