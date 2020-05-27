@@ -25,7 +25,7 @@ if (length(args)==0) {
 folder <- "~/master/ar/dataflow/03-blast/CARD/"
 files <- list.files(folder, pattern = "\\.txt$")
 
-df_hit_summary <- summarize_blast_output(folder = folder, files = files)
+df_hit_summary <- summarize_blast_output(folder = folder, files = files, cutoff = cutoff, cutoff2 = cutoff2)
 
 # split query id into the gene id, contig id and genome file name
 

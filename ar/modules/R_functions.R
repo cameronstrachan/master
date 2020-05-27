@@ -1,6 +1,6 @@
 library(data.table)
 
-summarize_blast_output <- function(folder = folder, files = files){
+summarize_blast_output <- function(folder = folder, files = files, cutoff = cutoff, cutoff2 = cutoff2){
   
   df_list <- list()
   i <- 1
@@ -8,6 +8,9 @@ summarize_blast_output <- function(folder = folder, files = files){
   for (file in files){
     
     input_file <- paste(folder, file, sep = "")
+    
+    if (file.size(input_file) == 0) next
+    
     df <- read.delim(input_file, header=FALSE)
     df <- data.table(df)
     
@@ -29,7 +32,7 @@ summarize_blast_output <- function(folder = folder, files = files){
   }
   
   df_hit_summary <- rbindlist(df_list)
-  colnames(df_hit_summary) <- c("query_id", "card_id", "percent_identity", "percent_alignment", "file")
+  colnames(df_hit_summary) <- c("query_id", "card_id", "percent_identity", "percent_alignment", "query_file")
   df_hit_summary <- as.data.frame(df_hit_summary)
   
   return(df_hit_summary)
