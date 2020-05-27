@@ -8,8 +8,8 @@ files <- list.files(folder, pattern = "\\.txt$")
 
 df_list <- list()
 i <- 1
-cutoff = 0
-cutoff2 = 0
+cutoff = 99
+cutoff2 = 70
 
 folder <- "~/master/ar/dataflow/03-blast/pathogens/"
 files <- list.files(folder, pattern = "\\.txt$")
@@ -29,11 +29,10 @@ df_hit_summary$pathogen_file <- paste(df_hit_summary$pathogen_genome_id, "_renam
 
 # merge with card meta data
 df_card_hits <- read.csv("~/master/ar/dataflow/04-tables/CARD_hits_95_90.csv")
-df_card_hits$percent_identity <- NULL
-df_card_hits$percent_alignment <- NULL
-df_card_hits$file <- NULL
-df_card_hits$query_file <- NULL
-df_card_hits$gene_id <- NULL
-df_card_hits$contig_id <- NULL
+df_card_hits <- df_card_hits[,c(2, 9, 11)]
 
 df_final  <- merge(x=df_hit_summary,y=df_card_hits,by="query_id",all.x=TRUE)
+
+# save the file with the cutoff applied in the file name
+save_file <- paste("dataflow/04-tables/PATH_hits_", as.character(cutoff), "_", as.character(cutoff2), ".csv", sep = "")
+write.csv(df_final, save_file, row.names = FALSE)
