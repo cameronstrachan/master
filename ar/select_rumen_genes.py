@@ -31,12 +31,15 @@ for index, row in df_card_selected.iterrows():
     command = 'cp ' + input_dir_genomes + file + ' ' + output_dir_genomes
     os.system(command)
 
+    print(orf)
+    print(list(orf))
+
     file_obj = sc.Fasta(file, input_dir_genes)
     file_obj.setOutputName(orf + '.fasta')
     file_obj.setOutputLocation(output_dir_genes)
-    file_obj.subsetfasta(seqlist = list(orf))
+    #file_obj.subsetfasta(seqlist = list(orf))
 
     file_obj = sc.Fasta(file, input_dir_prots)
     file_obj.setOutputName(orf + '.fasta')
     file_obj.setOutputLocation(output_dir_prots)
-    file_obj.subsetfasta(seqlist = list(orf))
+    #file_obj.subsetfasta(seqlist = list(orf))
