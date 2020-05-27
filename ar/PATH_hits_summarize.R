@@ -7,7 +7,7 @@ args = commandArgs(trailingOnly=TRUE)
 
 if (length(args)==0) {
   cutoff = 99
-  cutoff2 = 70
+  cutoff2 = 60
 } else if (length(args)==2) {
   cutoff = as.numeric(args[1])
   cutoff2 = as.numeric(args[2])
