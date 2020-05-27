@@ -1,5 +1,8 @@
 library(data.table)
 
+# set data.table threads
+setDTthreads(10)
+
 summarize_blast_output <- function(folder = folder, files = files, cutoff = cutoff, cutoff2 = cutoff2){
   
   df_list <- list()
@@ -22,7 +25,7 @@ summarize_blast_output <- function(folder = folder, files = files, cutoff = cuto
       
       if (nrow(df_select2) > 0){
         
-        df_select2 = df_select2[,.(V1,V2,V3,V13)]
+        df_select2 = df_select2[,.(V1,V2,V3, V4, V5, V13)]
         df_select2$V14 <- file
         df_list[[i]] <- df_select2
         i <- i + 1
@@ -32,7 +35,7 @@ summarize_blast_output <- function(folder = folder, files = files, cutoff = cuto
   }
   
   df_hit_summary <- rbindlist(df_list)
-  colnames(df_hit_summary) <- c("query_id", "subject_id", "percent_identity", "percent_alignment", "query_file")
+  colnames(df_hit_summary) <- c("query_id", "subject_id", "percent_identity", "subject_start", "subject_end", "percent_alignment", "query_file")
   df_hit_summary <- as.data.frame(df_hit_summary)
   
   return(df_hit_summary)

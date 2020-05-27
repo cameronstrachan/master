@@ -5,9 +5,6 @@ library(stringr)
 library(stringi)
 source('modules/R_functions.R')
 
-# set data.table threads
-setDTthreads(10)
-
 # allow for provide cutoff argument
 args = commandArgs(trailingOnly=TRUE)
 
