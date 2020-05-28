@@ -29,9 +29,15 @@ for file in selected_rumen_genomes:
     df_headers['file'] = file
     header_dfs.append(df_headers)
 
+# clean up header to have start, end and direction of the ORFs
 df_final = pd.concat(header_dfs)
 df_final.columns = ['header', 'file']
 df_positions = df_final['header'].str.split('#', expand=True).loc[:,[1,2,3]]
 df_final = pd.concat([df_final, df_positions], axis=1)
+df_final = df_final.drop('header', 1)
+df_final.columns = ['file', 'start', 'end', 'direction']
+df_final['start'] = df_final['start'].str.strip()
+df_final['end'] = df_final['end'].str.strip()
+df_final['direction'] = df_final['direction'].str.strip()
 
 df_final.to_csv('dataflow/04-tables/rumen_genomes_header_map.csv')
