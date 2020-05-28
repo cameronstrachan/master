@@ -9,10 +9,8 @@ for (pathogen in pathogens){
     count_list[[pathogen]] <- n_files
 }
 
-df_count <- as.data.frame(count_list)
-colnames(df_count) <- c('genome_count')
-df_count$organism <- row.names(df_count)
+df_count <- t(as.data.frame(count_list))
+colnames(df_count) <- 'genome_count'
 
-
-write.csv(df_count, '~/master/ar/dataflow/00-meta/pathogen_genome_count.csv', row.names = FALSE)
+write.csv(df_count, '~/master/ar/dataflow/00-meta/pathogen_genome_count.csv')
 
