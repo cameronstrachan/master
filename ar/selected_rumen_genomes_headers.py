@@ -40,4 +40,4 @@ df_final['start'] = df_final['start'].str.strip()
 df_final['end'] = df_final['end'].str.strip()
 df_final['direction'] = df_final['direction'].str.strip()
 
-df_final.to_csv('dataflow/04-tables/rumen_genomes_header_map.csv')
+df_final.to_csv('dataflow/04-tables/header_map_rumen_genomes.csv')
