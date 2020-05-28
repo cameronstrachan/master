@@ -13,14 +13,15 @@ else:
 
 from modules import seq_core as sc
 
-prots_input_folder = 'dataflow/03-selected-prots/'
+prots_input_folder = 'dataflow/02-prots/'
 genome_extension = '.fasta'
 
-genome_prot_files = [f for f in os.listdir(prots_input_folder) if f.endswith(genome_extension)]
+df_CARD_hits = pd.read_csv('dataflow/04-tables/CARD_hits_95_90.csv', low_memory=False)
+selected_rumen_genomes = df_CARD_hits['file'].tolist()
 
 header_dfs = []
 
-for file in genome_prot_files:
+for file in selected_rumen_genomes:
 
     file_obj = sc.Fasta(file, prots_input_folder)
     headers = file_obj.fasta2headermap()
