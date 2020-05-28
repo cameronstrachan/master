@@ -22,7 +22,7 @@ header_dfs = []
 
 for file in genome_prot_files:
 
-    file_obj = sc.Fasta(file, genome_prot_files)
+    file_obj = sc.Fasta(file, prots_input_folder)
     headers = file_obj.fasta2headermap()
     df_headers = pd.DataFrame.from_dict(headers, orient="index")
     df_headers['file'] = file
