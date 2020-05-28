@@ -10,5 +10,5 @@ for (pathogen in pathogens){
 }
 
 df_count <- t(as.data.frame(count_list))
-write.csv(df_count, '~/master/ar/dataflow/00-meta/pathogen_genome_count.csv', col.names = FALSE)
+write.csv(df_count, '~/master/ar/dataflow/00-meta/pathogen_genome_count.csv', col.names = c('organism', 'genome_count'))
 
