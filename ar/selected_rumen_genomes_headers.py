@@ -31,6 +31,6 @@ for file in selected_rumen_genomes:
 
 df_final = pd.concat(header_dfs)
 df_final.columns = ['header', 'file']
-df_final['header'].str.split(' \# ', expand=True)
+df_final['header'].str.split('#', expand=True)
 
 df_final.to_csv('dataflow/04-tables/rumen_genomes_header_map.csv')
