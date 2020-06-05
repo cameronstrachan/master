@@ -27,10 +27,10 @@ files = list(set(df_ac_nt_selected['query_id'].tolist()))
 
 for file in files:
 
-    file = orf + '.fasta'
+    file_w_ext = file + '.fasta'
 
-    command = 'cp ' + input_dir_genes + file + ' ' + output_dir_genes
+    command = 'cp ' + input_dir_genes + file_w_ext + ' ' + output_dir_genes
     os.system(command)
 
-    command = 'cp ' + input_dir_prots + file + ' ' + output_dir_prots
+    command = 'cp ' + input_dir_prots + file_w_ext + ' ' + output_dir_prots
     os.system(command)
