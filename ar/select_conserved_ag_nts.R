@@ -2,7 +2,7 @@ library(tidyverse)
 
 # pathogen hits
 
-df_pathogen_hits <- read_csv("~/master/ar/dataflow/04-tables/PATH_hits_99_60.csv")
+df_pathogen_hits <- read_csv("~/master/ar/dataflow/04-tables/PATH_hits_100_60.csv")
 df_pathogen_count <- read_csv("~/master/ar/dataflow/00-meta/pathogen_genome_count.csv")
 colnames(df_pathogen_count)[1] <- 'organism'
 
@@ -29,7 +29,6 @@ df_ag_nts <- left_join(df_pathogen_hits, df_pathogen_count) %>%
   inner_join(df_rumen_header) %>%
   inner_join(df_card_activities) %>%
   distinct() %>%
-  filter(percent_identity == 100) %>%
   filter(activity == "nucleotidyltransferase" & specificity == "aminoglycoside")
 
 # save dataframe
