@@ -21,14 +21,33 @@ output_dir_genes = 'dataflow/03-selected-genes/aminoglycoside_modifying/'
 output_dir_prots = 'dataflow/03-selected-prots/aminoglycoside_modifying/'
 
 df_ac_nt_selected = pd.read_csv('dataflow/04-tables/aminoglycoside_modifying.csv', low_memory=False)
-files = list(set(df_ac_nt_selected['query_id'].tolist()))
 
-for file in files:
+# aminoglycoside phosphotransferases
+
+df_ac_nt_selected_phosphotransferase = df_ac_nt_selected[df_ac_nt_selected['activity'] == 'phosphotransferase']
+files1 = list(set(df_ac_nt_selected_phosphotransferase['df_ac_nt_selected_phosphotransferase'].tolist()))
+
+for file in files1:
 
     file_w_ext = file + '.fasta'
 
-    command = 'cp ' + input_dir_genes + file_w_ext + ' ' + output_dir_genes
+    command = 'cp ' + input_dir_genes + file_w_ext + ' ' + output_dir_genes + 'phosphotransferases/'
     os.system(command)
 
-    command = 'cp ' + input_dir_prots + file_w_ext + ' ' + output_dir_prots
+    command = 'cp ' + input_dir_prots + file_w_ext + ' ' + output_dir_prots + 'phosphotransferases/'
+    os.system(command)
+
+# aminoglycoside nucleotidyltransferases
+
+df_ac_nt_selected_nucleotidyltransferase = df_ac_nt_selected[df_ac_nt_selected['activity'] == 'nucleotidyltransferase']
+files2 = list(set(df_ac_nt_selected_nucleotidyltransferase['df_ac_nt_selected_nucleotidyltransferase''].tolist()))
+
+for file in files2:
+
+    file_w_ext = file + '.fasta'
+
+    command = 'cp ' + input_dir_genes + file_w_ext + ' ' + output_dir_genes + 'nucleotidyltransferases/'
+    os.system(command)
+
+    command = 'cp ' + input_dir_prots + file_w_ext + ' ' + output_dir_prots + 'nucleotidyltransferases/'
     os.system(command)
