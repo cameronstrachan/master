@@ -29,7 +29,10 @@ df_ag_nts <- left_join(df_pathogen_hits, df_pathogen_count) %>%
   inner_join(df_rumen_header) %>%
   inner_join(df_card_activities) %>%
   distinct() %>%
-  filter(activity == "nucleotidyltransferase" & specificity == "aminoglycoside")
+  filter(specificity == "aminoglycoside") %>%
+  mutate(gene_length = abs(end - start)) %>%
+  filter(gene_length > 200)
+  #filter(activity == "nucleotidyltransferase" & specificity == "aminoglycoside")
 
 # save dataframe
 
