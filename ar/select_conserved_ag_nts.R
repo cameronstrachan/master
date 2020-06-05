@@ -36,4 +36,4 @@ df_ag_nts <- left_join(df_pathogen_hits, df_pathogen_count) %>%
 
 # save dataframe
 
-write.csv(df_ag_nts, "~/master/ar/dataflow/04-tables/aminoglycoside_nucleotidyltransferases.csv")
+write.csv(df_ag_nts, "~/master/ar/dataflow/04-tables/aminoglycoside_modifying.csv")

@@ -13,16 +13,14 @@ else:
 
 from modules import seq_core as sc
 
-df_ac_nt_selected = pd.read_csv('dataflow/04-tables/aminoglycoside_nucleotidyltransferases.csv', low_memory=False)
-
 
 input_dir_genes  = 'dataflow/03-selected-genes/'
 input_dir_prots = 'dataflow/03-selected-prots/'
 
-output_dir_genes = 'dataflow/03-selected-genes/aminoglycoside_nucleotidyltransferases/'
-output_dir_prots = 'dataflow/03-selected-prots/aminoglycoside_nucleotidyltransferases/'
+output_dir_genes = 'dataflow/03-selected-genes/aminoglycoside_modifying/'
+output_dir_prots = 'dataflow/03-selected-prots/aminoglycoside_modifying/'
 
-df_ac_nt_selected = pd.read_csv('dataflow/04-tables/aminoglycoside_nucleotidyltransferases.csv', low_memory=False)
+df_ac_nt_selected = pd.read_csv('dataflow/04-tables/aminoglycoside_modifying.csv', low_memory=False)
 files = list(set(df_ac_nt_selected['query_id'].tolist()))
 
 for file in files:
