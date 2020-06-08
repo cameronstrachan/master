@@ -37,3 +37,7 @@ df_ag_nts <- left_join(df_pathogen_hits, df_pathogen_count) %>%
 # save dataframe
 
 write.csv(df_ag_nts, "~/master/ar/dataflow/04-tables/aminoglycoside_modifying.csv")
+
+check <- df_ag_nts  %>%
+  select(query_id, start, end, card_annotation, gene_family) %>%
+  distinct()
