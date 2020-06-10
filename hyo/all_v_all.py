@@ -17,7 +17,9 @@ df_selected = pd.read_csv('dataflow/00-meta/selected_genomes.csv', low_memory=Fa
 
 for index, row in df_selected.iterrows():
     file = row['file']
-    command = cp '../trees/concatenated_marker/complete_genomes/' + file + ' dataflow/dataflow/01-nucl/'
+    command =  'cp ../trees/concatenated_marker/complete_genomes/' + file + ' dataflow/dataflow/01-nucl/'
+    os.system(command)
+
 
 nucl_dir = 'dataflow/01-nucl/'
 prot_dir = 'dataflow/01-prot/'
