@@ -20,11 +20,10 @@ input_dir_prots = 'dataflow/03-selected-prots/'
 output_dir_genes = 'dataflow/03-selected-genes/aminoglycoside_modifying/'
 output_dir_prots = 'dataflow/03-selected-prots/aminoglycoside_modifying/'
 
-df_ac_nt_selected = pd.read_csv('dataflow/04-tables/aminoglycoside_modifying.csv', low_memory=False)
 
 # aminoglycoside phosphotransferases
 
-df_ac_nt_selected_phosphotransferase = df_ac_nt_selected[df_ac_nt_selected['activity'] == 'phosphotransferase']
+df_ac_nt_selected_phosphotransferase = pd.read_csv('dataflow/04-tables/CARD_hits_30_60_aminoglycoside_modifying_aph.csv', low_memory=False)
 files1 = list(set(df_ac_nt_selected_phosphotransferase['query_id'].tolist()))
 
 for file in files1:
@@ -39,7 +38,7 @@ for file in files1:
 
 # aminoglycoside nucleotidyltransferases
 
-df_ac_nt_selected_nucleotidyltransferase = df_ac_nt_selected[df_ac_nt_selected['activity'] == 'nucleotidyltransferase']
+df_ac_nt_selected_nucleotidyltransferase = pd.read_csv('dataflow/04-tables/CARD_hits_30_60_aminoglycoside_modifying_ant.csv', low_memory=False)
 files2 = list(set(df_ac_nt_selected_nucleotidyltransferase['query_id'].tolist()))
 
 for file in files2:
