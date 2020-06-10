@@ -47,7 +47,7 @@ for index, row in df_ac_nt_selected_phosphotransferase.iterrows():
 
 df_ac_nt_selected_nucleotidyltransferase = pd.read_csv('dataflow/04-tables/CARD_hits_30_60_aminoglycoside_modifying_ant.csv', low_memory=False)
 
-for index, row in df_ac_nt_selected_phosphotransferase.iterrows():
+for index, row in df_ac_nt_selected_nucleotidyltransferase.iterrows():
 
     orf = row['query_id']
     file = row['file']
