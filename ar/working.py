@@ -37,6 +37,11 @@ for index, row in df_ac_nt_selected_phosphotransferase.iterrows():
     file_obj.setOutputLocation(output_dir_genes_aph)
     file_obj.subsetfasta(seqlist = [orf])
 
+    file_obj = sc.Fasta(file, input_dir_prots)
+    file_obj.setOutputName(orf + '.fasta')
+    file_obj.setOutputLocation(output_dir_prots_aph)
+    file_obj.subsetfasta(seqlist = [orf])
+
 
 # aminoglycoside nucleotidyltransferases
 
@@ -50,4 +55,9 @@ for index, row in df_ac_nt_selected_phosphotransferase.iterrows():
     file_obj = sc.Fasta(file, input_dir_genes)
     file_obj.setOutputName(orf + '.fasta')
     file_obj.setOutputLocation(output_dir_genes_ant)
+    file_obj.subsetfasta(seqlist = [orf])
+
+    file_obj = sc.Fasta(file, input_dir_prots)
+    file_obj.setOutputName(orf + '.fasta')
+    file_obj.setOutputLocation(output_dir_prots_ant)
     file_obj.subsetfasta(seqlist = [orf])
