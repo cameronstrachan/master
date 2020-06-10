@@ -14,8 +14,8 @@ else:
 from modules import seq_core as sc
 
 
-input_dir_genes  = 'dataflow/03-genes/'
-input_dir_prots = 'dataflow/03-prots/'
+input_dir_genes  = 'dataflow/02-genes/'
+input_dir_prots = 'dataflow/02-prots/'
 
 output_dir_genes = 'dataflow/03-selected-genes/aminoglycoside_modifying/'
 output_dir_prots = 'dataflow/03-selected-prots/aminoglycoside_modifying/'
