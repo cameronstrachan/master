@@ -21,11 +21,11 @@ files = [f for f in os.listdir('.') if f.endswith(".fastq")]
 for file in files:
     file_prefix = file.split('_')[0] + "_" + file.split('.')[1]
     sam_file = file_prefix + ".bam"
-    command = "bwa mem -t 60 -B 1 -k 8 -O 2 cyo1_nanopore.fasta " + file + " > " sam_file
+    command = "bwa mem -t 60 -B 1 -k 8 -O 2 cyo1_nanopore.fasta " + file + " > " + sam_file
     os.system(command)
 
     bam_file = file_prefix + ".bam"
-    command = "samtools view -@ 60 -bS " + sam_file + " > " bam_file
+    command = "samtools view -@ 60 -bS " + sam_file + " > " + bam_file
 
     bam_file_sorted = file_prefix + ".sorted.bam"
     command = "samtools sort -@ 60 " + sam_file + " > " + bam_file_sorted
