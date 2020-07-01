@@ -18,20 +18,20 @@ from modules import seq_gen_lin as sg
 
 files = [f for f in os.listdir('.') if f.endswith(".fastq")]
 
-for file in files:
-    bam_file_sorted = file_prefix + ".sorted.bam"
-    bam_file_sorted_mapped = file_prefix + ".sorted.mapped.bam"
-    fastq_file_mapped = file_prefix + ".sorted.mapped.fastq"
-    fasta_file_mapped = file_prefix + ".sorted.mapped.fasta"
-
-    command = 'samtools view -@ 60 -b -F 4 ' + bam_file_sorted + ' > ' + bam_file_sorted_mapped
-    #os.system(command)
-
-    command = 'samtools fastq ' + bam_file_sorted_mapped + ' > fastq/' + fastq_file_mapped
-    #os.system(command)
-
-    command = 'samtools fasta ' + bam_file_sorted_mapped + ' > fasta/' + fasta_file_mapped
-    #os.system(command)
+# for file in files:
+#     bam_file_sorted = file_prefix + ".sorted.bam"
+#     bam_file_sorted_mapped = file_prefix + ".sorted.mapped.bam"
+#     fastq_file_mapped = file_prefix + ".sorted.mapped.fastq"
+#     fasta_file_mapped = file_prefix + ".sorted.mapped.fasta"
+#
+#     command = 'samtools view -@ 60 -b -F 4 ' + bam_file_sorted + ' > ' + bam_file_sorted_mapped
+#     os.system(command)
+#
+#     command = 'samtools fastq ' + bam_file_sorted_mapped + ' > fastq/' + fastq_file_mapped
+#     os.system(command)
+#
+#     command = 'samtools fasta ' + bam_file_sorted_mapped + ' > fasta/' + fasta_file_mapped
+#     os.system(command)
 
 
 # blast mapped reads
