@@ -46,7 +46,9 @@ files = [f for f in os.listdir('fasta') if f.endswith(".fasta")]
 
 for file in files:
 
+    outname = file.split('.fa')[0] + '.txt'
+
     file_obj = sc.Fasta(file, 'fasta/')
     file_obj.setOutputLocation('blast_output/')
-    file_obj.setOutputName("32740_1.sorted.mapped.cyo1.txt")
+    file_obj.setOutputName(outname)
     file_obj.runblast(blast='blastn', db='cyo1_nanopore.fasta', dblocation='blastdb/', max_target_seqs=1, evalue=1e-5, num_threads = 10)
