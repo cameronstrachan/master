@@ -42,8 +42,11 @@ file_obj.setOutputLocation('blastdb/')
 file_obj.runmakeblastdb(dbtype='nucl')
 
 
+files = [f for f in os.listdir('fasta') if f.endswith(".fasta")]
 
-file_obj = sc.Fasta('32740_1.sorted.mapped.fasta', 'fasta/')
-file_obj.setOutputLocation('blast_output/')
-file_obj.setOutputName("32740_1.sorted.mapped.cyo1.txt")
-file_obj.runblast(blast='blastn', db='cyo1_nanopore.fasta', dblocation='blastdb/', max_target_seqs=10, evalue=1e-5, num_threads = 10)
+for file in files:
+
+    file_obj = sc.Fasta(file, 'fasta/')
+    file_obj.setOutputLocation('blast_output/')
+    file_obj.setOutputName("32740_1.sorted.mapped.cyo1.txt")
+    file_obj.runblast(blast='blastn', db='cyo1_nanopore.fasta', dblocation='blastdb/', max_target_seqs=1, evalue=1e-5, num_threads = 10)
