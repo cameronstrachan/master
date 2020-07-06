@@ -50,7 +50,7 @@ files = [f for f in os.listdir('fasta') if f.endswith(".fasta")]
 
 for file in files:
 
-    outname = file.split('.fa')[0] + '.txt'
+    outname = file.split('.fa')[0] + '_concensus_orf.txt'
 
     file_obj = sc.Fasta(file, 'fasta/')
     file_obj.setOutputLocation('blast_output/')
