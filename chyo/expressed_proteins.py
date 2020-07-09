@@ -13,7 +13,7 @@ else:
 
 from modules import seq_core_lin as sc
 
-seq_obj = sc.Fasta('chyo_transcriptome_concensus_genome_nucl.fasta', 'expressed/')
+seq_obj = sc.Fasta('error_corrected_full_genome_prot.fasta', 'error_corrected/')
 seq_dic = seq_obj.fasta2dict()
 
 seq_dic_trim = dict(seq_dic)
@@ -22,10 +22,10 @@ for k,v in seq_dic.items():
     if 'NN' in v:
         del seq_dic_trim[k]
 
-outputfile = open('expressed/chyo_transcriptome_concensus_genome_nucl_trimmed_100.fasta', 'w')
+outputfile = open('error_corrected//error_corrected_full_genome_prot_200.fasta', 'w')
 
 for k,v in seq_dic_trim.items():
     seq = v.rstrip()
-    if len(seq) > 100:
+    if len(seq) > 200:
         outputfile.write(">" + k + '\n')
         outputfile.write(v + '\n')
