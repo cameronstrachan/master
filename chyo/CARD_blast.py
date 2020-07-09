@@ -15,12 +15,12 @@ from modules import seq_core_lin as sc
 from modules import seq_gen_lin as sg
 
 
-file_obj = sc.Fasta('card_db.fasta', 'fasta/')
-file_obj.setOutputName('card_db.fasta')
-file_obj.setOutputLocation('blastdb/')
-file_obj.runmakeblastdb(dbtype='prot')
+#file_obj = sc.Fasta('card_db.fasta', 'fasta/')
+#file_obj.setOutputName('card_db.fasta')
+#file_obj.setOutputLocation('blastdb/')
+#file_obj.runmakeblastdb(dbtype='prot')
 
-file_obj = sc.Fasta('error_corrected_full_genome_prot_100.fasta', 'fasta/')
+file_obj = sc.Fasta('cyo1_nanopore.fasta', 'fasta/')
 file_obj.setOutputLocation('blast_output/')
 file_obj.setOutputName('CARD_blast.txt')
-file_obj.runblast(blast='blastp', db='card_db.fasta', dblocation='blastdb/', max_target_seqs=1, evalue=1e-5, num_threads = 30)
+file_obj.runblast(blast='blastn', db='campylobacter_coli.fasta', dblocation='blastdb/', max_target_seqs=1000, evalue=1e-5, num_threads = 30)
