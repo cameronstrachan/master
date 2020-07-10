@@ -35,7 +35,7 @@ blastdbs = files.copy()
 
 for file in files:
 	file_obj = sc.Fasta(file, 'dataflow/01-prot/')
-	file_obj.setOutputLocation('03-blastout/')
+	file_obj.setOutputLocation('dataflow/03-blastout/')
 	for blastdb in blastdbs:
 		outputfilename = file.split('.f')[0] + ':' + blastdb.split('.f')[0] + '.txt'
 		file_obj.setOutputName(outputfilename)
