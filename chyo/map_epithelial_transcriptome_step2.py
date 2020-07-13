@@ -36,13 +36,10 @@ files = [f for f in os.listdir('.') if f.endswith(".fastq")]
 
 # blast mapped reads
 
-file_obj = sc.Fasta('cyo1_nanopore.fasta', 'fasta/')
-file_obj.setOutputName('cyo1_nanopore.fasta')
-file_obj.setOutputLocation('blastdb/')
-file_obj.runmakeblastdb(dbtype='nucl')
 
-file_obj = sc.Fasta('chyo_transcriptome_concensus_genome_nucl_trimmed_100.fasta', 'fasta/')
-file_obj.setOutputName('chyo_transcriptome_concensus_genome_nucl_trimmed_100.fasta')
+
+file_obj = sc.Fasta('error_corrected_full_genome_nucl.fasta ', 'fasta/')
+file_obj.setOutputName('error_corrected_full_genome_nucl.fasta )
 file_obj.setOutputLocation('blastdb/')
 file_obj.runmakeblastdb(dbtype='nucl')
 
@@ -50,10 +47,10 @@ files = [f for f in os.listdir('fasta') if f.endswith(".fasta")]
 
 for file in files:
 
-    outname = file.split('.fa')[0] + '_concensus_orf.txt'
+    outname = file.split('.fa')[0] + '_error_corrected.txt'
 
     file_obj = sc.Fasta(file, 'fasta/')
     file_obj.setOutputLocation('blast_output/')
     file_obj.setOutputName(outname)
     #file_obj.runblast(blast='blastn', db='cyo1_nanopore.fasta', dblocation='blastdb/', max_target_seqs=1, evalue=1e-5, num_threads = 10)
-    file_obj.runblast(blast='blastn', db='chyo_transcriptome_concensus_genome_nucl_trimmed_100.fasta', dblocation='blastdb/', max_target_seqs=1, evalue=1e-5, num_threads = 10)
+    file_obj.runblast(blast='blastn', db='error_corrected_full_genome_nucl.fasta ', dblocation='blastdb/', max_target_seqs=1, evalue=1e-5, num_threads = 10)

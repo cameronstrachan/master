@@ -1,0 +1,162 @@
+﻿gene_num,annotation,query_cover,per_id,category,notes
+7,type I glutamate--ammonia ligase [Campylobacter sp.],90%,75.16,,condensation of glutamate and ammonia to form glutamine
+46,Tol-Pal system protein TolB [Campylobacter gracilis],99%,87.29,,outer membrane invagination during cell division
+47,Tol-Pal system protein TolB [Campylobacter gracilis],90%,91.41,,outer membrane invagination during cell division
+90,"NAD-independent L-lactate dehydrogenase LldEFG, oxidoreductase...",64%,70.08,,conversion of lactate to pyruvate / lactate utilization
+91,iron-sulfur cluster-binding protein [Campylobacter sp. MIT...,91%,71.03,,conversion of lactate to pyruvate / lactate utilization
+91,lactate utilization protein [Campylobacter jejuni],91%,65.42,,conversion of lactate to pyruvate / lactate utilization
+92,iron-sulfur cluster-binding protein [Desulfobulbus propionicus],98%,65.91,,conversion of lactate to pyruvate / lactate utilization
+92,lactate utilization protein [Campylobacter jejuni],98%,58.52,,conversion of lactate to pyruvate / lactate utilization
+128,VacJ family lipoprotein [Campylobacter sp.],99%,81.38,,membrane
+138,thioredoxin [Campylobacter showae],99%,86.67,oxidative stress,"reduce cystein residues, response to reactive oxygen species"
+195,formate dehydrogenase subunit alpha [Campylobacter sputorum],99%,90.48,,formate utlization
+197,formate dehydrogenase subunit alpha [Campylobacter gracilis],94%,75.74,,formate utlization
+198,formate dehydrogenase subunit alpha [Campylobacter blaseri],88%,81.08,,formate utlization
+213,thiol peroxidase [Campylobacter sp.],76%,67.96,oxidative stress,reduction of hydrogen peroxide and organic hydroperoxides to water and alcohols
+244,"cysteine desulfurase, NifS family [Campylobacter gracilis]",99%,90.18,,"delivers sulfur to a number of partners involved in Fe-S cluster assembly, forming alanine"
+247,trigger factor [Campylobacter hominis],98%,68.26,,"protein export, chaperone, peptidyl-prolyl cis-trans isomerase"
+248,trigger factor [Campylobacter gracilis],96%,71.09,,"protein export, chaperone, peptidyl-prolyl cis-trans isomerase"
+252,ATP-dependent Clp endopeptidase proteolytic subunit ClpP...,99%,85.82,,peptide hydrolysis
+347,biotin attachment protein [Campylobacter gracilis],99%,52.59,,conversion of pyruvate to oxaloacetate
+347,biotin/lipoyl-binding protein [Campylobacter lanienae],92%,47.46,,conversion of pyruvate to oxaloacetate
+347,"pyruvate carboxylase, subunit B [Campylobacter sp. CGEMS]",95%,46.73,,conversion of pyruvate to oxaloacetate
+360,preprotein translocase subunit SecY [Campylobacter sp.],77%,89.66,,protein secretion
+361,preprotein translocase subunit SecY [Campylobacter sp.],98%,87.54,,protein secretion
+392,iron-containing alcohol dehydrogenase [Campylobacter curvus],92%,74.23,,conversion of butyraldehyde (butanal) into butanol
+392,NADH-dependent butanol dehydrogenase A [Campylobacter concisus...,98%,71.84,,conversion of butyraldehyde (butanal) into butanol
+412,MULTISPECIES: DUF4156 domain-containing protein [unclassified...,97%,33.59,,membrane
+447,molybdopterin-dependent oxidoreductase [Campylobacteraceae...,93%,64.49,respiratory electron acceptor,reduction of thiosulfate to sulfite and hydrogen sulfide
+447,TPA: twin-arginine translocation signal domain-containing...,91%,50,respiratory electron acceptor,reduction of thiosulfate to sulfite and hydrogen sulfide
+447,thiosulfate reductase [Desulfobulbaceae bacterium],93%,47.66,respiratory electron acceptor,reduction of thiosulfate to sulfite and hydrogen sulfide
+461,trimethylamine-N-oxide reductase TorA [Campylobacter sp.],98%,72.9,respiratory electron acceptor,reduction of TMAO
+461,molybdopterin guanine dinucleotide-containing S/N-oxide...,99%,70.37,respiratory electron acceptor,reduction of TMAO
+507,cytochrome c551 peroxidase [Campylobacter gracilis],92%,39.36,oxidative stress,"peroxidative oxidation of azurin and cytochrome c551, likely to provide protection against toxic peroxides."
+507,c-type cytochrome [Alteromonas alba],80%,38.55,oxidative stress,"peroxidative oxidation of azurin and cytochrome c551, likely to provide protection against toxic peroxides."
+507,cytochrome B6 [Sulfuricurvum sp. RIFCSPLOWO2_02_FULL_43_45],80%,40.96,oxidative stress,"peroxidative oxidation of azurin and cytochrome c551, likely to provide protection against toxic peroxides."
+527,carbonic anhydrase [Campylobacter sp.],98%,80,C02 and pH regulation,catalyze the hydration of carbon dioxide to bicarbonate and protons
+580,DASS family sodium-coupled anion symporter [Campylobacter...,73%,75.61,transport,transportrs Krebs cycle intermediates
+580,"transporter, NadC family [Campylobacter hominis ATCC BAA-381]",75%,58.33,transport,transportrs Krebs cycle intermediates
+587,CTP synthase [Campylobacter sp.],99%,86.49,nucleic acid synthesis,pyrimidine biosynthesis
+587,gamma-glutamyl-gamma-aminobutyrate hydrolase family protein...,99%,75.33,,interconversion of 4-(gamma-glutamylamino)butanoate to 4-aminobutanoate / L-glutamate
+608,phosphoglucosamine mutase [Campylobacter gracilis],99%,86.24,UDP-N-Acetylglucosamine biosynthesis?,conversion of glucosamine-6-phosphate to glucosamine-1-phosphate
+638,tryptophan 7-halogenase [Campylobacter geochelonis],97%,57.38,natural product biosynthesis,chlorotryptophan formation. chloronated natural product biosynthesis?
+639,tryptophan 7-halogenase [Campylobacter geochelonis],92%,72.96,natural product biosynthesis,chlorotryptophan formation. chloronated natural product biosynthesis?
+644,beta-ACP synthase [Campylobacter fetus],98%,66.24,fatty acid biosynthesis,elongates ACP-bound acyl species
+644,3-oxoacyl-[acp] synthase I [Campylobacter sp. CCUG 57310],96%,58.71,fatty acid biosynthesis,elongates ACP-bound acyl species
+656,1-acyl-sn-glycerol-3-phosphate acyltransferase [Campylobacter...,92%,62.5,membrane,catalyzes the transfer of acyl-CoAs to lysophospholipids to produce different classes of phospholipids
+656,lysophospholipid acyltransferase [Campylobacter geochelonis],93%,60.53,membrane,catalyzes the transfer of acyl-CoAs to lysophospholipids to produce different classes of phospholipids
+672,hypothetical protein [Campylobacter fetus],85%,37.21,,
+684,Cell wall-associated hydrolase [Campylobacter jejuni subsp....,99%,92.59,membrane,cell wall degradation during devision
+734,2-oxoacid:acceptor oxidoreductase family protein [Campylobacte...,89%,85,anaerobic respiration,Oxidative decarboxylation of 2-oxoacids (pyruvate)
+734,pyruvate:ferredoxin (flavodoxin) oxidoreductase [Campylobacter...,90%,90.1,anaerobic respiration,Oxidative decarboxylation of 2-oxoacids (pyruvate)
+763,type II 3-dehydroquinate dehydratase [Campylobacter gracilis],97%,81.67,amino acid biosynthesis,"production of aromatic amino acids, conversion of 3-dehydroquinate to 3-dehydroshikimate + H2O"
+784,thermonuclease family protein [Campylobacter geochelonis],83%,34.44,,hydrolysis of both DNA and RNA at the 5' position
+807,major outer membrane protein [Campylobacter geochelonis],99%,55.97,,
+807,porin [Campylobacter sputorum],99%,47.21,,transport of molecules
+817,CvpA family protein [Campylobacter gracilis RM3268],93%,48,,Colicin V production
+834,peroxiredoxin [Campylobacter coli],99%,84.34,oxidative stress,cysteine-dependent peroxidase
+834,redoxin domain-containing protein [Campylobacter gracilis],99%,88.89,,
+836,nucleoside-diphosphate kinase [Campylobacter blaseri],99%,86,nucleic acid synthesis,nucleoside triphosphates production
+842,DUF2130 domain-containing protein [Erysipelotrichia bacterium],76%,48.08,,
+851,homeostatic response regulator transcription factor HsrA...,99%,93.27,regulator,translation regulator
+877,Cell wall-associated hydrolase [Campylobacter jejuni subsp....,99%,92.59,membrane,cell wall degradation during devision
+911,Peroxide stress regulator [Campylobacter concisus ATCC 51561],99%,56.64,oxidative stress,regulator
+911,transcriptional repressor [Campylobacter gracilis],99%,75.22,regulator,
+912,CHAD domain-containing protein [Campylobacter sp.],97%,58.68,polyP binding?,
+937,ammonia-forming cytochrome c nitrite reductase subunit c552...,98%,70.47,ammonia anabolism ,nrfA
+937,ammonia-forming cytochrome c nitrite reductase subunit NrfA...,99%,34.58,ammonia anabolism ,nrfA
+938,cytochrome c nitrite reductase small subunit [Campylobacter sp...,98%,68.97,ammonia anabolism ,nrfA
+938,"formate-dependent nitrite reductase NrfAH, membrane-bound...",98%,68.97,ammonia anabolism ,nrfA
+954,sensor histidine kinase/response regulator [Campylobacter...,96%,40.31,regulation,nitrite and nitrate regulator
+954,nitrate- and nitrite sensing domain-containing protein...,77%,34.62,regulation,nitrite and nitrate regulator
+954,BarA sensory histidine kinase [Hydrogenimonas sp.],59%,34.15,regulation,nitrite and nitrate regulator
+955,response regulator [Campylobacter sp.],72%,77.65,regulation,nitrite and nitrate regulator
+955,nitrate- and nitrite sensing domain-containing protein...,75%,54.49,regulation,nitrite and nitrate regulator
+957,response regulator [Campylobacter hominis],98%,31.5,regulation,nitrite and nitrate regulator
+957,cobalamin B12-binding domain-containing protein [Alkalibaculum...,59%,31.71,,
+980,hypothetical protein [Campylobacter sp.],82%,34.48,,
+982,hypothetical protein [Campylobacter gracilis],93%,50.79,,
+985,hypothetical protein D8H92_04360 [Campylobacter sp.],97%,30.43,,
+991,cysteine ABC transporter substrate-binding protein...,96%,46.32,transport,cystein transport
+1024,FTR1 family iron permease [Campylobacter sp.],75%,59.44,transport,iron uptate
+1074,acetyl-CoA carboxylase carboxyltransferase subunit beta...,98%,82.31,fatty acid biosynthesis,malonyl-CoA biosynthesis
+1139,bifunctional (p)ppGpp...,60%,92.5,regulation,ppGpp biosynthesis
+1139,"ppGpp synthetase / guanosine-3',5'-bis(diphosphate) 3'...",60%,92.5,regulation,ppGpp biosynthesis
+1139,RelA/SpoT family protein [Campylobacter sp. FMV-PI01],60%,81.25,regulation,ppGpp biosynthesis
+1167,potassium channel protein [Campylobacter sp.],80%,84.21,transport,ion transport
+1167,MULTISPECIES: NAD-binding protein [unclassified Campylobacter],80%,68.42,transport,ion transport
+1167,TrkA N-terminal domain protein [Campylobacter rectus RM3267],76%,67.89,transport,ion transport
+1174,peptidoglycan-binding protein LysM [Campylobacter sp.],95%,78.1,membrane,
+1184,hypothetical protein [Geodermatophilus obscurus],66%,29.73,,
+1233,outer membrane protein assembly factor BamD [Campylobacter...,85%,84.55,membrane,
+1233,tRNA (guanine-N(1)-)-methyltransferase [Campylobacter fetus...,84%,59.02,,
+1266,DeoR family transcriptional regulator [Bacilli bacterium],91%,47.96,regulation,
+1266,WYL domain-containing transcriptional regulator [Campylobacter...,91%,45.92,regulation,
+1285,5-formyltetrahydrofolate cyclo-ligase [Campylobacter sp.],99%,78.18,,"removal of 5-formyltetrahydrofolate, folate metabolism"
+1286,YmdA/YtgF family protein [Campylobacter gracilis RM3268],98%,77.59,,
+1286,ribonuclease Y [Campylobacter gracilis],98%,77.01,,rna degradation
+1300,UDP-glucose 4-epimerase GalE [Campylobacter gracilis],99%,83.9,membrane,"UDP-galactose to UDP-glucose, LPS synthesis"
+1301,glucose-1-phosphate thymidylyltransferase RfbA [Arcobacter...,93%,87.23,membrane,"formation of dTDP-glucose, LPS-O antigen biosynthesis"
+1326,sel1 repeat family protein [Campylobacter concisus],99%,42.79,,
+1333,polysaccharide biosynthesis protein [Campylobacter sp.],85%,79.41,membrane,LPS synthesis
+1333,"UDP-N-acetylglucosamine 4,6-dehydratase...",85%,74.76,,
+1350,nitrate reductase cytochrome c-type subunit [Campylobacter...,95%,59.65,anaerobic respiration,nitrate reduction
+1350,"periplasmic nitrate reductase NapAB, small subunit, periplasmi...",95%,53.04,anaerobic respiration,nitrate reduction
+1354,ferredoxin-type protein NapG [Campylobacter sp. RM8966],99%,70,anaerobic respiration,nitrate reduction
+1361,nitrate reductase catalytic subunit NapA [Campylobacter fetus],95%,77.38,anaerobic respiration,nitrate reduction
+1417,4-hydroxy-tetrahydrodipicolinate synthase [Campylobacter sp.],99%,85.23,amino acid biosynthesis,lysine biosynthesis
+1435,acetyl-CoA carboxylase subunit A [Campylobacter sp.],98%,85.12,membrane,"synthesizes malonyl-CoA from acetyl-CoA, lipid biosynthesis"
+1459,argininosuccinate synthase [Campylobacter geochelonis],96%,86.98,amino acid biosynthesis, L-arginine from L-ornithine and carbamoyl phosphate
+1467,C4-dicarboxylate ABC transporter [Campylobacter sp. RM12916],98%,38.45,transport,"exchange dicarboxylates such as aspartate, malate, fumarate and succinate."
+1467,hypothetical protein [Campylobacter gracilis],99%,76.48,,
+1468,type 4a pilus biogenesis protein PilO [Campylobacter hominis],98%,40.78,membrane,"pilus assemnly, trwitching motility"
+1468,hypothetical protein D8H92_09430 [Campylobacter sp.],98%,68.02,,
+1469,hypothetical protein D8H92_09435 [Campylobacter sp.],99%,60.32,,
+1469,transformation system protein [Campylobacter ureolyticus],99%,33.33,,natural DNA uptake?
+1471,pilus (MSHA type) biogenesis protein MshL [Campylobacter...,94%,78.26,membrane,"pilus assembly, surface binding"
+1493,RHS domain-containing protein [Streptomyces sp. ISID311],36%,41.67,,
+1562,outer membrane lipoprotein chaperone LolA [Campylobacter sp.],60%,57.97,membrane,lipoprotein chaperone
+1585,cysteine ABC transporter substrate-binding protein...,84%,46.51,transport,L-cystein transport
+1585,transporter substrate-binding domain-containing protein...,98%,45,,
+1639,DUF4298 domain-containing protein [Butyrivibrio proteoclasticus],89%,44.68,,
+1639,GCN5-like N-acetyltransferase [uncultured bacterium Contig1450],94%,35.85,,
+1685,DUF1566 domain-containing protein [Arcobacter butzleri],73%,39.77,,
+1685,sel1 repeat family protein [Campylobacter rectus],92%,33.9,,
+1686,sel1 repeat family protein [Campylobacter blaseri],74%,34.83,,
+1720,NAD(+) synthase [Campylobacter sp.],98%,68.3,core metabolism,NAD synthesis
+1720,"NAD synthetase, NH3-dependent [Campylobacter ureolyticus RIGS...",99%,49.07,core metabolism,NAD synthesis
+1733,Rrf2 family transcriptional regulator [Campylobacter sp.],97%,62.39,regulation,
+1755,"Ni/Fe-hydrogenase, b-type cytochrome subunit [Campylobacter...",98%,65.29,,hydrogen oxidation
+1774,MetQ/NlpA family ABC transporter substrate-binding protein...,98%,77.6,amino acid metabolism,methionine import
+1774,NLPA family lipoprotein [Campylobacter fetus subsp. fetus],97%,68.78,amino acid metabolism,methionine import
+1788,hypothetical protein [Campylobacter gracilis],95%,75.16,,
+1858,acetolactate synthase small subunit [Campylobacter gracilis],99%,85.26,amino acid biosynthesis,branched amino acid synthesis
+1858,"acetolactate synthase III, valine-sensitive, regulatory (small...",98%,70.13,amino acid biosynthesis,branched amino acid synthesis
+1874,Acyltransferase family protein [Firmicutes bacterium...,45%,41.67,,
+1900,membrane protein insertion efficiency factor YidD [Campylobact...,96%,59.81,,
+1946,TAXI family TRAP transporter solute-binding subunit...,97%,71.94,transport,"potential glutamine/glutamate specific uptake systems, or organic acids"
+1947,TAXI family TRAP transporter solute-binding subunit...,84%,85.96,transport,"potential glutamine/glutamate specific uptake systems, or organic acids"
+1951,aspartate kinase [Campylobacter sp.],99%,79.1,amino acid biosynthesis,
+1951,ACT domain-containing protein [Campylobacter jejuni],99%,70.62,regulation ,amino acid regulation
+1960,single-stranded DNA-binding protein [Campylobacter gracilis],99%,67.16,DNA replication,
+1967,ketol-acid reductoisomerase [Campylobacter sputorum],87%,95.38,amino acid metabolism,biosynthesis of branched-chain amino acids
+1993,sulfur oxygenase/reductase [Candidatus Aramenus sulfurataquae],38%,37.21,sulfur metabolism,
+1993,discoidin domain-containing protein [Cystobacter ferrugineus],60%,31.51,,
+2006,adenylosuccinate lyase [Campylobacter showae],82%,95.52,,
+2012,carbon starvation protein A [Campylobacter mucosalis],95%,62.83,peptide update,
+2033,aminofutalosine synthase MqnE [Campylobacter sp.],93%,69.72,,electron transport? Menaquinone Biosynthesis?
+2093,UDP-N-acetylmuramate--L-alanine ligase...,93%,36.63,cell wall formation,
+2094,UDP-N-acetylmuramate--alanine ligase [Campylobacter concisus],96%,38.68,cell wall formation,
+2142,anthranilate synthase component I family protein [Campylobacte...,97%,73.38,,
+2142,chorismate-binding protein [Campylobacter fetus],99%,68.31,,
+2162,hypothetical protein CYY_005492 [Polysphondylium violaceum],79%,35.37,,
+2232,cbb3-type cytochrome oxidase assembly protein CcoS...,98%,76,respiration,Cbb3-type cytochrome c oxidase is the component of the respiratory chain that catalyzes the reduction of oxygen to water
+2233,cbb3-type cytochrome oxidase assembly protein CcoS...,91%,80.2,respiration,Cbb3-type cytochrome c oxidase is the component of the respiratory chain that catalyzes the reduction of oxygen to water
+2244,large-conductance mechanosensitive channel protein MscL...,83%,89.25,,Participates in the regulation of osmotic pressure changes within the cell
+2274,cytochrome-c peroxidase [Campylobacter blaseri],99%,70.15,,
+2274,cytochrome C biogenesis protein CcsA [Sulfurovum sp. 35-42-20],98%,69.85,,biogenesis of c-type cytochromes 
+2349,2-iminoacetate synthase ThiH [Campylobacter hominis],97%,78.87,,thiamine diphosphate biosynthesis
+2381,glycerol-3-phosphate dehydrogenase [Streptococcus pneumoniae],95%,75.45,,
+2388,chain length determinant protein [Campylobacter hominis],91%,42.96,,Confers a modal distribution of chain length on the O-antigen component of lipopolysaccharide (LPS)
+2388,polysaccharide biosynthesis tyrosine autokinase [Zhongshania...,50%,38.27,,
+2400,hypothetical protein [Campylobacter gracilis],98%,67.59,,
