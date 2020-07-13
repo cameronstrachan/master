@@ -39,7 +39,7 @@ files = [f for f in os.listdir('.') if f.endswith(".fastq")]
 
 
 file_obj = sc.Fasta('error_corrected_full_genome_nucl.fasta ', 'fasta/')
-file_obj.setOutputName('error_corrected_full_genome_nucl.fasta )
+file_obj.setOutputName('error_corrected_full_genome_nucl.fasta)
 file_obj.setOutputLocation('blastdb/')
 file_obj.runmakeblastdb(dbtype='nucl')
 
