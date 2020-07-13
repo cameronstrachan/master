@@ -43,7 +43,7 @@ file_obj.setOutputName('error_corrected_full_genome_nucl.fasta )
 file_obj.setOutputLocation('blastdb/')
 file_obj.runmakeblastdb(dbtype='nucl')
 
-files = [f for f in os.listdir('fasta') if f.endswith(".fasta")]
+files = [f for f in os.listdir('fasta') if f.endswith(".sorted.mapped.fasta")]
 
 for file in files:
 
