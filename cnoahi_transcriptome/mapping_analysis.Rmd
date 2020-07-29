@@ -1,0 +1,68 @@
+---
+title: "mapping_analysis"
+author: "Cameron Strachan"
+date: '2020-07-29'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+df_meta <- read.csv("~/Desktop/cnoahi_files/sample_mapping.csv")
+```
+
+```{r}
+df_32740_1 <- read.delim("~/Desktop/cnoahi_files/32740_1_spades_coassembly_trimmed.txt", header=FALSE)
+df_32740_1$sample <- "32740_1"
+
+df_32740_2 <- read.delim("~/Desktop/cnoahi_files/32740_2_spades_coassembly_trimmed.txt", header=FALSE)
+df_32740_2$sample <- "32740_2"
+
+df_32741_1 <- read.delim("~/Desktop/cnoahi_files/32741_1_spades_coassembly_trimmed.txt", header=FALSE)
+df_32741_1$sample <- "32741_1"
+
+df_32741_2 <- read.delim("~/Desktop/cnoahi_files/32741_2_spades_coassembly_trimmed.txt", header=FALSE)
+df_32741_2$sample <- "32741_2"
+
+df_32743_1 <- read.delim("~/Desktop/cnoahi_files/32743_1_spades_coassembly_trimmed.txt", header=FALSE)
+df_32743_1$sample <- "32743_1"
+
+df_32743_2 <- read.delim("~/Desktop/cnoahi_files/32743_2_spades_coassembly_trimmed.txt", header=FALSE)
+df_32743_2$sample <- "32743_2"
+
+df_compiled <- bind_rows(df_32740_1, df_32740_2, df_32741_1, df_32741_2, df_32743_1, df_32743_2)
+colnames(df_compiled) <- c("id", 'cds', 'count', 'file')
+```
+
+```{r}
+df_cds_mapped <- df_compiled %>%
+  filter(cds != '') %>%
+  select(-id)
+```
+
+```{r}
+df_not_aligned <- df_compiled %>%
+  filter(id == "__not_aligned" | id == "__no_feature" | id == "__ambiguous") %>%
+  select(-cds)
+
+df_summary <- df_cds_mapped %>%
+  group_by(file) %>%
+  mutate(sum = sum(count)) %>%
+  ungroup() %>%
+  select(file, sum) %>%
+  distinct() %>%
+  inner_join(df_not_aligned) 
+
+df_summary$id <- gsub("__", "", df_summary$id)
+
+df_summary <- df_summary %>%
+  spread(id, count) %>%
+  mutate(per_aligned = ((sum + ambiguous + no_feature) / not_aligned) *100)
+
+```
