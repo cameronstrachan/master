@@ -1,0 +1,78 @@
+---
+title: "Untitled"
+author: "Cameron Strachan"
+date: '2020-07-13'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+files <- list.files(path = '~/master/chyo/blast_output/error_corrected', pattern = "\\.txt$")
+file_samples <- gsub(".sorted.mapped_error_corrected.txt", "", files)
+
+df_list_count <- list()
+i <- 1
+
+for (x in 1:length(files)) {
+  
+  df <- read.delim(paste('~/master/chyo/blast_output/error_corrected/', files[x], sep = '/'), header=FALSE)
+  colnames(df)[1:13] <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+  
+  df_trim <- df %>%
+    mutate(per_aln = (length / qlen)*100) %>%
+    filter(per_aln > 90) %>%
+    filter(pident > 95) %>%
+    mutate(center = round(if_else(sstart < send, (((send - sstart)/2) + sstart), (((sstart - send)/2) + send))))
+  
+  df_trim$sample <- file_samples[[x]] 
+  
+  df_list_count[[i]] <- df_trim 
+  i <- i + 1
+
+}
+
+df_compiled_count <- bind_rows(df_list_count)
+```
+
+```{r}
+df_meta1 <- read.csv("~/master/chyo/sample_mapping.csv")
+df_meta2 <- read.csv("~/master/campylobacter_cores/dataflow/00-meta/group2core_gracillis_cnoahi.csv")
+colnames(df_meta2)[5] <- "sseqid"
+
+df_selected <- df_compiled_count %>%
+  
+  inner_join(df_meta1) %>%
+  
+  filter(treatment == 'baseline') %>%
+  
+  group_by(sseqid, sample) %>%
+  mutate(count = length(unique(qseqid))) %>%
+  ungroup() %>%
+  
+  select(sseqid, treatment, count) %>%
+  
+  distinct() %>%
+  
+  group_by(sseqid, treatment) %>%
+  summarise(counts = list(count)) %>%
+  ungroup() %>%
+  
+  
+  inner_join(df_meta2) %>%
+  
+  rowwise() %>%
+  
+  mutate(count_sum = sum(unlist(counts))) %>%
+  
+  filter(count_sum > 10)
+
+
+write.csv(df_selected, "~/master/campylobacter_cores/dataflow/00-meta/group2core_gracillis_cnoahi_expressed.csv")
+```

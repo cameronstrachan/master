@@ -1,0 +1,109 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(stringi)
+library(reshape2)
+library(readr)
+library(ggthemes)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+files <- list.files('~/master/campylobacter_cores/dataflow/03-blastout/')
+blastdir <- '~/master/campylobacter_cores/dataflow/03-blastout/'
+
+dflist <- list()
+
+i <- 1
+for (file in files){
+  df <- read.table(paste(blastdir, file, sep = ''))
+  df$file <- file
+  df$V1 <- as.character(df$V1)
+  df$V2 <- as.character(df$V2)
+  dflist[[i]] <- df
+  i <- i+1
+}
+
+df_compiled <- bind_rows(dflist)
+colnames(df_compiled)[1:13] <- c("qseqid", "sseqid", "pident", "sstart", "send", "qstart", "qend", "evalue", "bitscore", "score", "qlen", "length", "sseq")
+
+df_compiled$file <- gsub("\\.txt", "", df_compiled$file)
+
+df_compiled <- df_compiled %>%
+  separate(file, into = c("file1", "file2"), sep = "\\:") %>%
+  mutate(piali = (length / qlen) * 100) %>%
+  filter(piali > 30) 
+
+
+df_compiled$sseq <- NULL
+
+df_forward <- df_compiled %>%
+  select(qseqid, sseqid, file1, file2, pident) %>%
+  rename(forward_pi = pident) %>%
+  distinct()
+
+df_reverse <- df_compiled %>%
+  select(qseqid, sseqid, file1, file2, pident) %>%
+  rename(reverse_pi = pident) %>%
+  distinct()
+
+colnames(df_reverse)[1:4] <- c("sseqid", "qseqid", "file2", "file1")
+
+df_rbh <- inner_join(df_forward, df_reverse) %>%
+  mutate(mean_pi = (forward_pi + reverse_pi)/2) %>%
+  select(-forward_pi, -reverse_pi) %>%
+  distinct() %>%
+  rowwise() %>%
+  mutate(samefile = ifelse(file1 == file2, "yes", "no")) %>%
+  filter(samefile != "yes") %>%
+  select(-samefile) 
+
+colnames(df_rbh)[1:2] <- c("gene1", "gene2")
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+df_groups1 <- read.csv("~/master/campylobacter_cores/dataflow/00-meta/representative_genomes.csv")
+colnames(df_groups1) <- c("file1", "genus1", "species1", "group1", "n_genomes1")
+
+df_groups2 <- read.csv("~/master/campylobacter_cores/dataflow/00-meta/representative_genomes.csv")
+colnames(df_groups2) <- c("file2", "genus2", "species2", "group2", "n_genomes2")
+
+df_rbh_count_groups <- df_rbh %>% 
+  inner_join(df_groups1) %>%
+  inner_join(df_groups2) %>%
+  
+  group_by(gene1, file1) %>%
+  mutate(total_rbh_genomes = length(unique(file2))) %>%
+  ungroup() %>%
+    
+  group_by(gene1, file1, group2) %>%
+  mutate(total_group_rbh_genomes = length(unique(file2))) %>%
+  ungroup() %>%
+  
+  select(gene1, file1, genus1, species1, group1, group2, total_rbh_genomes, total_group_rbh_genomes) %>%
+  
+  distinct() %>%
+  
+  spread(group2, total_group_rbh_genomes)
+  
+df_rbh_count_groups$`1`[is.na(df_rbh_count_groups$`1`)] <- 0
+df_rbh_count_groups$`2`[is.na(df_rbh_count_groups$`2`)] <- 0  
+
+colnames(df_rbh_count_groups)[7:8] <- c("group2_1", "group2_2")
+
+df_rbh_count_groups <- df_rbh_count_groups %>%
+  filter(total_rbh_genomes < 38) %>%
+  filter(group2_1 == 0) %>%
+  mutate(group_diff = group2_2 - group2_1) %>%
+  # 90% of the group 2 genomes that is not present in the group 1 genomes
+  filter(group_diff >= 20) %>%
+  filter(species1 == "Campylobacter_B gracilis")
+```

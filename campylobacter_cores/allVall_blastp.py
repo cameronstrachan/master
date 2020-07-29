@@ -16,27 +16,49 @@ df_representative_genomes = pd.read_csv('dataflow/00-meta/representative_genomes
 genomes = df_representative_genomes['user_genome'].tolist()
 files = [item + ".fna" for item in genomes]
 
-for file in files:
-    file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
-    outputfilename = file.split(".f")[0] + '.faa'
-    file_obj.setOutputName(outputfilename)
-    file_obj.setOutputLocation('dataflow/01-prot/')
-    file_obj.runprodigal()
+#for file in files:
+#    file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
+#    outputfilename = file.split(".f")[0] + '.faa'
+#    file_obj.setOutputName(outputfilename)
+#    file_obj.setOutputLocation('dataflow/01-prot/')
+#    file_obj.runprodigal()
 
 files = [item + ".faa" for item in genomes]
 
-for file in files:
-    file_obj = sc.Fasta(file, 'dataflow/01-prot/')
-    file_obj.setOutputName(file)
-    file_obj.setOutputLocation('dataflow/02-blastdbs/')
-    file_obj.runmakeblastdb(dbtype='prot')
+#for file in files:
+#    file_obj = sc.Fasta(file, 'dataflow/01-prot/')
+#    file_obj.setOutputName(file)
+#    file_obj.setOutputLocation('dataflow/02-blastdbs/')
+#    file_obj.runmakeblastdb(dbtype='prot')
+
+
+file_obj = sc.Fasta('spades_coassembly_scaffolds.faa', 'dataflow/01-prot/')
+file_obj.setOutputName('spades_coassembly_scaffolds.faa')
+file_obj.setOutputLocation('dataflow/02-blastdbs/')
+file_obj.runmakeblastdb(dbtype='prot')
 
 blastdbs = files.copy()
+
+#for file in files:
+#	file_obj = sc.Fasta(file, 'dataflow/01-prot/')
+#	file_obj.setOutputLocation('dataflow/03-blastout/')
+#	for blastdb in blastdbs:
+#		outputfilename = file.split('.f')[0] + ':' + blastdb.split('.f')[0] + '.txt'
+#		file_obj.setOutputName(outputfilename)
+#		file_obj.runblast(blast='blastp', db=blastdb, dblocation='dataflow/02-blastdbs/', max_target_seqs=1, evalue=1e-3, num_threads = 60)
+
+file_obj = sc.Fasta('spades_coassembly_scaffolds.faa', 'dataflow/01-prot/')
+file_obj.setOutputLocation('dataflow/03-blastout/')
+for blastdb in blastdbs:
+	outputfilename = file.split('.f')[0] + ':' + blastdb.split('.f')[0] + '.txt'
+	file_obj.setOutputName(outputfilename)
+	file_obj.runblast(blast='blastp', db=blastdb, dblocation='dataflow/02-blastdbs/', max_target_seqs=1, evalue=1e-3, num_threads = 60)
+
+file_new_genome = 'spades_coassembly_scaffolds.faa'
 
 for file in files:
 	file_obj = sc.Fasta(file, 'dataflow/01-prot/')
 	file_obj.setOutputLocation('dataflow/03-blastout/')
-	for blastdb in blastdbs:
-		outputfilename = file.split('.f')[0] + ':' + blastdb.split('.f')[0] + '.txt'
-		file_obj.setOutputName(outputfilename)
-		file_obj.runblast(blast='blastp', db=blastdb, dblocation='dataflow/02-blastdbs/', max_target_seqs=1, evalue=1e-3, num_threads = 60)
+	outputfilename = file_new_genomesplit('.f')[0] + ':' + blastdb.split('.f')[0] + '.txt'
+	file_obj.setOutputName(outputfilename)
+	file_obj.runblast(blast='blastp', db=file_new_genome, dblocation='dataflow/02-blastdbs/', max_target_seqs=1, evalue=1e-3, num_threads = 60)
