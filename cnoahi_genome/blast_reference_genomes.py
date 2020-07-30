@@ -29,4 +29,4 @@ file_obj.setOutputLocation('assembled_genomes/reference_annotations/')
 for blastdb in blastdbs:
 	outputfilename = file.split('.f')[0] + ':' + blastdb.split('.f')[0] + '.txt'
 	file_obj.setOutputName(outputfilename)
-	file_obj.runblast(blast='blastp', db=blastdb, dblocation='blastdbs/', max_target_seqs=1, evalue=1e-3, num_threads = 10)
+	file_obj.runblast(blast='blastp', db=blastdb, dblocation='assembled_genomes/blastdbs/', max_target_seqs=1, evalue=1e-3, num_threads = 10)
