@@ -12,7 +12,7 @@ else:
 
 from modules import seq_core_lin as sc
 
-files = ["Campylobacter_jejuni_ATCC 700819.faa", "Campylobacter_hyointestinalis.faa", "Campylobacter_gracilis.faa", "Campylobacter_concisus.faa"]
+files = ["Campylobacter_jejuni_ATCC_700819.faa", "Campylobacter_hyointestinalis.faa", "Campylobacter_gracilis.faa", "Campylobacter_concisus.faa"]
 
 for file in files:
     file_obj = sc.Fasta(file, 'assembled_genomes/reference_genomes/')
@@ -25,7 +25,7 @@ blastdbs = files.copy()
 file = 'spades_coassembly_scaffolds.faa'
 
 file_obj = sc.Fasta(file, 'assembled_genomes/spades_coassembly_scaffolds_annotations/')
-file_obj.setOutputLocation('dataflow/reference_annotations/')
+file_obj.setOutputLocation('assembled_genomes/reference_annotations/')
 for blastdb in blastdbs:
 	outputfilename = file.split('.f')[0] + ':' + blastdb.split('.f')[0] + '.txt'
 	file_obj.setOutputName(outputfilename)
