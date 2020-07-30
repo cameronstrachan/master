@@ -22,7 +22,9 @@ for file in files:
 
 blastdbs = files.copy()
 
-file_obj = sc.Fasta('spades_coassembly_scaffolds.faa', 'assembled_genomes/spades_coassembly_scaffolds_annotations/')
+file = 'spades_coassembly_scaffolds.faa'
+
+file_obj = sc.Fasta(file, 'assembled_genomes/spades_coassembly_scaffolds_annotations/')
 file_obj.setOutputLocation('dataflow/reference_annotations/')
 for blastdb in blastdbs:
 	outputfilename = file.split('.f')[0] + ':' + blastdb.split('.f')[0] + '.txt'
