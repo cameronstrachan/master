@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 ```
 
 ```{r}
@@ -14,55 +14,152 @@ library(tidyverse)
 ```
 
 ```{r}
-df_meta <- read.csv("~/Desktop/cnoahi_files/sample_mapping.csv")
+meta <- read.csv("~/Desktop/cnoahi_files/sample_mapping.csv")
+
+df_annotations <- read.delim("~/Desktop/cnoahi_files/annotations/spades_coassembly_scaffolds.tsv")
+
+annotations  <- df_annotations %>%
+  filter(ftype == "CDS") 
+rm("df_annotations")
+
+colnames(annotations)[1] <- "cds"
+
+
+ref_annotations <- read.csv("~/Desktop/cnoahi_files/reference_annotations_summarized.csv")
+colnames(ref_annotations)[1] <- "cds"
 ```
 
 ```{r}
-df_32740_1 <- read.delim("~/Desktop/cnoahi_files/32740_1_spades_coassembly_trimmed.txt", header=FALSE)
+df_32740_1 <- read.delim("~/Desktop/cnoahi_files/mapping/32740_1_spades_coassembly_scaffolds.txt", header=FALSE)
 df_32740_1$sample <- "32740_1"
 
-df_32740_2 <- read.delim("~/Desktop/cnoahi_files/32740_2_spades_coassembly_trimmed.txt", header=FALSE)
+df_32740_2 <- read.delim("~/Desktop/cnoahi_files/mapping/32740_2_spades_coassembly_scaffolds.txt", header=FALSE)
 df_32740_2$sample <- "32740_2"
 
-df_32741_1 <- read.delim("~/Desktop/cnoahi_files/32741_1_spades_coassembly_trimmed.txt", header=FALSE)
+df_32741_1 <- read.delim("~/Desktop/cnoahi_files/mapping/32741_1_spades_coassembly_scaffolds.txt", header=FALSE)
 df_32741_1$sample <- "32741_1"
 
-df_32741_2 <- read.delim("~/Desktop/cnoahi_files/32741_2_spades_coassembly_trimmed.txt", header=FALSE)
+df_32741_2 <- read.delim("~/Desktop/cnoahi_files/mapping/32741_2_spades_coassembly_scaffolds.txt", header=FALSE)
 df_32741_2$sample <- "32741_2"
 
-df_32743_1 <- read.delim("~/Desktop/cnoahi_files/32743_1_spades_coassembly_trimmed.txt", header=FALSE)
+df_32743_1 <- read.delim("~/Desktop/cnoahi_files/mapping/32743_1_spades_coassembly_scaffolds.txt", header=FALSE)
 df_32743_1$sample <- "32743_1"
 
-df_32743_2 <- read.delim("~/Desktop/cnoahi_files/32743_2_spades_coassembly_trimmed.txt", header=FALSE)
+df_32743_2 <- read.delim("~/Desktop/cnoahi_files/mapping/32743_2_spades_coassembly_scaffolds.txt", header=FALSE)
 df_32743_2$sample <- "32743_2"
 
-df_compiled <- bind_rows(df_32740_1, df_32740_2, df_32741_1, df_32741_2, df_32743_1, df_32743_2)
-colnames(df_compiled) <- c("id", 'cds', 'count', 'file')
+df_32744_1 <- read.delim("~/Desktop/cnoahi_files/mapping/32744_1_spades_coassembly_scaffolds.txt", header=FALSE)
+df_32744_1$sample <- "32744_1"
+
+df_32744_2 <- read.delim("~/Desktop/cnoahi_files/mapping/32744_2_spades_coassembly_scaffolds.txt", header=FALSE)
+df_32744_2$sample <- "32744_2"
+
+df_32745_1 <- read.delim("~/Desktop/cnoahi_files/mapping/32745_1_spades_coassembly_scaffolds.txt", header=FALSE)
+df_32745_1$sample <- "32745_1"
+
+df_32745_2 <- read.delim("~/Desktop/cnoahi_files/mapping/32745_2_spades_coassembly_scaffolds.txt", header=FALSE)
+df_32745_2$sample <- "32745_2"
+
+df_35054_1 <- read.delim("~/Desktop/cnoahi_files/mapping/35054_1_spades_coassembly_scaffolds.txt", header=FALSE)
+df_35054_1$sample <- "35054_1"
+
+df_35054_2 <- read.delim("~/Desktop/cnoahi_files/mapping/35054_2_spades_coassembly_scaffolds.txt", header=FALSE)
+df_35054_2$sample <- "35054_2"
+
+
+
+compiled <- bind_rows(df_32740_1, df_32740_2, df_32741_1, df_32741_2, df_32743_1, df_32743_2, df_32744_1, df_32744_2, df_32745_1, df_32745_2, df_35054_1, df_35054_2)
+rm(list = c("df_32740_1", "df_32740_2", "df_32741_1", "df_32741_2", "df_32743_1", "df_32743_2", "df_32744_1", "df_32744_2", "df_32745_1", "df_32745_2", "df_35054_1", "df_35054_2"))
+colnames(compiled) <- c("id", 'cds', 'count', 'sample')
 ```
 
 ```{r}
-df_cds_mapped <- df_compiled %>%
-  filter(cds != '') %>%
-  select(-id)
-```
-
-```{r}
-df_not_aligned <- df_compiled %>%
+df_not_aligned <- compiled %>%
   filter(id == "__not_aligned" | id == "__no_feature" | id == "__ambiguous") %>%
   select(-cds)
 
-df_summary <- df_cds_mapped %>%
-  group_by(file) %>%
+summary <- compiled %>%
+  filter(cds != '') %>%
+  select(-id) %>%
+  group_by(sample) %>%
   mutate(sum = sum(count)) %>%
   ungroup() %>%
-  select(file, sum) %>%
+  select(sample, sum) %>%
   distinct() %>%
   inner_join(df_not_aligned) 
 
-df_summary$id <- gsub("__", "", df_summary$id)
+rm("df_not_aligned")
 
-df_summary <- df_summary %>%
+summary$id <- gsub("__", "", summary$id)
+
+summary <- summary %>%
   spread(id, count) %>%
-  mutate(per_aligned = ((sum + ambiguous + no_feature) / not_aligned) *100)
+  mutate(per_aligned = ((sum + ambiguous + no_feature) / not_aligned) *100) %>%
+  inner_join(meta)
+```
 
+```{r}
+count_table <- compiled %>%
+  filter(cds != '') %>%
+  select(-id) %>%
+  separate(sample, into = c("sample_id", "read"), sep = "_") %>%
+  
+  group_by(cds, sample_id) %>%
+  mutate(count_max = max(count)) %>%
+  ungroup() %>%
+  
+  select(cds, sample_id, count_max) %>%
+  distinct() %>%
+  spread(sample_id, count_max)
+
+library(DESeq2)
+library(apeglm)
+
+cts <- as.matrix(count_table[,2:7])
+rownames(cts) <- count_table$cds
+
+coldata = matrix(c("baseline", "baseline", "SARA", "SARA", "SARA", "baseline"))
+colnames(coldata) <- "treatment"
+rownames(coldata) <- c("32740", "32741", "32743", "32744", "32745", "35054")
+
+dds <- DESeqDataSetFromMatrix(countData = cts,
+                              colData = coldata,
+                              design= ~ treatment)
+
+dds <- DESeq(dds)
+#resultsNames(dds)
+res <- results(dds, name="treatment_SARA_vs_baseline")
+#resLFC <- lfcShrink(dds, coef="treatment_SARA_vs_baseline", type="apeglm")
+deseq <- as.data.frame(res)
+rm(list = c("res", "dds", "cts", "coldata"))
+
+deseq$cds <- rownames(deseq)
+```
+
+```{r}
+differential_select <- compiled %>%
+  filter(cds != '') %>%
+  select(-id) %>%
+  inner_join(summary) %>%
+  mutate(norm = (count / (sum + ambiguous + no_feature + not_aligned)*1000000)) %>%
+  select(cds, sample, treatment, norm) %>%
+  group_by(cds, treatment) %>%
+  summarise(norm_list = list(round(norm, 2))) %>%
+  ungroup() %>%
+  spread(treatment, norm_list) %>%
+  rowwise() %>%
+  mutate(median_baseline = median(baseline)) %>%
+  mutate(median_SARA = median(SARA)) %>%
+  mutate(pvalue_norm = (t.test(unlist(baseline), unlist(SARA))$p.value)) %>%
+  ungroup() %>%
+  mutate(log2FoldChangeNorm = log2(median_SARA / median_baseline))%>%
+  inner_join(annotations) %>%
+  left_join(ref_annotations) %>%
+  inner_join(deseq) %>%
+  filter(pvalue < 0.05) %>%
+  filter(pvalue_norm < 0.05) %>%
+  select(cds, median_baseline, median_SARA, log2FoldChangeNorm, log2FoldChange, pvalue_norm, pvalue, gene, product, starts_with("Campylobacter")) %>%
+  arrange(desc(log2FoldChange))
+
+write.csv(differential_select, '~/Desktop/cnoahi_files/differentially_expressed_genes_annotations.csv', row.names = FALSE)
 ```
