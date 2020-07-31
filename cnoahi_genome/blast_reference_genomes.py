@@ -12,7 +12,7 @@ else:
 
 from modules import seq_core_lin as sc
 
-files = ["Campylobacter_jejuni_ATCC_700819.faa", "Campylobacter_hyointestinalis.faa", "Campylobacter_gracilis.faa", "Campylobacter_concisus.faa", "card_db.fasta"]
+files = ["Campylobacter_jejuni_ATCC_700819.faa", "Campylobacter_hyointestinalis.faa", "Campylobacter_gracilis.faa", "Campylobacter_concisus.faa", "Campylobacter_geochelonis.faa", "card_db.fasta"]
 
 for file in files:
     file_obj = sc.Fasta(file, 'assembled_genomes/reference_genomes/')
