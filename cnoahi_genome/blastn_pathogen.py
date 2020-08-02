@@ -22,4 +22,4 @@ file_obj.setOutputLocation('assembled_genomes/reference_annotations/pathogen_bla
 for blastdb in blastdbs:
 	outputfilename = file.split('.f')[0] + ':' + blastdb.split('.f')[0] + '.txt'
 	file_obj.setOutputName(outputfilename)
-	file_obj.runblast(blast='blastn', db=blastdb, dblocation='../ar/dataflow/01-dbs/blastdbs/', max_target_seqs=100, evalue=1e-3, num_threads = 60)
+	file_obj.runblast(blast='blastn', db=blastdb, dblocation='../ar/dataflow/01-dbs/blastdbs/', max_target_seqs=1, evalue=1e-3, num_threads = 60)
