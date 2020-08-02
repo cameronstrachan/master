@@ -10,6 +10,8 @@ if system == 'S':
 else:
     sys.path.insert(0, '/Users/cameronstrachan/master/')
 
+from modules import seq_core_lin as sc
+
 blastdbs = ['staphylococcus_aureus', 'campylobacter_coli', 'campylobacter_jejuni', 'clostridioides_difficile', 'salmonella_typhimurium', 'salmonella_newport', 'staphylococcus_pseudintermedius', 'streptococcus_agalactiae', 'enterococcus_faecium', 'erysipelothrix_rhusiopathiae', 'streptococcus_suis']
 
 file = 'cnoahi_unicycler_closed_no_rRNA.ffn'
