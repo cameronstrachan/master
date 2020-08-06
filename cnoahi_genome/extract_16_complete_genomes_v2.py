@@ -29,7 +29,7 @@ for file in files:
     line_count = 0
     for line in lines:
         if line[0] == '>':
-            line_count2 = line_count.copy()
+            line_count2 = line_count
             if '16S ribosomal RNA' in line:
                 line_count2 = line_count2 + 1
                 while lines[line_count2][0] != '>':
