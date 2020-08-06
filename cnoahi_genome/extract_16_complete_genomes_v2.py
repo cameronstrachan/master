@@ -32,6 +32,6 @@ for file in files:
             line_count2 = line_count.copy()
             if '16S ribosomal RNA' in line:
                 line_count2 = line_count2 + 1
-                while lines[line_count2][0] != '>'
+                while lines[line_count2][0] != '>':
                     file_16s.write(lines[line_count2][0])
                     line_count2 = line_count2 + 1
