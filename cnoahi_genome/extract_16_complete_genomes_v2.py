@@ -32,6 +32,7 @@ for file in files:
         line_count = line_count + 1
         if line[0] == '>':
             if '16S ribosomal RNA' in line:
+                print(file)
                 print(line)
                 file_16s.write(line)
                 while lines[line_count2][0] != '>':
