@@ -28,14 +28,17 @@ for file in files:
 
     end_of_file = len(lines)
     line_count = 0
+    rRNA_count = 1
     for line in lines:
         line_count2 = line_count + 1
         line_count = line_count + 1
         if line[0] == '>':
             if '16S ribosomal RNA' in line:
-                print(file)
-                print(line)
-                file_16s.write(line)
+
+                header = file_prefix + '_rRNA_' + str(    rRNA_count)
+                file_16s.write(header)
+
+                rRNA_count = rRNA_count + 1
                 while lines[line_count2][0] != '>':
                     file_16s.write(lines[line_count2])
                     line_count2 = line_count2 + 1
