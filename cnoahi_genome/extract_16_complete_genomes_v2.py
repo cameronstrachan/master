@@ -35,7 +35,7 @@ for file in files:
         if line[0] == '>':
             if '16S ribosomal RNA' in line:
 
-                header = file_prefix + '_rRNA_' + str(    rRNA_count)
+                header = file_prefix + '_rRNA_' + str(rRNA_count) + '\n'
                 file_16s.write(header)
 
                 rRNA_count = rRNA_count + 1
