@@ -26,6 +26,7 @@ for file in files:
     file_ffn = open(outdir + file_prefix + '/' + file_prefix + '.ffn', 'r')
     lines = file_ffn.readlines()
 
+    end_of_file = len(lines)
     line_count = 0
     for line in lines:
         line_count2 = line_count + 1
@@ -38,6 +39,7 @@ for file in files:
                 while lines[line_count2][0] != '>':
                     file_16s.write(lines[line_count2])
                     line_count2 = line_count2 + 1
-
+                    if line_count2 == end_of_file:
+                        break
         else:
             pass
