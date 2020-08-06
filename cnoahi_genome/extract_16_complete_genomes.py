@@ -17,5 +17,5 @@ outdir = 'related_genomes/prokka/'
 for file in files:
 
     file_prefix = file.split(".f")[0]
-    command = 'prokka --outdir ' + outdir + ' --prefix ' + file_prefix + ' ' + genome_dir + file
+    command = 'prokka --outdir ' + outdir + file_prefix + ' --prefix ' + file_prefix + ' ' + genome_dir + file
     os.system(command)
