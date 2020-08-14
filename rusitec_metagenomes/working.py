@@ -11,9 +11,6 @@ if system == 'S':
 else:
     sys.path.insert(0, '/Users/cameronstrachan/master/')
 
-from modules import seq_core_lin as sc
-from modules import seq_gen_lin as sg
-
 files = [f for f in os.listdir('dataflow/01-bam/') if f.endswith(".bam")]
 
 for file in files:
