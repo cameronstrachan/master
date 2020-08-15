@@ -19,13 +19,13 @@ for file in files:
     fastq_sorted = file_prefix + ".sorted.fastq"
 
     command = 'samtools sort --threads 60 -n dataflow/01-bam/' + file + ' -o dataflow/01-bam/' + file_sorted
-    os.system(command)
+    #os.system(command)
 
     command = 'bedtools bamtofastq -i dataflow/01-bam/' + file_sorted + ' -fq dataflow/01-fastq/' + file_id + '_R1.fastq' + ' -fq2 dataflow/01-fastq/' + file_id + '_R2.fastq'
-    os.system(command)
+    #os.system(command)
 
 
-os.system('gzip dataflow/01-fastq/*fastq')
+#os.system('gzip dataflow/01-fastq/*fastq')
 
 files = [f for f in os.listdir('dataflow/01-fastq/') if f.endswith("_R1.fastq.gz")]
 
@@ -41,6 +41,6 @@ for file in files:
     file_r1_out = file_prefix + '_trimmed_R1.fastq.gz'
     file_r2_out = file_prefix + '_trimmed_R2.fastq.gz'
 
-    command = 'trimmomatic PE -threads 60 -phred33 ' + dir + file_r1 + ' ' + dir + file_r2 + ' ' + dir + file_r1_out + ' ' + dir + file_r2_out + ' ILLUMINACLIP:dataflow/00-meta/neb.fasta:2:30:10:2:keepBothReads LEADING:3 TRAILING:3 MINLEN:36'
+    command = 'trimmomatic PE -threads 60 -phred33 ' + dir + file_r1 + ' ' + dir + file_r2 + ' ' + dir + file_r1_out + ' ' + dir + file_r2_out + ' ILLUMINACLIP:/home/strachan/master/rusitec_metagenomes/dataflow/00-meta/neb.fasta:2:30:10:2:keepBothReads LEADING:5 TRAILING:5 MINLEN:36'
 
     os.system(command)
