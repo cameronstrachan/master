@@ -41,6 +41,6 @@ for file in files:
     file_r1_out = file_prefix + '_trimmed_R1.fastq.gz'
     file_r2_out = file_prefix + '_trimmed_R2.fastq.gz'
 
-    command = 'trimmomatic PE -threads 60 -phred33 ' + dir + file_r1 + ' ' + dir + file_r2 + ' ' + dir + file_r1_out + ' ' + dir + file_r2_out + ' ILLUMINACLIP:/dataflow/00-meta/neb.fasta:2:30:10:2:keepBothReads LEADING:5 TRAILING:5 MINLEN:36'
+    command = 'trimmomatic PE -threads 60 -phred33 ' + dir + file_r1 + ' ' + dir + file_r2 + ' ' + dir + file_r1_out + ' ' + dir + file_r2_out + ' ILLUMINACLIP:neb.fasta:2:30:10:2:keepBothReads LEADING:5 TRAILING:5 MINLEN:36'
 
     os.system(command)
