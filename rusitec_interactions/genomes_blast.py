@@ -21,6 +21,8 @@ for file in files:
    file_obj.setOutputLocation('dataflow/01-prot/')
    file_obj.runprodigal()
 
+files = [f for f in os.listdir('dataflow/01-prot/') if f.endswith(".faa")]
+
 for file in files:
     file_obj = sc.Fasta(file, 'dataflow/01-prot/')
     file_obj.setOutputName(file)
