@@ -37,5 +37,5 @@ for file in files:
 command = 'jgi_summarize_bam_contig_depths --outputDepth dataflow/04-tables/megahit-metagenome-depth.txt dataflow/03-alignments/*sorted.bam'
 os.system(command)
 
-command = 'metabat2 -i dir/contigs_from_megahit.fasta -a dataflow/04-tables/megahit-metagenome-depth.txt -o dataflow/04-bins/bin -m 1500 -t 70 -v --unbinned'
+command = 'metabat2 -i dataflow/04-coassembly/final.contigs.fa -a dataflow/04-tables/megahit-metagenome-depth.txt -o dataflow/04-bins/bin -m 1500 -t 70 -v --unbinned'
 os.system(command)
