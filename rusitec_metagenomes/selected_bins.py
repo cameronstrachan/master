@@ -12,7 +12,7 @@ else:
 
 
 df_selected_bins = pd.read_csv('dataflow/00-meta/checkM_select_90_10.csv', low_memory=False)
-bins = df_representative_genomes['bin'].tolist()
+bins = df_selected_bins['bin'].tolist()
 
 files = [item + ".fa" for item in bins]
 
