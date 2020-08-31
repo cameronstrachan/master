@@ -23,7 +23,7 @@ for file in files:
     file_r1 = file_prefix + '_trimmed_R1.fastq.gz'
     file_r2 = file_prefix + '_trimmed_R2.fastq.gz'
 
-    for contig_file in contig_giles:
+    for contig_file in contig_files:
 
         contig_file_prefix = file.split('.fasta')[0]
 
