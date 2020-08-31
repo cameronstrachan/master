@@ -25,7 +25,7 @@ for file in files:
 
     for contig_file in contig_files:
 
-        contig_file_prefix = file.split('.fasta')[0]
+        contig_file_prefix = contig_file.split('.fasta')[0]
 
         sam_file = file_prefix + '_' + contig_file_prefix + '_hybridassembly' + ".sam"
         command = "bwa mem -t 60 dataflow/04-hybridassembly/" + contig_file + " " + 'dataflow/01-fastq/' + file_r1  + ' dataflow/01-fastq/' + file_r2  + " > " + "dataflow/03-alignments/hybrid/" + sam_file
