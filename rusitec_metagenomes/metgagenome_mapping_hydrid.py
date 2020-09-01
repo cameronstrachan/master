@@ -28,16 +28,16 @@ for file in files:
         contig_file_prefix = contig_file.split('.fasta')[0]
 
         sam_file = file_prefix + '_' + contig_file_prefix + '_hybridassembly' + ".sam"
-        command = "bwa mem -t 60 dataflow/04-hybridassembly/" + contig_file + " " + 'dataflow/01-fastq/' + file_r1  + ' dataflow/01-fastq/' + file_r2  + " > " + "../../proj/manngroup/strachan/tmp/" + sam_file
+        command = "bwa mem -t 60 dataflow/04-hybridassembly/" + contig_file + " " + 'dataflow/01-fastq/' + file_r1  + ' dataflow/01-fastq/' + file_r2  + " > " + "../../../proj/manngroup/strachan/tmp/" + sam_file
 
         os.system(command)
 
         bam_file = file_prefix + '_' + contig_file_prefix + '_hybridassembly' + ".bam"
-        command = "samtools view -@ 60 -bS " + "../../proj/manngroup/strachan/tmp/" + sam_file + " > " + "../../proj/manngroup/strachan/tmp/" + bam_file
+        command = "samtools view -@ 60 -bS " + "../../../proj/manngroup/strachan/tmp/" + sam_file + " > " + "../../../proj/manngroup/strachan/tmp/" + bam_file
         os.system(command)
 
         bam_file_sorted = file_prefix + '_' + contig_file_prefix + '_hybridassembly' + ".sorted.bam"
-        command = "samtools sort -@ 60 " + "../../proj/manngroup/strachan/tmp/" + sam_file + " > " + "../../proj/manngroup/strachan/tmp/" + bam_file_sorted
+        command = "samtools sort -@ 60 " + "../../../proj/manngroup/strachan/tmp/" + sam_file + " > " + "../../../proj/manngroup/strachan/tmp/" + bam_file_sorted
         os.system(command)
 
 #command = 'jgi_summarize_bam_contig_depths --outputDepth dataflow/04-tables/megahit-metagenome-depth.txt dataflow/03-alignments/*sorted.bam'
