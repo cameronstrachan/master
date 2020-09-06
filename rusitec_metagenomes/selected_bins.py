@@ -13,7 +13,7 @@ else:
 
 df_selected_bins = pd.read_csv('dataflow/00-meta/checkM_hybrid_select_90_10.csv', low_memory=False)
 
-df['bin'] = df['bin'].apply(str)
+df_selected_bins['bin'] = df_selected_bins['bin'].apply(str)
 
 bins = df_selected_bins['bin'].tolist()
 
