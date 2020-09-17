@@ -12,14 +12,14 @@ else:
 
 from modules import seq_core_lin as sc
 
-files = [f for f in os.listdir('dataflow/01-nucl/') if f.endswith(".fasta")]
+#files = [f for f in os.listdir('dataflow/01-nucl/') if f.endswith(".fasta")]
 
-for file in files:
-   file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
-   outputfilename = file.split(".f")[0] + '.faa'
-   file_obj.setOutputName(outputfilename)
-   file_obj.setOutputLocation('dataflow/01-prot/')
-   file_obj.runprodigal()
+#for file in files:
+#   file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
+#   outputfilename = file.split(".f")[0] + '.faa'
+#   file_obj.setOutputName(outputfilename)
+#   file_obj.setOutputLocation('dataflow/01-prot/')
+#   file_obj.runprodigal()
 
 files = [f for f in os.listdir('dataflow/01-prot/') if f.endswith(".faa")]
 
