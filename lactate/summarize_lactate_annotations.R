@@ -86,7 +86,8 @@ complete_gene_count_summary <- compiled_corrected %>%
   ungroup() %>%
   select(genome, annotation, num_genes, lactate_utilizer, lactate_producer) %>%
   filter(annotation != "D-Lactate production") %>%
-  distinct()
+  distinct() %>%
+  arrange(lactate_utilizer)
 
 write.csv(complete_gene_count_summary, 'dataflow/04-analysis-tables/lactate_metabolism_classification.csv')
 
