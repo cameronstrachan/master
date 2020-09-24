@@ -85,5 +85,5 @@ for hmm in hmms:
     os.system(command1)
     for file in files:
         out_file = file.split('.fa')[0] + ':' + hmm.split('.hm')[0] + '.txt'
-        command2 = 'hmmscan --tblout dataflow/03-hmmout/' + out_file + ' -T 200 --cpu 20 -E 1e-3 20 dataflow/01-hmm/' + hmm + ' dataflow/01-prot/selected/' + file
+        command2 = 'hmmscan --tblout dataflow/03-hmmout/' + out_file + ' -T 200 --cpu 20 -E 1e-3 dataflow/01-hmm/' + hmm + ' dataflow/01-prot/selected/' + file
         os.system(command2)
