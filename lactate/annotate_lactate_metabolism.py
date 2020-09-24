@@ -66,9 +66,11 @@ for file in hitfiles:
     df = pd.DataFrame.from_dict(headers, orient="index")
     df['file'] = genome_file
     df['category'] = category
+    df.index.name = 'gene_id'
 
-    df = df.index[orfs]
+    df = df[df["gene_id"].isin(orfs)]
     df_list.append(df)
 
 df_headers = pd.concat(df_list)
+df_headers.reset_index(inplace=True)
 df_headers.to_csv('dataflow/00-meta/selected_prot_headers.csv')
