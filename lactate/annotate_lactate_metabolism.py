@@ -60,15 +60,15 @@ for file in hitfiles:
     file_obj.setOutputLocation('dataflow/01-prot/selected/')
     file_obj.subsetfasta(seqlist=orfs, headertag=category)
 
-    #file_obj = sc.Fasta(genome_file, 'dataflow/01-prot/')
-    #file_obj.setOutputName(genome_file)
-    #headers = file_obj.fasta2headermap()
-    #df = pd.DataFrame.from_dict(headers, orient="index")
-    #df['file'] = genome_file
-    #df['category'] = category
+    file_obj = sc.Fasta(genome_file, 'dataflow/01-prot/')
+    file_obj.setOutputName(genome_file)
+    headers = file_obj.fasta2headermap()
+    df = pd.DataFrame.from_dict(headers, orient="index")
+    df['file'] = genome_file
+    df['category'] = category
 
-    #df = df[df['0'].isin(orfs)]
-    #df_list.append(df)
+    df = df[df.iloc[:,0].isin(orfs)]
+    df_list.append(df)
 
-#df_headers = pd.concat(df_list)
-#df_headers.to_csv('dataflow/00-meta/selected_prot_headers.csv')
+df_headers = pd.concat(df_list)
+df_headers.to_csv('dataflow/00-meta/selected_prot_headers.csv')
