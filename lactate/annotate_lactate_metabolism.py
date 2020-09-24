@@ -12,16 +12,16 @@ else:
 
 from modules import seq_core_lin as sc
 
-files = [f for f in os.listdir('dataflow/01-nucl/') if f.endswith(".fasta")]
+files = [f for f in os.listdir('dataflow/01-nucl/') if f.endswith(".fa")]
 
 for file in files:
     file_obj = sc.Fasta(file, 'dataflow/01-nucl/')
-    outputfilename = file.split(".f")[0] + '.fasta'
+    outputfilename = file.split(".f")[0] + '.fa'
     file_obj.setOutputName(outputfilename)
     file_obj.setOutputLocation('dataflow/01-prot/')
     file_obj.runprodigal()
 
-dbfiles = ['characterized_lactate_permease.fasta', 'characterized_lactate_production.fasta', 'characterized_lactate_utilization.fasta']
+dbfiles = ['characterized_lactate_permease.fa', 'characterized_lactate_production.fa', 'characterized_lactate_utilization.fa']
 
 for file in dbfiles:
     file_obj = sc.Fasta(file, 'dataflow/01-prot/')
@@ -29,7 +29,7 @@ for file in dbfiles:
     file_obj.setOutputLocation('dataflow/02-blastdbs/')
     file_obj.runmakeblastdb(dbtype='prot')
 
-blastdbs = ['characterized_lactate_permease.fasta', 'characterized_lactate_production.fasta', 'characterized_lactate_utilization.fasta']
+blastdbs = ['characterized_lactate_permease.fa', 'characterized_lactate_production.fa', 'characterized_lactate_utilization.fa']
 
 for file in files:
     file_obj = sc.Fasta(file, 'dataflow/01-prot/')
@@ -46,14 +46,14 @@ df_list = list()
 
 for file in hitfiles:
 
-    genome_file = file.split(':')[0] + '.fasta'
+    genome_file = file.split(':')[0] + '.fa'
     file_loc = 'dataflow/03-blastout/' + file
     df_file = pd.read_csv(file_loc, sep = '\t', low_memory=False, header=None)
     orfs = list(set(df_file.iloc[:,0].tolist()))
 
     category_file = file.split(':')[1].split('.txt')[0]
     category = file.split(':')[1].split('.txt')[0].split('lactate_')[1]
-    subset_file = genome_file.split('.fa')[0] + ':' + category_file + '.fasta'
+    subset_file = genome_file.split('.fa')[0] + ':' + category_file + '.fa'
 
     file_obj = sc.Fasta(genome_file, 'dataflow/01-prot/')
     file_obj.setOutputName(subset_file)
@@ -77,7 +77,7 @@ df_headers.reset_index(inplace=True)
 df_headers.to_csv('dataflow/00-meta/selected_prot_headers.csv')
 
 
-files = [f for f in os.listdir('dataflow/01-prot/selected/') if f.endswith(".fasta")]
+files = [f for f in os.listdir('dataflow/01-prot/selected/') if f.endswith(".fa")]
 hmms = [f for f in os.listdir('dataflow/01-hmm/') if f.endswith(".hmm")]
 
 for hmm in hmms:
