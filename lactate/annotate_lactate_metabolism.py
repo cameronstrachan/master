@@ -58,7 +58,7 @@ for file in hitfiles:
     file_obj = sc.Fasta(genome_file, 'dataflow/01-prot/')
     file_obj.setOutputName(subset_file)
     file_obj.setOutputLocation('dataflow/01-prot/selected/')
-    file_obj.subsetfasta(seqlist=orfs, headertag=category)
+    file_obj.subsetfasta(seqlist=orfs, headertag='none')
 
     file_obj = sc.Fasta(genome_file, 'dataflow/01-prot/')
     file_obj.setOutputName(genome_file)
