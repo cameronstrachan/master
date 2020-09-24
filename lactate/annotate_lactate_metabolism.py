@@ -39,7 +39,7 @@ for file in files:
     	file_obj.setOutputName(outputfilename)
     	file_obj.runblast(blast='blastp', db=blastdb, dblocation='dataflow/02-blastdbs/', max_target_seqs=100, evalue=1e-5, num_threads = 15)
 
-os.command('find dataflow/02-blastdbs/ -size  0 -print -delete')
+os.system('find dataflow/02-blastdbs/ -size  0 -print -delete')
 
 hitfiles = [f for f in os.listdir('dataflow/02-blastdbs/') if f.endswith(".txt")]
 df_list = list()
