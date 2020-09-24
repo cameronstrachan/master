@@ -67,7 +67,7 @@ for file in hitfiles:
     df['file'] = genome_file
     df['category'] = category
 
-    df = df[df.loc[:].isin(orfs)]
+    df = df.index[orfs]
     df_list.append(df)
 
 df_headers = pd.concat(df_list)
