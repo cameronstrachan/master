@@ -78,12 +78,12 @@ df_headers.to_csv('dataflow/00-meta/selected_prot_headers.csv')
 
 
 files = [f for f in os.listdir('dataflow/01-prot/selected/') if f.endswith(".fasta")]
-hmms = [f for f in os.listdir('dataflow/01-hm/selected/') if f.endswith(".hmm")]
+hmms = [f for f in os.listdir('dataflow/01-hmm/') if f.endswith(".hmm")]
 
 for hmm in hmms:
     command1 = 'hmmpress dataflow/01-hmm/' + hmm
     os.system(command1)
     for file in files:
         out_file = file.split('.fa')[0] + ':' + hmm.split('.hm') + 'txt'
-        command2 = 'hmmscan --tblout dataflow/03-hmm-out/' + out_file + ' -T 200 --cpu 20 dataflow/01-hmm/' + hmm + ' dataflow/01-prot/selected/file'
+        command2 = 'hmmscan --tblout dataflow/03-hmm-out/' + out_file + ' -T 200 --cpu 20 dataflow/01-hmm/' + hmm + ' dataflow/01-prot/selected/' + file
         os.system(command2)
