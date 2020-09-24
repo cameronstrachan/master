@@ -44,7 +44,7 @@ os.system('find dataflow/02-blastdbs/ -size  0 -print -delete')
 hitfiles = [f for f in os.listdir('dataflow/02-blastdbs/') if f.endswith(".txt")]
 df_list = list()
 
-for file in files:
+for file in hitfiles:
 
     genome_file = file.split(':')[0]
     file_loc = 'dataflow/02-blastdbs/' + file
