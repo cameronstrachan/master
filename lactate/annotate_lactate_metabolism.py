@@ -87,3 +87,5 @@ for hmm in hmms:
         out_file = file.split('.fa')[0] + ':' + hmm.split('.hm')[0] + '.txt'
         command2 = 'hmmscan --tblout dataflow/03-hmmout/' + out_file + ' --cpu 20 -E 1e-3 dataflow/01-hmm/' + hmm + ' dataflow/01-prot/selected/' + file
         os.system(command2)
+
+os.command('Rscript summarize_lactate_annotations.R')
