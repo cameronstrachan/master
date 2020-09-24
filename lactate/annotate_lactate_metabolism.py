@@ -21,9 +21,9 @@ for file in files:
     file_obj.setOutputLocation('dataflow/01-prot/')
     file_obj.runprodigal()
 
-files = [f for f in os.listdir('dataflow/01-prot/') if f.endswith(".fasta")]
+dbfiles = ['characterized_lactate_permease.fasta', 'characterized_lactate_production.fasta', 'characterized_lactate_utilization.fasta']
 
-for file in files:
+for file in dbfiles:
     file_obj = sc.Fasta(file, 'dataflow/01-prot/')
     file_obj.setOutputName(file)
     file_obj.setOutputLocation('dataflow/02-blastdbs/')
