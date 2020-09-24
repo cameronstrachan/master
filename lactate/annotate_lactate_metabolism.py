@@ -51,15 +51,9 @@ for file in hitfiles:
     df_file = pd.read_csv(file_loc, sep = '\t', low_memory=False, header=None)
     orfs = list(set(df_file.iloc[:,0].tolist()))
 
-    print(genome_file)
-    print(orfs)
-
-
+    category_file = file.split(':')[1].split('.txt')[0]
     category = file.split(':')[1].split('.txt')[0].split('lactate_')[1]
-    subset_file = genome_file.split('.fa')[0] + ':' + category + '.fasta'
-
-    print(category)
-    print(subset_file)
+    subset_file = genome_file.split('.fa')[0] + ':' + category_file + '.fasta'
 
     file_obj = sc.Fasta(genome_file, 'dataflow/01-prot/')
     file_obj.setOutputName(subset_file)
