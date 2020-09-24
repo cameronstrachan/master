@@ -64,9 +64,10 @@ for file in hitfiles:
     file_obj.setOutputName(genome_file)
     headers = file_obj.fasta2headermap()
     df = pd.DataFrame.from_dict(headers, orient="index")
+    df = df.rename_axis("gene_id").reset_index()
     df['file'] = genome_file
     df['category'] = category
-    df.index.name = 'gene_id'
+
 
     df = df[df["gene_id"].isin(orfs)]
     df_list.append(df)
