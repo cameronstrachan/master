@@ -39,15 +39,15 @@ for file in files:
     	file_obj.setOutputName(outputfilename)
     	file_obj.runblast(blast='blastp', db=blastdb, dblocation='dataflow/02-blastdbs/', max_target_seqs=100, evalue=1e-5, num_threads = 15)
 
-os.system('find dataflow/02-blastdbs/ -size  0 -print -delete')
+os.system('find dataflow/03-blastout/ -size  0 -print -delete')
 
-hitfiles = [f for f in os.listdir('dataflow/02-blastdbs/') if f.endswith(".txt")]
+hitfiles = [f for f in os.listdir('dataflow/03-blastout/') if f.endswith(".txt")]
 df_list = list()
 
 for file in hitfiles:
 
     genome_file = file.split(':')[0]
-    file_loc = 'dataflow/02-blastdbs/' + file
+    file_loc = 'dataflow/03-blastout/' + file
     df_file = pd.read_csv(file_loc, sep = '\t', low_memory=False)
     orfs = list(set(df_file['qseqid'].tolist()))
 
