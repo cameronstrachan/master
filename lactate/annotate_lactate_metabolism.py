@@ -32,7 +32,6 @@ for file in files:
 blastdbs = ['characterized_lactate_permease.fasta', 'characterized_lactate_production.fasta', 'characterized_lactate_utilization.fasta']
 
 for file in files:
-    blastdbs = files.copy()
     file_obj = sc.Fasta(file, 'dataflow/01-prot/')
     file_obj.setOutputLocation('dataflow/03-blastout/')
     for blastdb in blastdbs:
