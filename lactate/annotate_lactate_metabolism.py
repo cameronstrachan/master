@@ -55,7 +55,7 @@ for file in hitfiles:
     print(orfs)
 
 
-    category = file.split(':')[1].split('.txt')[0]
+    category = file.split(':')[1].split('.txt')[0].split('lactate_')[1]
     subset_file = genome_file.split('.fa')[0] + ':' + category + '.fasta'
 
     print(category)
