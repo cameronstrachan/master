@@ -48,8 +48,8 @@ for file in hitfiles:
 
     genome_file = file.split(':')[0]
     file_loc = 'dataflow/03-blastout/' + file
-    df_file = pd.read_csv(file_loc, sep = '\t', low_memory=False)
-    orfs = list(set(df_file['qseqid'].tolist()))
+    df_file = pd.read_csv(file_loc, sep = '\t', low_memory=False, header=None)
+    orfs = list(set(df_file['0'].tolist()))
 
     print(genome_file)
     print(orfs)
