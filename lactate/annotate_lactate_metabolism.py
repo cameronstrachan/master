@@ -38,3 +38,35 @@ for file in files:
     	outputfilename = file.split('.f')[0] + ':' + blastdb.split('.f')[0] + '.txt'
     	file_obj.setOutputName(outputfilename)
     	file_obj.runblast(blast='blastp', db=blastdb, dblocation='dataflow/02-blastdbs/', max_target_seqs=100, evalue=1e-5, num_threads = 15)
+
+os.command('find dataflow/02-blastdbs/ -size  0 -print -delete')
+
+hitfiles = [f for f in os.listdir('dataflow/02-blastdbs/') if f.endswith(".txt")]
+df_list = list()
+
+for file in files:
+
+    genome_file = file.split(':')[0]
+    file_loc = 'dataflow/02-blastdbs/' + file
+    df_file = pd.read_csv(file_loc, sep = '\t', low_memory=False)
+    orfs = list(set(df_file['qseqid'].tolist()))
+
+    category = file.split(':')[1].split('.txt')[0]
+    subset_file = genome_file.split('.fa')[0] + ':' + category + '.fasta'
+    file_obj = sc.Fasta(genome_file, 'dataflow/01-prot/')
+    file_obj.setOutputName(subset_file)
+    file_obj.setOutputLocation('dataflow/01-prot/selected/')
+    file_obj.subsetfasta(seqlist=orfs, headertag=category)
+
+    file_obj = sc.Fasta(genome_file, 'dataflow/01-prot/')
+    file_obj.setOutputName(genome_file)
+    headers = file_obj.fasta2headermap()
+    df = pd.DataFrame.from_dict(headers, orient="index")
+    df['file'] = genome_file
+    df['category'] = category
+
+    df = df[df['0'].isin(orfs)]
+    df_list.append(df)
+
+df_headers = pd.concat(df_list)
+df_headers.to_csv('dataflow/00-meta/selected_prot_headers.csv')
