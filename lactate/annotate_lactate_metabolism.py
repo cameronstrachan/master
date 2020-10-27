@@ -37,7 +37,7 @@ for file in files:
     for blastdb in blastdbs:
     	outputfilename = file.split('.f')[0] + ':' + blastdb.split('.f')[0] + '.txt'
     	file_obj.setOutputName(outputfilename)
-    	file_obj.runblast(blast='blastp', db=blastdb, dblocation='dataflow/02-blastdbs/', max_target_seqs=100, evalue=1e-3, num_threads = 15)
+    	file_obj.runblast(blast='blastp', db=blastdb, dblocation='dataflow/02-blastdbs/', max_target_seqs=100, evalue=1e-3, num_threads = 60)
 
 os.system('find dataflow/03-blastout/ -size  0 -print -delete')
 
@@ -85,7 +85,7 @@ for hmm in hmms:
     os.system(command1)
     for file in files:
         out_file = file.split('.fa')[0] + ':' + hmm.split('.hm')[0] + '.txt'
-        command2 = 'hmmscan --tblout dataflow/03-hmmout/' + out_file + ' --cpu 20 -E 1e-3 dataflow/01-hmm/' + hmm + ' dataflow/01-prot/selected/' + file
+        command2 = 'hmmscan --tblout dataflow/03-hmmout/' + out_file + ' --cpu 60 -E 1e-3 dataflow/01-hmm/' + hmm + ' dataflow/01-prot/selected/' + file
         os.system(command2)
 
 os.system('Rscript compile_lactate_annotations.R')
