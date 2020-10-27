@@ -88,4 +88,4 @@ for hmm in hmms:
         command2 = 'hmmscan --tblout dataflow/03-hmmout/' + out_file + ' --cpu 20 -E 1e-3 dataflow/01-hmm/' + hmm + ' dataflow/01-prot/selected/' + file
         os.system(command2)
 
-os.command('Rscript summarize_lactate_annotations.R')
+os.system('Rscript compile_lactate_annotations.R')
