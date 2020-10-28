@@ -37,7 +37,7 @@ for file in files:
     for blastdb in blastdbs:
     	outputfilename = file.split('.f')[0] + ':' + blastdb.split('.f')[0] + '.txt'
     	file_obj.setOutputName(outputfilename)
-    	file_obj.runblast(blast='blastp', db=blastdb, dblocation='dataflow/02-blastdbs/', max_target_seqs=100, evalue=1e-3, num_threads = 60)
+    	#file_obj.runblast(blast='blastp', db=blastdb, dblocation='dataflow/02-blastdbs/', max_target_seqs=100, evalue=1e-3, num_threads = 60)
 
 os.system('find dataflow/03-blastout/ -size  0 -print -delete')
 
