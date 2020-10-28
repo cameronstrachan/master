@@ -86,6 +86,16 @@ for hmm in hmms:
     for file in files:
         out_file = file.split('.fa')[0] + ':' + hmm.split('.hm')[0] + '.txt'
         command2 = 'hmmscan --tblout dataflow/03-hmmout/' + out_file + ' --cpu 60 -E 1e-3 dataflow/01-hmm/' + hmm + ' dataflow/01-prot/selected/' + file
+        #os.system(command2)
+
+files = ['characterized_lactate_permease.fa', 'characterized_lactate_production.fa', 'characterized_lactate_utilization.fa']
+
+for hmm in hmms:
+    command1 = 'hmmpress dataflow/01-hmm/' + hmm
+    os.system(command1)
+    for file in files:
+        out_file = file.split('.fa')[0] + ':' + hmm.split('.hm')[0] + '.txt'
+        command2 = 'hmmscan --tblout dataflow/03-hmmout/' + out_file + ' --cpu 60 -E 1e-3 dataflow/01-hmm/' + hmm + ' dataflow/01-prot/' + file
         os.system(command2)
 
 os.system('Rscript compile_lactate_annotations.R')
