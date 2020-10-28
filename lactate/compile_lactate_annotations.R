@@ -50,7 +50,8 @@ compiled_headers <- compiled_headers %>%
 # compile everything and save
 compiled <- full_join(compiled_headers, compiled_blast_hits) %>%
   full_join(compiled_hmm_hits) %>%
-  select(genome, gene_id, gene, annotation, start, stop, direction, blast_pident, blast_per_aln, hmm_domain, hmm_evalue) %>%
+  select(genome, gene_id, start, stop, direction, characterized_protein, blast_pident, blast_per_aln, hmm_domain, hmm_evalue) %>%
   distinct()
 
-write.csv(compiled, 'dataflow/04-analysis-tables/compiled_lactate_annotations.csv')
+write.csv(compiled, 'dataflow/04-analysis-tables/compiled_lactate_annotations.csv', row.names = FALSE)
+
