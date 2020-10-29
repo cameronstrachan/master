@@ -43,6 +43,7 @@ os.system('find dataflow/03-blastout/ -size  0 -print -delete')
 
 hitfiles = [f for f in os.listdir('dataflow/03-blastout/') if f.endswith(".txt")]
 df_list = list()
+df_list2 = list()
 
 for file in hitfiles:
 
@@ -66,12 +67,18 @@ for file in hitfiles:
     df = df.rename_axis("gene_id").reset_index()
     df['file'] = genome_file
 
+	df_list2.append(df)
+
     df = df[df["gene_id"].isin(orfs)]
     df_list.append(df)
-
+    
 df_headers = pd.concat(df_list)
 df_headers.reset_index(inplace=True)
 df_headers.to_csv('dataflow/00-meta/selected_prot_headers.csv')
+
+df_headers_complete = pd.concat(df_list2)
+df_headers_complete.reset_index(inplace=True)
+df_headers_complete.to_csv('dataflow/00-meta/all_prot_headers.csv')
 
 
 files = [f for f in os.listdir('dataflow/01-prot/selected/') if f.endswith(".fa")]
@@ -93,6 +100,6 @@ for hmm in hmms:
     for file in files:
         out_file = file.split('.fa')[0] + ':' + hmm.split('.hm')[0] + '.txt'
         command2 = 'hmmscan --tblout dataflow/03-hmmout/ref/' + out_file + ' --cpu 60 -E 1e-3 dataflow/01-hmm/' + hmm + ' dataflow/01-prot/' + file
-        os.system(command2)
+        #os.system(command2)
 
 os.system('Rscript compile_lactate_annotations.R')
