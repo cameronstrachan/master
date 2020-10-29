@@ -52,7 +52,6 @@ for file in hitfiles:
     orfs = list(set(df_file.iloc[:,0].tolist()))
 
     category_file = file.split(':')[1].split('.txt')[0]
-    category = file.split(':')[1].split('.txt')[0].split('lactate_')[1]
     subset_file = genome_file.split('.fa')[0] + ':' + category_file + '.fa'
 
     file_obj = sc.Fasta(genome_file, 'dataflow/01-prot/')
@@ -66,8 +65,6 @@ for file in hitfiles:
     df = pd.DataFrame.from_dict(headers, orient="index")
     df = df.rename_axis("gene_id").reset_index()
     df['file'] = genome_file
-    df['category'] = category
-
 
     df = df[df["gene_id"].isin(orfs)]
     df_list.append(df)
@@ -86,16 +83,6 @@ for hmm in hmms:
     for file in files:
         out_file = file.split('.fa')[0] + ':' + hmm.split('.hm')[0] + '.txt'
         command2 = 'hmmscan --tblout dataflow/03-hmmout/' + out_file + ' --cpu 60 -E 1e-3 dataflow/01-hmm/' + hmm + ' dataflow/01-prot/selected/' + file
-        #os.system(command2)
-
-files = ['characterized_lactate_permease.fa', 'characterized_lactate_production.fa', 'characterized_lactate_utilization.fa']
-
-for hmm in hmms:
-    command1 = 'hmmpress dataflow/01-hmm/' + hmm
-    os.system(command1)
-    for file in files:
-        out_file = file.split('.fa')[0] + ':' + hmm.split('.hm')[0] + '.txt'
-        command2 = 'hmmscan --tblout dataflow/03-hmmout/' + out_file + ' --cpu 60 -E 1e-3 dataflow/01-hmm/' + hmm + ' dataflow/01-prot/' + file
         os.system(command2)
 
 os.system('Rscript compile_lactate_annotations.R')
