@@ -66,8 +66,8 @@ for file in hitfiles:
     df = pd.DataFrame.from_dict(headers, orient="index")
     df = df.rename_axis("gene_id").reset_index()
     df['file'] = genome_file
-
-	df_list2.append(df)
+    
+    df_list2.append(df)
 
     df = df[df["gene_id"].isin(orfs)]
     df_list.append(df)
