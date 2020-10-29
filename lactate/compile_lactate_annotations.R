@@ -46,7 +46,7 @@ compiled_headers$genome <- gsub(".fa", "", compiled_headers$file)
 compiled_headers <- compiled_headers %>%
   select(-X, -index) %>%
   separate(X0, into = c("rm", "start", "stop", "direction"), sep = " # ") %>%
-  select(-rm, -category, -file) %>%
+  select(-rm, -file) %>%
   distinct()
 
 # compile everything and save
@@ -56,4 +56,17 @@ compiled <- full_join(compiled_headers, compiled_blast_hits) %>%
   distinct()
 
 write.csv(compiled, 'dataflow/04-analysis-tables/compiled_lactate_annotations.csv', row.names = FALSE)
+
+# compile hmm results
+files <- list.files("dataflow/03-hmmout/", pattern = ".txt")
+
+df_list <-lapply(files,function(file){
+  x <- try(read.delim(paste("dataflow/03-hmmout/", file, sep = ""), header = FALSE, comment.char = "#"))
+  if(inherits(x, "try-error"))
+    return(NULL)
+  else
+    x$file <- file
+  return(x)
+})
+
 
