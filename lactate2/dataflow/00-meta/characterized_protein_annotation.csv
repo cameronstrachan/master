@@ -1,0 +1,24 @@
+﻿characterized_protein,func,gene,isomer
+sp|P33231.1|LLDP_ECOLI,transport,lctP,L-Lactate
+sp|P71067.2|LUTP_BACSU,transport,lutP,L-Lactate
+sp|O33654.1|LCTP_STRIN,transport,lctP,L-Lactate
+sp|Q46839.1|GLCA_ECOLI,transport,glcA,L-Lactate
+lcl|CP009709.1_prot_AJH79743.1_2789,transport,lutP,L-Lactate
+lcl|NC_000907.1_prot_WP_165442163.1_1206,transport,lctP,L-Lactate
+ENA|EEZ46130|EEZ46130.1,transport,lctP,L-Lactate
+sp|P55910|LCTP_BACSU,transport,lctP,L-Lactate
+NP_391283.1,utilization,lutC,L-Lactate
+NP_391284.1,utilization,lutB,L-Lactate
+NP_391285.1,utilization,lutA,L-Lactate
+sp|P33232|LLDD_ECOLI,utilization,lldD,L-Lactate
+sp|P46454|LLDD_HAEIN,utilization,lldD,L-Lactate
+sp|P56512|LDH1_LACPL,production,ldh,L-Lactate
+sp|P00343|LDH_LACCA,production,ldh,L-Lactate
+sp|P26297|LDHD_LACDA,production,ldhA,D-Lactate
+sp|E8ME30|LDH2_BIFL2,production,ldh2,L-Lactate
+sp|P06149|DLD_ECOLI,utilization,dld,D-Lactate
+WP_111857643.1,utilization,lctO,L-Lactate
+sp|O33655.1|LA2M_STRIN,utilization,lctO,L-Lactate
+sp|P0AEP9|GLCD_ECOLI,utilization,glcD,D-Lactate
+sp|F9USS9|LARA_LACPL,epimerization,larA,L- and D-Lactate
+lcl|NC_006677.1_prot_WP_011252806.1_1227,utilization,dld,D-Lactate
