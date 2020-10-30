@@ -58,15 +58,19 @@ compiled <- full_join(compiled_headers, compiled_blast_hits) %>%
 write.csv(compiled, 'dataflow/04-analysis-tables/compiled_lactate_annotations.csv', row.names = FALSE)
 
 # compile hmm results
-files <- list.files("dataflow/03-hmmout/", pattern = ".txt")
+files <- list.files("dataflow/03-hmmout/ref/", pattern = ".txt")
 
 df_list <-lapply(files,function(file){
-  x <- try(read.delim(paste("dataflow/03-hmmout/", file, sep = ""), header = FALSE, comment.char = "#"))
+  x <- try(read.delim(paste("dataflow/03-hmmout/ref/", file, sep = ""), header = FALSE, comment.char = "#"))
   if(inherits(x, "try-error"))
     return(NULL)
   else
-    x$file <- file
   return(x)
 })
 
+compiled_hmm_characterized <- bind_rows(df_list) %>%
+  separate(V1, into = c("hmm_domain", "hmm_pfam", "gene_id", "rm0", "hmm_evalue"), sep = "\\s+") %>%
+  select(-rm0)
+
+write.csv(compiled_hmm_characterized, 'dataflow/04-analysis-tables/characterized_domains.csv', row.names = FALSE)
 
