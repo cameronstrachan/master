@@ -1,18 +1,28 @@
 library(tidyverse)
 
+
+# now i have made it so the lactate utilization proteins need to have the exact same domain structure. 
+# but the lactate dehydrogenases are a bit more complicated, as there are several hits of ldhs that also hit
+# the D domain, which wasn't the case with the characterized proteins. therefore, for the heat map
+# i will start from the compiled dataframe, which has not yet joined based on the same domain content. done.
+
+
+# another thing i should do, is show all gene diagrams with a lactate permase, even if there are no
+# annotated lactate utilization genes in the area. 
+
 # user defined
 distance_to_permease = 10000
 file_extension = '.fa'
 
 # input data from annotate_lactate_metabolism.py (runs compile_lactate_annotations.R)
 # compiled blast and hmmer results
-compiled <- read.csv("~/master/lactate/dataflow/04-analysis-tables/compiled_lactate_annotations.csv")
+compiled <- read.csv("dataflow/04-analysis-tables/compiled_lactate_annotations.csv")
 compiled$characterized_protein <- as.character(compiled$characterized_protein)
 # meta data for characterized protein DB
-meta <- read.csv("~/master/lactate/dataflow/00-meta/characterized_protein_annotation.csv")
+meta <- read.csv("dataflow/00-meta/characterized_protein_annotation.csv")
 meta$characterized_protein <- as.character(meta$characterized_protein)
 # hmmer results for characterized protein DB
-characterized_domains <- read.csv("~/master/lactate/dataflow/04-analysis-tables/characterized_domains.csv")
+characterized_domains <- read.csv("dataflow/04-analysis-tables/characterized_domains.csv")
 colnames(characterized_domains)[3] <- "characterized_protein"
 
 # combine meta data and hmmer results for characterized protein DB
@@ -22,19 +32,27 @@ meta_domains <- inner_join(meta, characterized_domains) %>%
   # count number of hmm domains found for each characterized protein
   group_by(characterized_protein) %>%
   mutate(n_domains_characterized = length(unique(hmm_domain))) %>%
+  mutate(domain_set = as.character(list(sort(unique(as.character(hmm_domain)))))) %>%
   ungroup()
+
 
 # inner join all dataframes from above
 # as this joins on the characterized protein id and the hmm domains, 
 # proteins that have other domains not in the characterized proteins are excluded 
+
+# this is not removing the ldh hits that also hit the D domain
+
 compiled_annotations <- inner_join(compiled, meta_domains) %>%
   
   # ensure that the proteins have the same number of domains as the characterized proteins
   group_by(gene_id) %>%
   mutate(n_domains = length(unique(hmm_domain))) %>%
+  mutate(domain_set = as.character(list(sort(unique(as.character(hmm_domain)))))) %>%
   ungroup() %>%
   
-  filter(n_domains == n_domains_characterized) 
+  filter(n_domains == n_domains_characterized) %>%
+  
+  select(-domain_set)
   
   
 # convert gene names, gene ids and genomes to character 
@@ -86,15 +104,11 @@ best_hit_distance_to_permease <- compiled_annotations %>%
   
   # remove permeases 
   filter(hmm_domain != "Lactate_perm") %>% 
-  
-  # select the characterized gene name with the highest bit score and only keep that single version
-  # this should exlude hits to duplicated proteins and only look at the best hit (with all domains)
+
+  # calculate the number of gene names hit
   group_by(genome, gene) %>%
   mutate(n_gene = length(unique(gene_id))) %>%
-  mutate(max_bitscore_gene = max(bitscore)) %>%
   ungroup() %>%
-  
-  filter(bitscore == max_bitscore_gene) %>%
   
   # if a single protein hits two genes, only keep the best hit
   # since this is the same protein, it just select what gene gets assigned to it
@@ -147,9 +161,8 @@ plot_data <- best_hit_distance_to_permease %>%
   select(genome, genome_permease_num, contig_id, gene_id, gene, func, isomer, n_permease, permease_id, permease, distance_abs) %>%
   distinct() %>%
   
-  # combine function and isomer into a annotation label for plotting
-  unite(annotation, c("func", "isomer"), sep = " - ") %>%
-  
+  # relabel annotatin colum
+  mutate(annotation = func) %>%
   # select only genes within 10kB of a permease
   filter(distance_abs < distance_to_permease) %>%
   
@@ -160,7 +173,7 @@ plot_data <- best_hit_distance_to_permease %>%
   
 
 # write plot data for the selected genes
-write.csv(plot_data, "~/master/lactate/dataflow/04-analysis-tables/selected_genes.csv")
+write.csv(plot_data, "dataflow/04-analysis-tables/selected_genes.csv")
 
 # extract the surrounding regions of the selected genes from a complete headers file
 # this is to draw gene diagrams
@@ -171,7 +184,7 @@ genomes <- unique(plot_data$genome)
 permeases <- unique(plot_data$permease_id)
 
 # input headers file
-prot_headers <- read_csv("~/master/lactate/dataflow/00-meta/all_prot_headers.csv")
+prot_headers <- read_csv("dataflow/00-meta/all_prot_headers.csv")
 
 # remove file extension to get genome name
 prot_headers$genome <- gsub(file_extension, "", prot_headers$file)
@@ -204,32 +217,67 @@ permease_names <- plot_data %>%
   rename(gene = permease)
 
 # bind the dataframes above together
-names <- bind_rows(gene_names, permease_names) %>%
+names <- bind_rows(gene_names, permease_names) 
+
+names$annotation <- as.character(names$annotation)
+
+names <- names %>%
   mutate(annotation = if_else(!(is.na(annotation)), annotation, "permease"))
 
 prot_headers$start <- as.numeric(prot_headers$start)
 prot_headers$stop <- as.numeric(prot_headers$stop)
 
-
-
 permease_num_sub <- permease_num %>%
   filter(permease_id %in% permeases)
 
 prot_headers_subset <- inner_join(prot_headers, permease_num_sub) %>%
-  mutate(region_start = if_else(permease_centroid - distance_to_permease > 0, permease_centroid - 5000 , 0)) %>%
+  mutate(region_start = if_else(permease_centroid - distance_to_permease > 0, permease_centroid - distance_to_permease , 0)) %>%
   mutate(region_stop = permease_centroid + distance_to_permease) %>%
   filter(start > region_start) %>%
   filter(stop < region_stop) %>%
   left_join(names) %>%
   mutate(annotation = if_else(!(is.na(annotation)), annotation, "other")) %>%
-  mutate(gene = if_else(!(is.na(gene)), gene, "other")) #%>%
-  #select(gene_id, start, stop, direction, gene) %>%
-  #inner_join(colour_map) %>%
-  #select(gene_id, start, stop, direction, colour, gene)
+  mutate(gene = if_else(!(is.na(gene)), gene, "other")) 
 
-write.csv(prot_headers_subset, "~/master/lactate/dataflow/04-analysis-tables/gene_diagrams.csv")
+write.csv(prot_headers_subset, "dataflow/04-analysis-tables/gene_diagrams.csv")
+
+###### 
 
 
-#write.table(prot_headers_subset, "~/master/lactate/dataflow/04-analysis-tables/gene_diagrams.txt", sep = "\t", col.names = FALSE, row.names = FALSE)
+# add heatmap for other genes in the genome a heatmap without domain retrictions!
+annotations_throughout_genome <- inner_join(meta, compiled) %>% 
+  
+  extract(gene_id, c("contig_id","gene_num"), "(.*)_([^_]+)$", remove = FALSE) %>%
+
+  
+  select(genome, contig_id, gene_id, gene, blast_pident, blast_per_aln, bitscore, hmm_domain, hmm_evalue) %>%
+  
+  filter(hmm_domain != "Lactate_perm") %>% 
+  
+  group_by(genome, gene_id) %>%
+  mutate(max_bitscore_gene = max(bitscore)) %>%
+  ungroup() %>%
+  
+  filter(bitscore == max_bitscore_gene) %>%
+  
+  select(genome, gene_id, gene, blast_per_aln, hmm_domain) %>%
+  
+  distinct() %>% 
+  
+  group_by(genome, gene_id) %>%
+  
+  mutate(max_blast_per_aln = max(blast_per_aln)) %>%
+  
+  ungroup() %>%
+  
+  filter(blast_per_aln == max_blast_per_aln) %>%
+  
+  select(-max_blast_per_aln) %>%
+  
+  filter(genome %in% genomes)
+
+
+write.csv(annotations_throughout_genome, "dataflow/04-analysis-tables/heatmap_aln_len.csv")
+
 
 
