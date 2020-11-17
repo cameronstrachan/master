@@ -92,7 +92,7 @@ permease <- compiled_annotations %>%
   mutate(permease_centroid = round((((stop - start) / 2)  + start), 0)) %>%
   
   # remove the columns for gene location
-  select(-start, -stop, -direction, -gene_num, -func, -isomer) %>%
+  select(-start, -stop, -direction, -gene_num, -func) %>%
   
   # rename the gene name and id to be permase specific, to allow merging with df with the other proteins (based on genome and contig)
   rename(permease_id = gene_id) %>%
@@ -104,11 +104,15 @@ best_hit_distance_to_permease <- compiled_annotations %>%
   
   # remove permeases 
   filter(hmm_domain != "Lactate_perm") %>% 
-
-  # calculate the number of gene names hit
+  
+  # select the characterized gene name with the highest bit score and only keep that single version
+  # this should exlude hits to duplicated proteins and only look at the best hit (with all domains)
   group_by(genome, gene) %>%
   mutate(n_gene = length(unique(gene_id))) %>%
+  #mutate(max_bitscore_gene = max(bitscore)) %>%
   ungroup() %>%
+  
+  #filter(bitscore == max_bitscore_gene) %>%
   
   # if a single protein hits two genes, only keep the best hit
   # since this is the same protein, it just select what gene gets assigned to it
@@ -158,10 +162,11 @@ plot_data <- best_hit_distance_to_permease %>%
   # join with the new label with numbered permaease
   inner_join(permease_num) %>%
   
-  select(genome, genome_permease_num, contig_id, gene_id, gene, func, isomer, n_permease, permease_id, permease, distance_abs) %>%
+  select(genome, genome_permease_num, contig_id, gene_id, gene, func, n_permease, permease_id, permease, distance_abs) %>%
   distinct() %>%
   
-  # relabel annotatin colum
+  # combine function and isomer into a annotation label for plotting
+  #unite(annotation, c("func", "isomer"), sep = " - ") %>%
   mutate(annotation = func) %>%
   # select only genes within 10kB of a permease
   filter(distance_abs < distance_to_permease) %>%
